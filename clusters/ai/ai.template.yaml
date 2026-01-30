@@ -1,0 +1,29 @@
+kind: Cluster
+name: ai
+kubernetes:
+  version: v1.35.0
+talos:
+  version: v1.12.2
+patches:
+  - file: patches/cluster/kubelet-longhorn.yaml
+---
+kind: ControlPlane
+machines:
+  - 4c5615cc-1dd2-11b2-8000-4cbb47001716
+patches:
+  - file: patches/controlplane/cp-scheduling.yaml
+---
+kind: Workers
+---
+kind: Machine
+systemExtensions:
+  - siderolabs/iscsi-tools
+  - siderolabs/nvidia-container-toolkit-lts
+  - siderolabs/nvidia-open-gpu-kernel-modules-lts
+  - siderolabs/util-linux-tools
+name: 4c5615cc-1dd2-11b2-8000-4cbb47001716
+patches:
+  - file: patches/spark/hostname.yaml
+  - file: patches/spark/nvidia-modules.yaml
+  - file: patches/spark/volumeconfig.yaml
+  - file: patches/spark/uservolumeconfig.yaml

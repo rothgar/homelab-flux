@@ -1,0 +1,10 @@
+---
+apiVersion: v1alpha1
+kind: UserVolumeConfig
+name: local-data
+volumeType: partition
+provisioning:
+  diskSelector:
+    match: disk.transport == "nvme"
+  maxSize: 2TiB
+  minSize: 1TiB
