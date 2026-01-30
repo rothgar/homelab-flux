@@ -23,8 +23,9 @@ ai/
 This cluster is configured with the following namespaces:
 - **flux-system**: Flux controllers and sync resources
 - **monitoring**: For monitoring tools (Prometheus, Grafana, etc.)
-- **kube-system**: Kubernetes system components
 - **longhorn-system**: Longhorn distributed block storage
+
+Note: The `kube-system` namespace is a built-in Kubernetes namespace and doesn't need to be explicitly created.
 
 ## Usage
 

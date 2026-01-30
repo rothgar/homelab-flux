@@ -17,7 +17,7 @@ clusters/
 
 ### AI Cluster
 - **Path**: `clusters/ai`
-- **Namespaces**: monitoring, kube-system, longhorn-system
+- **Namespaces**: monitoring, longhorn-system
 
 See [clusters/ai/README.md](clusters/ai/README.md) for more details.
 
