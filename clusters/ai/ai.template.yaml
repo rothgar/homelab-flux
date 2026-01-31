@@ -25,5 +25,6 @@ name: 4c5615cc-1dd2-11b2-8000-4cbb47001716
 patches:
   - file: patches/spark/hostname.yaml
   - file: patches/spark/nvidia-modules.yaml
+  - file: patches/spark/gpu-labels.yaml
   - file: patches/spark/volumeconfig.yaml
   - file: patches/spark/uservolumeconfig.yaml

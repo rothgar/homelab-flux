@@ -66,3 +66,15 @@ patches:
               - name: extra-data
                 hostPath:
                   path: /var/mnt/longhorn
+
+  # This patches the Service (Frontend UI) to use LoadBalancer
+  - target:
+      kind: Service
+      name: longhorn-frontend
+    patch: |-
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: longhorn-frontend
+      spec:
+        type: LoadBalancer

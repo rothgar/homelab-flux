@@ -16,6 +16,8 @@ spec:
   values:
     config:
       pluginsDir: /headlamp/plugins
+    service:
+      type: LoadBalancer
     initContainers:
       - name: flux-plugin
         image: ghcr.io/headlamp-k8s/headlamp-plugin-flux:latest

@@ -6,3 +6,4 @@ resources:
   - longhorn-system
   - headlamp-system
   - metallb-system
+  - nvidia-system
