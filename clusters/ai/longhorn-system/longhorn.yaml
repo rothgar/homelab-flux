@@ -58,7 +58,7 @@ metadata:
     app.kubernetes.io/version: v1.9.0
 data:
   default-resource.yaml: |-
-    default-data-path: /var/mnt/local-data
+    default-data-path: /var/mnt/u-local-data
     kubelet-root-dir: /var/lib/kubelet
 ---
 # Source: longhorn/templates/default-setting.yaml
