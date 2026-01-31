@@ -414,6 +414,8 @@ spec:
     - lhbi
     singular: backingimage
   scope: Namespaced
+  conversion:
+    strategy: None
   versions:
   - additionalPrinterColumns:
     - description: The system generated UUID
