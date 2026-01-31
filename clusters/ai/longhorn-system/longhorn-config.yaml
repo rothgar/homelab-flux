@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: longhorn-default-resource
+  namespace: longhorn-system
+data:
+  default-resource.yaml: |-
+    default-data-path: /var/mnt/u-local-data
+    kubelet-root-dir: /var/lib/kubelet
