@@ -2,6 +2,48 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - longhorn-install.yaml
+
+patchesStrategicMerge:
+  - |-
+    # This patches the existing manager
+    apiVersion: apps/v1
+    kind: DaemonSet
+    metadata:
+      name: longhorn-manager
+      namespace: longhorn-system
+    spec:
+      template:
+        spec:
+          containers:
+            - name: longhorn-manager
+              volumeMounts:
+                - name: extra-data
+                  mountPath: /var/mnt/u-local-data
+                  mountPropagation: Bidirectional
+          volumes:
+            - name: extra-data
+              hostPath:
+                path: /var/mnt/u-local-data
+  - |-
+    # This patches the existing UI
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: longhorn-ui
+      namespace: longhorn-system
+    spec:
+      template:
+        spec:
+          containers:
+            - name: longhorn-ui
+              volumeMounts:
+                - name: extra-data
+                  mountPath: /var/mnt/u-local-data
+          volumes:
+            - name: extra-data
+              hostPath:
+                path: /var/mnt/u-local-data
+
 patches:
   - path: longhorn-config.yaml
   - target:
