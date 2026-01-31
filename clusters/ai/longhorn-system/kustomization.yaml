@@ -3,4 +3,4 @@ kind: Kustomization
 resources:
   - longhorn-install.yaml
 patches:
-  - path longhorn-config.yaml
+  - path: longhorn-config.yaml
