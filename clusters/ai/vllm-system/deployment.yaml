@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vllm
+  namespace: vllm-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vllm
+  template:
+    metadata:
+      labels:
+        app: vllm
+    spec:
+      runtimeClassName: nvidia
+      containers:
+      - name: vllm
+        image: vllm/vllm-openai:latest
+        ports:
+        - containerPort: 8000
+          name: http
+          protocol: TCP
+        env:
+        - name: HUGGING_FACE_HUB_TOKEN
+          value: ""  # Add your HF token here if needed for private models
+        - name: HF_HOME
+          value: /models/huggingface
+        - name: TRANSFORMERS_CACHE
+          value: /models/huggingface
+        args:
+        - --model
+        - facebook/opt-125m  # Small model for testing, change to your preferred model
+        - --download-dir
+        - /models
+        - --host
+        - "0.0.0.0"
+        - --port
+        - "8000"
+        - --gpu-memory-utilization
+        - "0.95"
+        - --max-model-len
+        - "4096"
+        resources:
+          requests:
+            nvidia.com/gpu: 1
+            memory: 32Gi
+            cpu: 4
+          limits:
+            nvidia.com/gpu: 1
+            memory: 64Gi
+            cpu: 8
+        volumeMounts:
+        - name: cache
+          mountPath: /root/.cache
+        - name: models
+          mountPath: /models
+        - name: dshm
+          mountPath: /dev/shm
+      volumes:
+      - name: cache
+        persistentVolumeClaim:
+          claimName: vllm-cache
+      - name: models
+        persistentVolumeClaim:
+          claimName: vllm-models
+      - name: dshm
+        emptyDir:
+          medium: Memory
+          sizeLimit: 16Gi
+      nodeSelector:
+        nvidia.com/gpu: "true"
