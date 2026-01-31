@@ -3,9 +3,10 @@ kind: Kustomization
 
 resources:
   - longhorn-install.yaml
-  - longhorn-config.yaml # Ensure this ONLY contains the ConfigMap now
 
 patches:
+  - path: longhorn-config.yaml
+
   # This targets the Namespace and adds the label safely
   - target:
       kind: Namespace
