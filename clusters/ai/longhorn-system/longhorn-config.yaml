@@ -7,3 +7,40 @@ data:
   default-resource.yaml: |-
     default-data-path: /var/mnt/u-local-data
     kubelet-root-dir: /var/lib/kubelet
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: longhorn-manager
+  namespace: longhorn-system
+spec:
+  template:
+    spec:
+      containers:
+        - name: longhorn-manager
+          volumeMounts:
+            - name: extra-data
+              mountPath: /var/mnt/u-local-data
+              mountPropagation: Bidirectional
+      volumes:
+        - name: extra-data
+          hostPath:
+            path: /var/mnt/u-local-data
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: longhorn-ui
+  namespace: longhorn-system
+spec:
+  template:
+    spec:
+      containers:
+        - name: longhorn-ui
+          volumeMounts:
+            - name: extra-data
+              mountPath: /var/mnt/u-local-data
+      volumes:
+        - name: extra-data
+          hostPath:
+            path: /var/mnt/u-local-data
