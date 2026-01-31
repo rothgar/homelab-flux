@@ -1,10 +1,10 @@
 machine:
   kubelet:
     extraMounts:
-      - destination: /var/mnt/u-local-data
+      - destination: /var/mnt/u-longhorn
         options:
           - bind
           - rshared
           - rw
-        source: /var/mnt/u-local-data
+        source: /var/mnt/u-longhorn
         type: bind

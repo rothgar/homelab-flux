@@ -1,7 +1,7 @@
 ---
 apiVersion: v1alpha1
 kind: UserVolumeConfig
-name: local-data
+name: longhorn
 volumeType: partition
 provisioning:
   diskSelector:
