@@ -5,3 +5,4 @@ resources:
   - namespaces
   - longhorn-system
   - headlamp-system
+  - metallb-system
