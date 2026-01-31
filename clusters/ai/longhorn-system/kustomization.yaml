@@ -4,3 +4,10 @@ resources:
   - longhorn-install.yaml
 patches:
   - path: longhorn-config.yaml
+  - target:
+      kind: Namespace
+      name: longhorn-system
+    patch: |-
+      - op: add
+        path: /metadata/labels/pod-security.kubernetes.io=enforce
+        value: privileged
