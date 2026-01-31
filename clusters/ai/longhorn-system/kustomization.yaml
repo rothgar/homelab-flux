@@ -1,51 +1,12 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+
 resources:
   - longhorn-install.yaml
-
-patchesStrategicMerge:
-  - |-
-    # This patches the existing manager
-    apiVersion: apps/v1
-    kind: DaemonSet
-    metadata:
-      name: longhorn-manager
-      namespace: longhorn-system
-    spec:
-      template:
-        spec:
-          containers:
-            - name: longhorn-manager
-              volumeMounts:
-                - name: extra-data
-                  mountPath: /var/mnt/u-local-data
-                  mountPropagation: Bidirectional
-          volumes:
-            - name: extra-data
-              hostPath:
-                path: /var/mnt/u-local-data
-  - |-
-    # This patches the existing UI
-    apiVersion: apps/v1
-    kind: Deployment
-    metadata:
-      name: longhorn-ui
-      namespace: longhorn-system
-    spec:
-      template:
-        spec:
-          containers:
-            - name: longhorn-ui
-              volumeMounts:
-                - name: extra-data
-                  mountPath: /var/mnt/u-local-data
-          volumes:
-            - name: extra-data
-              hostPath:
-                path: /var/mnt/u-local-data
+  - longhorn-config.yaml # Ensure this ONLY contains the ConfigMap now
 
 patches:
-  - path: longhorn-config.yaml
+  # This targets the Namespace and adds the label safely
   - target:
       kind: Namespace
       name: longhorn-system
@@ -56,3 +17,48 @@ patches:
         name: longhorn-system
         labels:
           pod-security.kubernetes.io/enforce: privileged
+
+  # This patches the DaemonSet (Manager)
+  - target:
+      kind: DaemonSet
+      name: longhorn-manager
+    patch: |-
+      apiVersion: apps/v1
+      kind: DaemonSet
+      metadata:
+        name: longhorn-manager
+      spec:
+        template:
+          spec:
+            containers:
+              - name: longhorn-manager
+                volumeMounts:
+                  - name: extra-data
+                    mountPath: /var/mnt/u-local-data
+                    mountPropagation: Bidirectional
+            volumes:
+              - name: extra-data
+                hostPath:
+                  path: /var/mnt/u-local-data
+
+  # This patches the Deployment (UI)
+  - target:
+      kind: Deployment
+      name: longhorn-ui
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: longhorn-ui
+      spec:
+        template:
+          spec:
+            containers:
+              - name: longhorn-ui
+                volumeMounts:
+                  - name: extra-data
+                    mountPath: /var/mnt/u-local-data
+            volumes:
+              - name: extra-data
+                hostPath:
+                  path: /var/mnt/u-local-data
