@@ -35,12 +35,12 @@ patches:
               - name: longhorn-manager
                 volumeMounts:
                   - name: extra-data
-                    mountPath: /var/mnt/u-longhorn
+                    mountPath: /var/mnt/longhorn
                     mountPropagation: Bidirectional
             volumes:
               - name: extra-data
                 hostPath:
-                  path: /var/mnt/u-longhorn
+                  path: /var/mnt/longhorn
 
   # This patches the Deployment (UI)
   - target:
@@ -58,8 +58,8 @@ patches:
               - name: longhorn-ui
                 volumeMounts:
                   - name: extra-data
-                    mountPath: /var/mnt/u-longhorn
+                    mountPath: /var/mnt/longhorn
             volumes:
               - name: extra-data
                 hostPath:
-                  path: /var/mnt/u-longhorn
+                  path: /var/mnt/longhorn
