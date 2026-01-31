@@ -6,6 +6,9 @@ resources:
 
 patches:
   - path: longhorn-config.yaml
+    target:
+      kind: ConfigMap
+      name: longhorn-default-setting
 
   # This targets the Namespace and adds the label safely
   - target:
