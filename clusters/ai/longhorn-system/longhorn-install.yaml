@@ -416,6 +416,7 @@ spec:
   scope: Namespaced
   conversion:
     strategy: None
+    webhookClientConfig: null
   versions:
   - additionalPrinterColumns:
     - description: The system generated UUID
