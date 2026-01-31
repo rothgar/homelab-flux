@@ -6,3 +6,6 @@ metadata:
 data:
   default-setting.yaml: |-
     default-data-path: /var/mnt/longhorn
+    storage-over-provisioning-percentage: 200
+    storage-minimal-available-percentage: 10
+    guaranteed-instance-manager-cpu: 10
