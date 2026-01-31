@@ -8,6 +8,9 @@ patches:
       kind: Namespace
       name: longhorn-system
     patch: |-
-      - op: add
-        path: /metadata/labels/pod-security.kubernetes.io=enforce
-        value: privileged
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: longhorn-system
+        labels:
+          pod-security.kubernetes.io/enforce: privileged
