@@ -7,4 +7,3 @@ resources:
   - headlamp-system
   - metallb-system
   - nvidia-system
-  - vllm-system
