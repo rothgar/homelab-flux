@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: longhorn-default-setting
+  namespace: longhorn-system
+data:
+  default-setting.yaml: |-
+    default-data-path: /var/mnt/longhorn
+    storage-over-provisioning-percentage: 200
+    storage-minimal-available-percentage: 10
+    guaranteed-instance-manager-cpu: 10
