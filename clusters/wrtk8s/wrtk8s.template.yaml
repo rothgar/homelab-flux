@@ -1,0 +1,47 @@
+kind: Cluster
+name: wrtk8s
+kubernetes:
+  version: v1.35.1
+talos:
+  version: v1.12.4
+features:
+  enableWorkloadProxy: true
+---
+kind: ControlPlane
+machines:
+  - 6ad2ae00-11cb-11ef-83fc-64bc3f0e2e00
+patches:
+  - idOverride: 400-wrtk8s-control-planes-untaint
+    inline:
+      cluster:
+        allowSchedulingOnControlPlanes: true
+---
+kind: Workers
+machines:
+  - 0564bde4-47b8-c3bd-79e6-63e7a2badf27
+---
+kind: Machine
+systemExtensions:
+  - siderolabs/amd-ucode
+  - siderolabs/intel-ice-firmware
+  - siderolabs/intel-ucode
+  - siderolabs/nvidia-container-toolkit-lts
+  - siderolabs/nonfree-kmod-nvidia-lts
+name: 0564bde4-47b8-c3bd-79e6-63e7a2badf27
+patches:
+  - file: patches/z.yaml
+  - file: patches/coretemp.yaml
+  - file: patches/nvidia.yaml
+---
+kind: Machine
+systemExtensions:
+  - siderolabs/amd-ucode
+  - siderolabs/amdgpu
+  - siderolabs/iscsi-tools
+  - siderolabs/nvidia-container-toolkit-lts
+  - siderolabs/nonfree-kmod-nvidia-lts
+name: 6ad2ae00-11cb-11ef-83fc-64bc3f0e2e00
+patches:
+  - file: patches/mini.yaml
+  - file: patches/k10temp.yaml
+  - file: patches/nvidia.yaml

@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kvmm-config
+  namespace: default
+data:
+  config.toml: |
+    [server]
+    port = 8080
+
+    [[devices]]
+    host = "10.1.1.10"
+    alias = "spark"
+
+    [[devices]]
+    host = "10.1.1.27"
+    alias = "z"

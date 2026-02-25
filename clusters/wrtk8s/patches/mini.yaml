@@ -1,0 +1,22 @@
+apiVersion: v1alpha1
+auto: "off"
+hostname: mini
+kind: HostnameConfig
+---
+apiVersion: v1alpha1
+kind: VolumeConfig
+name: EPHEMERAL
+provisioning:
+  diskSelector:
+    match: disk.transport == "nvme"
+  maxSize: 100GiB
+  grow: false
+---
+apiVersion: v1alpha1
+kind: UserVolumeConfig
+name: local-path
+provisioning:
+  diskSelector:
+    match: disk.transport == "nvme"
+  minSize: 10GiB
+  grow: true

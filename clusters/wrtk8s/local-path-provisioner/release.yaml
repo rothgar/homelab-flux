@@ -17,3 +17,7 @@ spec:
       create: true
       defaultClass: true
       name: local-path
+    nodePathMap:
+      - node: DEFAULT_PATH_FOR_NON_LISTED_NODES
+        paths:
+          - /var/mnt/local-path

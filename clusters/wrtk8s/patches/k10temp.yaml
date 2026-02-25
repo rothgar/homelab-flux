@@ -1,0 +1,4 @@
+machine:
+  kernel:
+    modules:
+      - name: k10temp

@@ -50,6 +50,28 @@ spec:
       adminPassword: admin
       defaultDashboardsEnabled: true
       defaultDashboardsTimezone: utc
+      dashboardProviders:
+        dashboardproviders.yaml:
+          apiVersion: 1
+          providers:
+            - name: default
+              orgId: 1
+              folder: ""
+              type: file
+              disableDeletion: false
+              editable: true
+              options:
+                path: /var/lib/grafana/dashboards/default
+      dashboards:
+        default:
+          raspberry-pi:
+            gnetId: 10578
+            revision: 1
+            datasource: Prometheus
+          node-exporter-full:
+            gnetId: 1860
+            revision: 37
+            datasource: Prometheus
 
     # AlertManager - disable if not needed
     alertmanager:

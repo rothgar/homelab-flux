@@ -66,7 +66,7 @@ spec:
         namespace: metallb-system
       spec:
         addresses:
-          - "10.1.1.100-10.1.1.200"
+          - "10.1.1.150-10.1.1.200"
 
     - apiVersion: metallb.io/v1beta1
       kind: L2Advertisement
