@@ -3,7 +3,7 @@ kind: Kustomization
 resources:
   - flux-system
   - namespaces
-  - longhorn-system
+  - local-path-provisioner
   - headlamp-system
   - metallb-system
   - nvidia-system

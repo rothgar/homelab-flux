@@ -1,0 +1,9 @@
+ollama:
+  gpu:
+    enabled: true
+    type: "nvidia"
+    number: 1
+  models:
+    pull:
+      - qwen3-coder-next:q8_0
+      - llama4:16x17b

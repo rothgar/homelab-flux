@@ -5,7 +5,7 @@ kubernetes:
 talos:
   version: v1.12.2
 patches:
-  - file: patches/cluster/kubelet-longhorn.yaml
+  - file: patches/cluster/kubelet-storage.yaml
 ---
 kind: ControlPlane
 machines:
