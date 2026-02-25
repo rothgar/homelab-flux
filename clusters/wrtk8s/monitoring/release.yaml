@@ -1,0 +1,56 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kube-prometheus-stack
+  namespace: monitoring
+spec:
+  interval: 5m
+  install:
+    crds: Create
+    remediation:
+      retries: 3
+  upgrade:
+    crds: CreateReplace
+  chart:
+    spec:
+      chart: kube-prometheus-stack
+      version: ">=65.0.0"
+      sourceRef:
+        kind: HelmRepository
+        name: prometheus-community
+        namespace: monitoring
+  values:
+    # Node Exporter - enable hwmon for CPU temperatures
+    nodeExporter:
+      enabled: true
+    prometheus-node-exporter:
+      extraArgs:
+        - --collector.hwmon
+      hostRootFsMount:
+        enabled: true
+      prometheus:
+        monitor:
+          enabled: true
+
+    # Prometheus configuration
+    prometheus:
+      prometheusSpec:
+        retention: 7d
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              accessModes: ["ReadWriteOnce"]
+              resources:
+                requests:
+                  storage: 10Gi
+
+    # Grafana configuration
+    grafana:
+      enabled: true
+      adminPassword: admin
+      defaultDashboardsEnabled: true
+      defaultDashboardsTimezone: utc
+
+    # AlertManager - disable if not needed
+    alertmanager:
+      enabled: true
