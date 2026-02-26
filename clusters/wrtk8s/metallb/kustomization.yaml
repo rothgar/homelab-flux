@@ -4,4 +4,4 @@ resources:
   - namespace.yaml
   - source.yaml
   - release.yaml
-  - config.yaml
+  - config-kustomization.yaml
