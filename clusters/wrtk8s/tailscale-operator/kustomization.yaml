@@ -3,8 +3,4 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - source.yaml
-  - library-pvc.yaml
-  - postgres.yaml
   - release.yaml
-  - ingress.yaml
-  - tailscale-ingress.yaml
