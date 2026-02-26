@@ -6,3 +6,4 @@ resources:
   - monitoring
   - local-path-provisioner
   - kvmm
+  - home-assistant
