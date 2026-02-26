@@ -1,7 +1,3 @@
-# values.yaml
-persistence:
-  media:
-    enabled: true
 config: |
   mqtt:
     host: "mqtt.example.com"

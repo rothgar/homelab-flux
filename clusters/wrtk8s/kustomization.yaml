@@ -12,3 +12,4 @@ resources:
   - external-dns
   - cert-manager
   - traefik
+  - frigate
