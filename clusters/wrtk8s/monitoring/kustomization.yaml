@@ -6,3 +6,4 @@ resources:
   - release.yaml
   - ingress.yaml
   - alerting-rules.yaml
+  - tailscale-ingress.yaml

@@ -7,3 +7,4 @@ resources:
   - values-configmap.yaml
   - http-config.yaml
   - ingress.yaml
+  - tailscale-ingress.yaml
