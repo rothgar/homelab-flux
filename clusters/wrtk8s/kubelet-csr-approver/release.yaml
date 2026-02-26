@@ -15,5 +15,5 @@ spec:
   values:
     providerIpPrefixes:
       - 10.1.1.0/24
-    providerRegex: ^(mini|z)$
+    providerRegex: ".*"
     bypassDnsResolution: true
