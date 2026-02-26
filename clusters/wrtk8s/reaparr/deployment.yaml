@@ -13,11 +13,23 @@ spec:
       labels:
         app: reaparr
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: reaparr
           image: reaparr/reaparr:latest
           ports:
             - containerPort: 7000
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
           env:
             - name: TZ
               value: "America/Los_Angeles"
