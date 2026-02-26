@@ -16,7 +16,7 @@ spec:
       initContainers:
         - name: fix-permissions
           image: busybox:latest
-          command: ["sh", "-c", "chown -R 1000:1000 /Config /Downloads /Movies /TvShows"]
+          command: ["sh", "-c", "chown -R 1000:1000 /Config /Downloads"]
           securityContext:
             runAsUser: 0
           volumeMounts:
@@ -24,10 +24,6 @@ spec:
               mountPath: /Config
             - name: downloads
               mountPath: /Downloads
-            - name: movies
-              mountPath: /Movies
-            - name: tvshows
-              mountPath: /TvShows
       securityContext:
         fsGroup: 1000
       containers:
