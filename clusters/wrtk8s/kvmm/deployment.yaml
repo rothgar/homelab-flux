@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: kvmm
-          image: ghcr.io/rothgar/kvmm:0.2.3
+          image: ghcr.io/rothgar/kvmm:0.2.4
           args:
             - server
             - -config
