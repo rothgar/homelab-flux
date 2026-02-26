@@ -48,7 +48,7 @@ spec:
         - name: kube-flannel
           image: ghcr.io/flannel-io/flannel:v0.26.4
           command: ["/opt/bin/flanneld"]
-          args: ["--ip-masq", "--kube-subnet-mgr"]
+          args: ["--ip-masq", "--kube-subnet-mgr", "--kube-api-url=https://127.0.0.1:7445"]
           resources:
             requests:
               cpu: 100m
