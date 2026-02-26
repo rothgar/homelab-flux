@@ -6,7 +6,7 @@ metadata:
   labels:
     app: kvmm
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   ports:
     - port: 8080
       targetPort: http

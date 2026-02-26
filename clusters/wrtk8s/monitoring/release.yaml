@@ -50,6 +50,8 @@ spec:
       adminPassword: admin
       defaultDashboardsEnabled: true
       defaultDashboardsTimezone: utc
+      service:
+        type: LoadBalancer
       dashboardProviders:
         dashboardproviders.yaml:
           apiVersion: 1
