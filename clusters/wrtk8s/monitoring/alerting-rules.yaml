@@ -1,0 +1,46 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: temperature-alerts
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: temperature
+      rules:
+        - alert: HighCPUTemperature
+          expr: node_hwmon_temp_celsius{chip=~".*coretemp.*|.*k10temp.*"} > 80
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High CPU temperature on {{ $labels.instance }}"
+            description: "CPU temperature is {{ $value }}°C on {{ $labels.instance }}"
+
+        - alert: CriticalCPUTemperature
+          expr: node_hwmon_temp_celsius{chip=~".*coretemp.*|.*k10temp.*"} > 90
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Critical CPU temperature on {{ $labels.instance }}"
+            description: "CPU temperature is {{ $value }}°C on {{ $labels.instance }} - thermal throttling likely"
+
+        - alert: HighGPUTemperature
+          expr: DCGM_FI_DEV_GPU_TEMP > 80
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High GPU temperature on {{ $labels.instance }}"
+            description: "GPU {{ $labels.gpu }} temperature is {{ $value }}°C"
+
+        - alert: CriticalGPUTemperature
+          expr: DCGM_FI_DEV_GPU_TEMP > 90
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Critical GPU temperature on {{ $labels.instance }}"
+            description: "GPU {{ $labels.gpu }} temperature is {{ $value }}°C - thermal throttling likely"

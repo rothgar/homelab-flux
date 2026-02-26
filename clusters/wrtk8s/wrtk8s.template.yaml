@@ -15,6 +15,7 @@ patches:
     inline:
       cluster:
         allowSchedulingOnControlPlanes: true
+  - file: patches/flannel.yaml
 ---
 kind: Workers
 machines:

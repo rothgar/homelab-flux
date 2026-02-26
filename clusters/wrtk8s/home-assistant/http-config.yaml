@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: home-assistant-http-config
+  namespace: home-assistant
+data:
+  http.yaml: |
+    http:
+      use_x_forwarded_for: true
+      trusted_proxies:
+        - 10.244.0.0/16
+        - 10.96.0.0/12

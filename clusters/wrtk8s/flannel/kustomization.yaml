@@ -2,7 +2,8 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - namespace.yaml
-  - source.yaml
-  - release.yaml
-  - ingress.yaml
-  - alerting-rules.yaml
+  - rbac.yaml
+  - configmap.yaml
+  - daemonset.yaml
+  - kube-proxy.yaml
+  - coredns.yaml
