@@ -29,7 +29,12 @@ spec:
             - name: config
               mountPath: /config
               readOnly: true
+            - name: thumbnails
+              mountPath: /config/thumbnails
       volumes:
         - name: config
           configMap:
             name: kvmm-config
+        - name: thumbnails
+          emptyDir:
+            sizeLimit: 10Mi
