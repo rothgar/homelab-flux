@@ -6,5 +6,5 @@ resources:
   - library-pvc.yaml
   - postgres.yaml
   - release.yaml
-  - ingress.yaml
+  - httproute.yaml
   - tailscale-ingress.yaml

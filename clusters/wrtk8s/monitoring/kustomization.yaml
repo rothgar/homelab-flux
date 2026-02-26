@@ -4,6 +4,6 @@ resources:
   - namespace.yaml
   - source.yaml
   - release.yaml
-  - ingress.yaml
+  - httproute.yaml
   - alerting-rules.yaml
   - tailscale-ingress.yaml

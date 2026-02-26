@@ -18,6 +18,12 @@ spec:
     ingressClass:
       enabled: true
       isDefaultClass: true
+    providers:
+      kubernetesGateway:
+        enabled: true
+    gatewayClass:
+      enabled: true
+      name: traefik
     ports:
       web:
         redirectTo:

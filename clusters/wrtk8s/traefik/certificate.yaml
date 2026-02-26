@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wildcard-jgarr-net
+  namespace: traefik
+spec:
+  secretName: wildcard-jgarr-net-tls
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+    - "*.jgarr.net"
+    - "jgarr.net"

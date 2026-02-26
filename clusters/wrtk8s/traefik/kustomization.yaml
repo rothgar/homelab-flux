@@ -4,3 +4,5 @@ resources:
   - namespace.yaml
   - source.yaml
   - release.yaml
+  - certificate.yaml
+  - gateway.yaml

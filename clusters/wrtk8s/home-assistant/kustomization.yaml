@@ -6,5 +6,5 @@ resources:
   - release.yaml
   - values-configmap.yaml
   - http-config.yaml
-  - ingress.yaml
+  - httproute.yaml
   - tailscale-ingress.yaml

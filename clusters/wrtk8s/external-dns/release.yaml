@@ -25,5 +25,6 @@ spec:
     sources:
       - service
       - ingress
+      - gateway-httproute
     txtOwnerId: wrtk8s
     domainFilters: []
