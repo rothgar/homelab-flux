@@ -1,0 +1,47 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: descheduler
+  namespace: descheduler
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: descheduler
+      sourceRef:
+        kind: HelmRepository
+        name: descheduler
+        namespace: descheduler
+  values:
+    schedule: "*/15 * * * *"
+    deschedulerPolicy:
+      profiles:
+        - name: default
+          pluginConfig:
+            - name: RemoveDuplicates
+            - name: RemovePodsViolatingNodeTaints
+            - name: RemovePodsViolatingNodeAffinity
+              args:
+                nodeAffinityType:
+                  - requiredDuringSchedulingIgnoredDuringExecution
+            - name: RemovePodsViolatingInterPodAntiAffinity
+            - name: LowNodeUtilization
+              args:
+                thresholds:
+                  cpu: 20
+                  memory: 20
+                  pods: 20
+                targetThresholds:
+                  cpu: 50
+                  memory: 50
+                  pods: 50
+          plugins:
+            balance:
+              enabled:
+                - RemoveDuplicates
+                - LowNodeUtilization
+            deschedule:
+              enabled:
+                - RemovePodsViolatingNodeTaints
+                - RemovePodsViolatingNodeAffinity
+                - RemovePodsViolatingInterPodAntiAffinity
