@@ -15,5 +15,3 @@ spec:
   values:
     operatorConfig:
       hostname: wrtk8s-operator
-      defaultTags:
-        - tag:k8s-operator
