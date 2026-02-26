@@ -24,6 +24,8 @@ spec:
         main:
           containers:
             main:
+              image:
+                tag: v2.5.6
               env:
                 DB_URL: "postgresql://immich:immich@immich-postgres:5432/immich"
 
@@ -34,6 +36,8 @@ spec:
         main:
           containers:
             main:
+              image:
+                tag: v2.5.6
               env:
                 DB_URL: "postgresql://immich:immich@immich-postgres:5432/immich"
       persistence:
