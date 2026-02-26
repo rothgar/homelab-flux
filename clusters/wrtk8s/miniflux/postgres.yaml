@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: miniflux-postgres
+  namespace: miniflux
+spec:
+  storageClassName: local-path
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: miniflux-postgres
+  namespace: miniflux
+type: Opaque
+stringData:
+  POSTGRES_USER: miniflux
+  POSTGRES_PASSWORD: miniflux
+  POSTGRES_DB: miniflux
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: miniflux-postgres
+  namespace: miniflux
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: miniflux-postgres
+  template:
+    metadata:
+      labels:
+        app: miniflux-postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16
+          envFrom:
+            - secretRef:
+                name: miniflux-postgres
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: miniflux-postgres
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: miniflux-postgres
+  namespace: miniflux
+spec:
+  selector:
+    app: miniflux-postgres
+  ports:
+    - port: 5432
+      targetPort: 5432
