@@ -9,3 +9,9 @@ data:
       enabled: true
     service:
       type: ClusterIP
+    configuration:
+      http:
+        use_x_forwarded_for: true
+        trusted_proxies:
+          - 10.244.0.0/16
+          - 10.96.0.0/12
