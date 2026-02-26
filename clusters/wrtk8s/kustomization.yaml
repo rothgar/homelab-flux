@@ -7,3 +7,4 @@ resources:
   - local-path-provisioner
   - kvmm
   - home-assistant
+  - dcgm-exporter
