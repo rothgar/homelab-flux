@@ -5,5 +5,4 @@ metadata:
   namespace: home-assistant
 spec:
   interval: 1h0m0s
-  url: oci://ghcr.io/home-assistant/charts
-  type: oci
+  url: https://pajikos.github.io/home-assistant-helm-chart/
