@@ -1,0 +1,4 @@
+clusters/*/talos
+clusters/*/kube
+clusters/*/kube-sa
+**/.claude/
