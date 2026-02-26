@@ -36,6 +36,7 @@ patches:
   - file: patches/coretemp.yaml
   - file: patches/nvidia.yaml
   - file: patches/gpu-labels.yaml
+  - file: patches/kubelet.yaml
 ---
 kind: Machine
 systemExtensions:
@@ -50,3 +51,4 @@ patches:
   - file: patches/k10temp.yaml
   - file: patches/nvidia.yaml
   - file: patches/gpu-labels.yaml
+  - file: patches/kubelet.yaml

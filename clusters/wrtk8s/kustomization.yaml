@@ -15,3 +15,5 @@ resources:
   - traefik
   - frigate
   - headlamp
+  - metrics-server
+  - kubelet-csr-approver

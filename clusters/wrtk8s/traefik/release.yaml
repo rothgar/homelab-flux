@@ -18,3 +18,7 @@ spec:
     ingressClass:
       enabled: true
       isDefaultClass: true
+    ports:
+      web:
+        redirectTo:
+          port: websecure

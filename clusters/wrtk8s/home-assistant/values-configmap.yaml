@@ -28,5 +28,5 @@ data:
               echo "http: !include http.yaml" >> /config/configuration.yaml
             fi
         volumeMounts:
-          - name: config
+          - name: home-assistant
             mountPath: /config
