@@ -15,9 +15,25 @@ spec:
   values:
     config:
       pluginsDir: /headlamp/plugins
+    podSecurityContext:
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
     initContainers:
       - name: install-flux-plugin
         image: alpine
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+          runAsNonRoot: true
+          runAsUser: 1000
         command:
           - /bin/sh
           - -c

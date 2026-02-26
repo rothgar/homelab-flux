@@ -15,9 +15,18 @@ spec:
       labels:
         app: kvmm
     spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: kvmm
           image: ghcr.io/rothgar/kvmm:0.2.4
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
           args:
             - server
             - -config

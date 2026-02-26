@@ -13,3 +13,4 @@ resources:
   - cert-manager
   - traefik
   - frigate
+  - headlamp
