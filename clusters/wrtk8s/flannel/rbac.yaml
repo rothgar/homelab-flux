@@ -2,6 +2,9 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: flannel
+  labels:
+    k8s-app: flannel
+    tier: node
 rules:
   - apiGroups: [""]
     resources: ["pods"]
@@ -17,6 +20,9 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: flannel
+  labels:
+    k8s-app: flannel
+    tier: node
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -24,10 +30,13 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: flannel
-    namespace: kube-flannel
+    namespace: kube-system
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: flannel
-  namespace: kube-flannel
+  namespace: kube-system
+  labels:
+    k8s-app: flannel
+    tier: node

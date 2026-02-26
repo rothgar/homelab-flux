@@ -15,17 +15,13 @@ cluster:
     - name: flannel
       contents: |
         ---
-        apiVersion: v1
-        kind: Namespace
-        metadata:
-          name: kube-flannel
-          labels:
-            pod-security.kubernetes.io/enforce: privileged
-        ---
         apiVersion: rbac.authorization.k8s.io/v1
         kind: ClusterRole
         metadata:
           name: flannel
+          labels:
+            k8s-app: flannel
+            tier: node
         rules:
           - apiGroups: [""]
             resources: ["pods"]
@@ -41,6 +37,9 @@ cluster:
         kind: ClusterRoleBinding
         metadata:
           name: flannel
+          labels:
+            k8s-app: flannel
+            tier: node
         roleRef:
           apiGroup: rbac.authorization.k8s.io
           kind: ClusterRole
@@ -48,19 +47,25 @@ cluster:
         subjects:
           - kind: ServiceAccount
             name: flannel
-            namespace: kube-flannel
+            namespace: kube-system
         ---
         apiVersion: v1
         kind: ServiceAccount
         metadata:
           name: flannel
-          namespace: kube-flannel
+          namespace: kube-system
+          labels:
+            k8s-app: flannel
+            tier: node
         ---
         apiVersion: v1
         kind: ConfigMap
         metadata:
           name: kube-flannel-cfg
-          namespace: kube-flannel
+          namespace: kube-system
+          labels:
+            k8s-app: flannel
+            tier: node
         data:
           cni-conf.json: |
             {
@@ -94,16 +99,21 @@ cluster:
         apiVersion: apps/v1
         kind: DaemonSet
         metadata:
-          name: kube-flannel-ds
-          namespace: kube-flannel
+          name: kube-flannel
+          namespace: kube-system
+          labels:
+            k8s-app: flannel
+            tier: node
         spec:
           selector:
             matchLabels:
-              app: flannel
+              k8s-app: flannel
+              tier: node
           template:
             metadata:
               labels:
-                app: flannel
+                k8s-app: flannel
+                tier: node
             spec:
               affinity:
                 nodeAffinity:
@@ -141,15 +151,7 @@ cluster:
                 - name: kube-flannel
                   image: ghcr.io/flannel-io/flannel:v0.26.4
                   command: ["/opt/bin/flanneld"]
-                  args: ["--ip-masq", "--kube-subnet-mgr", "--kube-api-url=https://127.0.0.1:7445"]
-                  resources:
-                    requests:
-                      cpu: 100m
-                      memory: 50Mi
-                  securityContext:
-                    privileged: false
-                    capabilities:
-                      add: ["NET_ADMIN", "NET_RAW"]
+                  args: ["--ip-masq", "--kube-subnet-mgr"]
                   env:
                     - name: POD_NAME
                       valueFrom:
@@ -161,6 +163,18 @@ cluster:
                           fieldPath: metadata.namespace
                     - name: EVENT_QUEUE_DEPTH
                       value: "5000"
+                    - name: KUBERNETES_SERVICE_HOST
+                      value: "127.0.0.1"
+                    - name: KUBERNETES_SERVICE_PORT
+                      value: "7445"
+                  resources:
+                    requests:
+                      cpu: 100m
+                      memory: 50Mi
+                  securityContext:
+                    privileged: false
+                    capabilities:
+                      add: ["NET_ADMIN", "NET_RAW"]
                   volumeMounts:
                     - name: run
                       mountPath: /run/flannel

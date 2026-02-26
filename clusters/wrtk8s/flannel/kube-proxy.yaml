@@ -3,11 +3,17 @@ kind: ServiceAccount
 metadata:
   name: kube-proxy
   namespace: kube-system
+  labels:
+    k8s-app: kube-proxy
+    tier: node
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: kube-proxy
+  labels:
+    k8s-app: kube-proxy
+    tier: node
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -22,6 +28,9 @@ kind: ConfigMap
 metadata:
   name: kube-proxy
   namespace: kube-system
+  labels:
+    k8s-app: kube-proxy
+    tier: node
 data:
   config.conf: |
     apiVersion: kubeproxy.config.k8s.io/v1alpha1
@@ -31,39 +40,25 @@ data:
     metricsBindAddress: 0.0.0.0:10249
     conntrack:
       maxPerCore: 0
-  kubeconfig.conf: |
-    apiVersion: v1
-    kind: Config
-    clusters:
-      - cluster:
-          certificate-authority: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-          server: https://127.0.0.1:7445
-        name: default
-    contexts:
-      - context:
-          cluster: default
-          namespace: default
-          user: default
-        name: default
-    current-context: default
-    users:
-      - name: default
-        user:
-          tokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
 ---
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: kube-proxy
   namespace: kube-system
+  labels:
+    k8s-app: kube-proxy
+    tier: node
 spec:
   selector:
     matchLabels:
       k8s-app: kube-proxy
+      tier: node
   template:
     metadata:
       labels:
         k8s-app: kube-proxy
+        tier: node
     spec:
       priorityClassName: system-node-critical
       serviceAccountName: kube-proxy
@@ -85,6 +80,10 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: spec.nodeName
+            - name: KUBERNETES_SERVICE_HOST
+              value: "127.0.0.1"
+            - name: KUBERNETES_SERVICE_PORT
+              value: "7445"
           securityContext:
             privileged: true
           volumeMounts:

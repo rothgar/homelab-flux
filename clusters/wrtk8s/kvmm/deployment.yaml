@@ -16,7 +16,6 @@ spec:
         app: kvmm
     spec:
       securityContext:
-        runAsNonRoot: true
         seccompProfile:
           type: RuntimeDefault
       containers:
