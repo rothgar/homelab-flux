@@ -16,7 +16,7 @@ spec:
       initContainers:
         - name: fix-permissions
           image: busybox:latest
-          command: ["sh", "-c", "chown -R 1000:1000 /Config /Downloads"]
+          command: ["sh", "-c", "chown -R 1000:1000 /Config /Downloads && chmod -R u+rw /Config"]
           securityContext:
             runAsUser: 0
           volumeMounts:
