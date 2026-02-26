@@ -7,4 +7,3 @@ resources:
   - postgres.yaml
   - release.yaml
   - ingress.yaml
-  - tailscale-ingress.yaml

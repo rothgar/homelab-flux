@@ -20,6 +20,11 @@ spec:
 
     server:
       enabled: true
+      service:
+        main:
+          annotations:
+            tailscale.com/expose: "true"
+            tailscale.com/hostname: "immich"
       controllers:
         main:
           containers:
