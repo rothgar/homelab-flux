@@ -18,6 +18,3 @@ spec:
       additionalLabels:
         release: kube-prometheus-stack
     runtimeClassName: nvidia
-    resources:
-      limits:
-        nvidia.com/gpu: 1
