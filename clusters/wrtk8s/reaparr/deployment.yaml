@@ -13,23 +13,28 @@ spec:
       labels:
         app: reaparr
     spec:
+      initContainers:
+        - name: fix-permissions
+          image: busybox:latest
+          command: ["sh", "-c", "chown -R 1000:1000 /Config /Downloads /Movies /TvShows"]
+          securityContext:
+            runAsUser: 0
+          volumeMounts:
+            - name: config
+              mountPath: /Config
+            - name: downloads
+              mountPath: /Downloads
+            - name: movies
+              mountPath: /Movies
+            - name: tvshows
+              mountPath: /TvShows
       securityContext:
-        runAsNonRoot: true
-        runAsUser: 1000
-        runAsGroup: 1000
         fsGroup: 1000
-        seccompProfile:
-          type: RuntimeDefault
       containers:
         - name: reaparr
           image: reaparr/reaparr:latest
           ports:
             - containerPort: 7000
-          securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop:
-                - ALL
           env:
             - name: TZ
               value: "America/Los_Angeles"
