@@ -9,3 +9,6 @@ resources:
   - home-assistant
   - nvidia-system
   - dcgm-exporter
+  - external-dns
+  - cert-manager
+  - traefik

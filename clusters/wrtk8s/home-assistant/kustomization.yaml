@@ -5,3 +5,4 @@ resources:
   - source.yaml
   - release.yaml
   - values-configmap.yaml
+  - ingress.yaml

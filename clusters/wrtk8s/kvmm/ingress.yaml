@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kvmm
+  namespace: default
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    external-dns.alpha.kubernetes.io/hostname: kvmm.jgarr.net
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - kvmm.jgarr.net
+      secretName: kvmm-tls
+  rules:
+    - host: kvmm.jgarr.net
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: kvmm
+                port:
+                  number: 80
