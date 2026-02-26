@@ -31,19 +31,19 @@ spec:
 
     machine-learning:
       enabled: true
-      runtimeClassName: nvidia
       controllers:
         main:
           containers:
             main:
               image:
-                tag: v2.5.6
+                tag: v2.5.6-cuda
               env:
                 DB_URL: "postgresql://immich:immich@immich-postgres:5432/immich"
               resources:
                 limits:
                   nvidia.com/gpu: 1
           pod:
+            runtimeClassName: nvidia
             nodeSelector:
               nvidia.com/gpu: "true"
       persistence:
