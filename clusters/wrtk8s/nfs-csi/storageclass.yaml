@@ -5,7 +5,7 @@ metadata:
 provisioner: nfs.csi.k8s.io
 parameters:
   # Update these values with your Synology NFS server and share path
-  server: "SYNOLOGY_IP"
+  server: "10.1.1.4"
   share: "/volume1/kubernetes"
 reclaimPolicy: Delete
 volumeBindingMode: Immediate
