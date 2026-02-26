@@ -1,0 +1,13 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: nfs-synology
+provisioner: nfs.csi.k8s.io
+parameters:
+  # Update these values with your Synology NFS server and share path
+  server: "SYNOLOGY_IP"
+  share: "/volume1/kubernetes"
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+mountOptions:
+  - nfsvers=4.1

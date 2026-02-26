@@ -17,3 +17,4 @@ resources:
   - headlamp
   - metrics-server
   - kubelet-csr-approver
+  - nfs-csi
