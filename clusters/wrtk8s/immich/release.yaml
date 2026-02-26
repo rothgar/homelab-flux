@@ -17,8 +17,13 @@ spec:
       persistence:
         library:
           existingClaim: immich-library
-      env:
-        DB_URL: "postgresql://immich:immich@immich-postgres:5432/immich"
+
+    controllers:
+      main:
+        containers:
+          main:
+            env:
+              DB_URL: "postgresql://immich:immich@immich-postgres:5432/immich"
 
     server:
       enabled: true
