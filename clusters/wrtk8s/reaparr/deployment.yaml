@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reaparr
+  namespace: reaparr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: reaparr
+  template:
+    metadata:
+      labels:
+        app: reaparr
+    spec:
+      containers:
+        - name: reaparr
+          image: reaparr/reaparr:latest
+          ports:
+            - containerPort: 7000
+          env:
+            - name: TZ
+              value: "America/Los_Angeles"
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+          volumeMounts:
+            - name: config
+              mountPath: /Config
+            - name: downloads
+              mountPath: /Downloads
+            - name: movies
+              mountPath: /Movies
+            - name: tvshows
+              mountPath: /TvShows
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: reaparr-config
+        - name: downloads
+          persistentVolumeClaim:
+            claimName: reaparr-downloads
+        - name: movies
+          persistentVolumeClaim:
+            claimName: reaparr-movies
+        - name: tvshows
+          persistentVolumeClaim:
+            claimName: reaparr-tvshows
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: reaparr
+  namespace: reaparr
+spec:
+  selector:
+    app: reaparr
+  ports:
+    - port: 7000
+      targetPort: 7000

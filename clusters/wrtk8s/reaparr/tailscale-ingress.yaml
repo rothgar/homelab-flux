@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: reaparr-tailscale
+  namespace: reaparr
+spec:
+  ingressClassName: tailscale
+  rules:
+    - host: reaparr
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: reaparr
+                port:
+                  number: 7000
+  tls:
+    - hosts:
+        - reaparr
