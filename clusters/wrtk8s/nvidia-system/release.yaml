@@ -1,21 +1,16 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: dcgm-exporter
-  namespace: dcgm-exporter
+  name: nvidia-device-plugin
+  namespace: nvidia-system
 spec:
   interval: 5m
   chart:
     spec:
-      chart: dcgm-exporter
+      chart: nvidia-device-plugin
       sourceRef:
         kind: HelmRepository
         name: nvidia
-        namespace: dcgm-exporter
+        namespace: nvidia-system
   values:
-    serviceMonitor:
-      enabled: true
     runtimeClassName: nvidia
-    resources:
-      limits:
-        nvidia.com/gpu: 1

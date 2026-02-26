@@ -7,4 +7,5 @@ resources:
   - local-path-provisioner
   - kvmm
   - home-assistant
+  - nvidia-system
   - dcgm-exporter
