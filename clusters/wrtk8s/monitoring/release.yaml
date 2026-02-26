@@ -52,6 +52,10 @@ spec:
       defaultDashboardsTimezone: utc
       service:
         type: LoadBalancer
+      grafana.ini:
+        auth.anonymous:
+          enabled: true
+          org_role: Viewer
       dashboardProviders:
         dashboardproviders.yaml:
           apiVersion: 1
