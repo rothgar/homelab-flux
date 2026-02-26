@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git rm:*)",
+      "Bash(KUBECONFIG=/var/home/jgarr/src/homelab-flux/clusters/wrtk8s/kube-sa kubectl get pods:*)",
+      "Bash(KUBECONFIG=/var/home/jgarr/src/homelab-flux/clusters/wrtk8s/kube-sa kubectl get:*)"
+    ]
+  }
+}
