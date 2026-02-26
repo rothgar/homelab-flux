@@ -40,16 +40,17 @@ spec:
                 tag: v2.5.6
               env:
                 DB_URL: "postgresql://immich:immich@immich-postgres:5432/immich"
+              resources:
+                limits:
+                  nvidia.com/gpu: 1
+          pod:
+            nodeSelector:
+              nvidia.com/gpu: "true"
       persistence:
         cache:
           enabled: true
           storageClass: local-path
           size: 10Gi
-      resources:
-        limits:
-          nvidia.com/gpu: 1
-      nodeSelector:
-        nvidia.com/gpu: "true"
 
     valkey:
       enabled: true
