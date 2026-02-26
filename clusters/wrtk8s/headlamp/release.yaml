@@ -1,0 +1,37 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: headlamp
+  namespace: headlamp
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: headlamp
+      sourceRef:
+        kind: HelmRepository
+        name: headlamp
+        namespace: headlamp
+  values:
+    config:
+      pluginsDir: /headlamp/plugins
+    initContainers:
+      - name: install-flux-plugin
+        image: alpine
+        command:
+          - /bin/sh
+          - -c
+          - |
+            wget -O /plugins/flux.tar.gz https://github.com/headlamp-k8s/plugins/releases/download/%40headlamp-k8s%2Fflux%400.1.2/flux-0.1.2.tar.gz
+            mkdir -p /plugins/flux
+            tar -xzf /plugins/flux.tar.gz -C /plugins/flux --strip-components=1
+            rm /plugins/flux.tar.gz
+        volumeMounts:
+          - name: plugins
+            mountPath: /plugins
+    extraVolumes:
+      - name: plugins
+        emptyDir: {}
+    extraVolumeMounts:
+      - name: plugins
+        mountPath: /headlamp/plugins
