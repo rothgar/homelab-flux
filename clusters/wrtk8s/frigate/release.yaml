@@ -18,7 +18,10 @@ spec:
     persistence:
       media:
         enabled: true
-    runtimeClassName: nvidia
+    gpu:
+      nvidia:
+        enabled: true
+        runtimeClassName: nvidia
     resources:
       limits:
         nvidia.com/gpu: 1
