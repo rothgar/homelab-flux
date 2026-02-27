@@ -25,6 +25,11 @@ spec:
     resources:
       limits:
         nvidia.com/gpu: 1
+    service:
+      type: LoadBalancer
+      annotations:
+        tailscale.com/expose: "true"
+        tailscale.com/hostname: "frigate"
   valuesFrom:
     - kind: Secret
       name: frigate-config
