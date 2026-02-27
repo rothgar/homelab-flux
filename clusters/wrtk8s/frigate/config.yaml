@@ -1,52 +1,53 @@
-config: |
-  mqtt:
-    enabled: true
-    host: "mosquitto.mqtt.svc.cluster.local"
-    port: 1883
-  auth:
-    enabled: false
-  detectors:
-    tensorrt:
-      type: tensorrt
-  objects:
-    track:
-      - person
-      - dog
-      - cat
-  detect:
-    enabled: true
-    fps: 5
-  snapshots:
-    enabled: true
-    bounding_box: true
-  record:
-    enabled: true
-    retain:
-      days: 7
-      mode: motion
-    events:
-      retain:
-        default: 14
-        mode: active_objects
-  cameras:
-    front_door:
-      ffmpeg:
-        inputs:
-          - path: rtsp://admin:qRU4zLZPtwEJjnHqY@10.1.1.60:554/h264Preview_01_main
-            roles:
-              - detect
-              - record
-    rear_door:
-      ffmpeg:
-        inputs:
-          - path: rtsp://admin:qRU4zLZPtwEJjnHqY@10.1.1.62:554/h264Preview_01_main
-            roles:
-              - detect
-              - record
-    backyard:
-      ffmpeg:
-        inputs:
-          - path: rtsp://admin:qRU4zLZPtwEJjnHqY@10.1.1.61:554/h264Preview_01_main
-            roles:
-              - detect
-              - record
+apiVersion: v1
+kind: Secret
+metadata:
+  name: frigate-config
+  namespace: frigate
+type: Opaque
+stringData:
+  config.yaml: |
+    config: |
+      mqtt:
+        enabled: true
+        host: "mosquitto.mqtt.svc.cluster.local"
+        port: 1883
+      auth:
+        enabled: false
+      detectors:
+        tensorrt:
+          type: tensorrt
+      objects:
+        track:
+          - person
+          - dog
+          - cat
+      detect:
+        enabled: true
+        fps: 5
+      snapshots:
+        enabled: true
+        bounding_box: true
+      record:
+        enabled: true
+      cameras:
+        front_door:
+          ffmpeg:
+            inputs:
+              - path: rtsp://admin:qRU4zLZPtwEJjnHqY@10.1.1.60:554/h264Preview_01_main
+                roles:
+                  - detect
+                  - record
+        rear_door:
+          ffmpeg:
+            inputs:
+              - path: rtsp://admin:qRU4zLZPtwEJjnHqY@10.1.1.62:554/h264Preview_01_main
+                roles:
+                  - detect
+                  - record
+        backyard:
+          ffmpeg:
+            inputs:
+              - path: rtsp://admin:qRU4zLZPtwEJjnHqY@10.1.1.61:554/h264Preview_01_main
+                roles:
+                  - detect
+                  - record
