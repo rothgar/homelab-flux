@@ -3,6 +3,8 @@ config: |
     enabled: true
     host: "mosquitto.mqtt.svc.cluster.local"
     port: 1883
+  auth:
+    enabled: false
   detectors:
     tensorrt:
       type: tensorrt
