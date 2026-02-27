@@ -35,6 +35,9 @@ kind: Service
 metadata:
   name: open-webui
   namespace: ollama
+  annotations:
+    tailscale.com/expose: "true"
+    tailscale.com/hostname: "ai"
 spec:
   selector:
     app: open-webui

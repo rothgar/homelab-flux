@@ -38,6 +38,9 @@ kind: Service
 metadata:
   name: ollama
   namespace: ollama
+  annotations:
+    tailscale.com/expose: "true"
+    tailscale.com/hostname: "ollama"
 spec:
   selector:
     app: ollama
