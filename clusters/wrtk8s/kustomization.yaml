@@ -24,5 +24,4 @@ resources:
   - tailscale-operator
   - miniflux
   - reaparr
-  - plex
   - ollama
