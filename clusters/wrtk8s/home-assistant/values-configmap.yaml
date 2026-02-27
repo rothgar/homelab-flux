@@ -9,24 +9,10 @@ data:
       enabled: true
     service:
       type: ClusterIP
-    extraVolumes:
-      - name: http-config
-        configMap:
-          name: home-assistant-http-config
-    extraVolumeMounts:
-      - name: http-config
-        mountPath: /config/http.yaml
-        subPath: http.yaml
-    initContainers:
-      - name: inject-http-config
-        image: busybox
-        command:
-          - /bin/sh
-          - -c
-          - |
-            if ! grep -q "http: !include http.yaml" /config/configuration.yaml 2>/dev/null; then
-              echo "http: !include http.yaml" >> /config/configuration.yaml
-            fi
-        volumeMounts:
-          - name: home-assistant
-            mountPath: /config
+    configuration:
+      enabled: true
+      forceInit: true
+      trusted_proxies:
+        - 10.244.0.0/16
+        - 10.96.0.0/12
+        - 100.64.0.0/10
