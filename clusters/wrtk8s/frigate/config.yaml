@@ -8,6 +8,26 @@ config: |
   detectors:
     tensorrt:
       type: tensorrt
+  objects:
+    track:
+      - person
+      - dog
+      - cat
+  detect:
+    enabled: true
+    fps: 5
+  snapshots:
+    enabled: true
+    bounding_box: true
+  record:
+    enabled: true
+    retain:
+      days: 7
+      mode: motion
+    events:
+      retain:
+        default: 14
+        mode: active_objects
   cameras:
     front_door:
       ffmpeg:
@@ -16,8 +36,6 @@ config: |
             roles:
               - detect
               - record
-      detect:
-        enabled: true
     rear_door:
       ffmpeg:
         inputs:
@@ -25,8 +43,6 @@ config: |
             roles:
               - detect
               - record
-      detect:
-        enabled: true
     backyard:
       ffmpeg:
         inputs:
@@ -34,5 +50,3 @@ config: |
             roles:
               - detect
               - record
-      detect:
-        enabled: true
