@@ -13,9 +13,15 @@ spec:
         name: frigate
         namespace: frigate
   values:
+    image:
+      tag: stable-tensorrt
     persistence:
       media:
         enabled: true
+    runtimeClassName: nvidia
+    resources:
+      limits:
+        nvidia.com/gpu: 1
   valuesFrom:
     - kind: Secret
       name: frigate-config
