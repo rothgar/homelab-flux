@@ -1,9 +1,8 @@
 config: |
   mqtt:
-    host: "mqtt.example.com"
+    enabled: true
+    host: "mosquitto.mqtt.svc.cluster.local"
     port: 1883
-    user: admin
-    password: "qRU4zLZPtwEJjnHqY"
   cameras:
     # Define at least one camera
     front_door:
