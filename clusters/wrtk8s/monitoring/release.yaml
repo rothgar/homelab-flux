@@ -48,6 +48,10 @@ spec:
     grafana:
       enabled: true
       adminPassword: admin
+      persistence:
+        enabled: true
+        size: 1Gi
+        storageClass: nfs-synology
       defaultDashboardsEnabled: true
       defaultDashboardsTimezone: utc
       service:
