@@ -4,6 +4,7 @@ resources:
   - namespace.yaml
   - source.yaml
   - library-pvc.yaml
+  - pictures-pvc.yaml
   - postgres.yaml
   - release.yaml
   - httproute.yaml

@@ -28,6 +28,13 @@ spec:
                 tag: v2.5.6
               env:
                 DB_URL: "postgresql://immich:immich@immich-postgres:5432/immich"
+      persistence:
+        pictures:
+          enabled: true
+          existingClaim: immich-pictures
+          globalMounts:
+            - path: /data/pictures
+              readOnly: true
 
     machine-learning:
       enabled: true
