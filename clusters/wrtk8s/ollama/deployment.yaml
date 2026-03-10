@@ -14,6 +14,16 @@ spec:
         app: ollama
     spec:
       runtimeClassName: nvidia
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - spark
       containers:
         - name: ollama
           image: ollama/ollama:latest
