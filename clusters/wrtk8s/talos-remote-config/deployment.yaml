@@ -23,8 +23,7 @@ spec:
               mountPath: /data
       volumes:
         - name: data
-          persistentVolumeClaim:
-            claimName: talos-remote-config-data
+          emptyDir: {}
 ---
 apiVersion: v1
 kind: Service
