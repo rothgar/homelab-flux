@@ -22,6 +22,8 @@ patches:
 kind: Workers
 machines:
   - 0564bde4-47b8-c3bd-79e6-63e7a2badf27
+  - 4c5615cc-1dd2-11b2-8000-4cbb47001716
+  - c828b893-c76a-4b1c-a7c6-345a6053adf6
 ---
 kind: Machine
 systemExtensions:
@@ -49,6 +51,33 @@ name: 6ad2ae00-11cb-11ef-83fc-64bc3f0e2e00
 patches:
   - file: patches/mini.yaml
   - file: patches/k10temp.yaml
+  - file: patches/nvidia.yaml
+  - file: patches/gpu-labels.yaml
+  - file: patches/kubelet.yaml
+---
+kind: Machine
+systemExtensions:
+  - siderolabs/iscsi-tools
+  - siderolabs/mellanox-mstflint
+  - siderolabs/nvidia-container-toolkit-lts
+  - siderolabs/nvidia-open-gpu-kernel-modules-lts
+  - siderolabs/util-linux-tools
+name: 4c5615cc-1dd2-11b2-8000-4cbb47001716
+patches:
+  - file: patches/spark.yaml
+  - file: patches/spark-nvidia-modules.yaml
+  - file: patches/gpu-labels.yaml
+  - file: patches/spark-volumeconfig.yaml
+  - file: patches/spark-uservolumeconfig.yaml
+  - file: patches/kubelet.yaml
+---
+kind: Machine
+systemExtensions:
+  - siderolabs/nvidia-container-toolkit-lts
+  - siderolabs/nonfree-kmod-nvidia-lts
+name: c828b893-c76a-4b1c-a7c6-345a6053adf6
+patches:
+  - file: patches/3d.yaml
   - file: patches/nvidia.yaml
   - file: patches/gpu-labels.yaml
   - file: patches/kubelet.yaml
