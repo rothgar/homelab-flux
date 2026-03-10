@@ -16,15 +16,15 @@ spec:
       runtimeClassName: nvidia
       containers:
         - name: plex
-          image: plexinc/pms-docker:latest
+          image: lscr.io/linuxserver/plex:latest
           ports:
             - containerPort: 32400
           env:
             - name: TZ
               value: "America/Los_Angeles"
-            - name: PLEX_UID
+            - name: PUID
               value: "1027"
-            - name: PLEX_GID
+            - name: PGID
               value: "100"
             - name: NVIDIA_VISIBLE_DEVICES
               value: "all"
