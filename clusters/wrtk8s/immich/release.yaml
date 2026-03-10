@@ -33,7 +33,7 @@ spec:
           enabled: true
           existingClaim: immich-pictures
           globalMounts:
-            - path: /data/pictures
+            - path: /mnt/external/pictures
               readOnly: true
 
     machine-learning:

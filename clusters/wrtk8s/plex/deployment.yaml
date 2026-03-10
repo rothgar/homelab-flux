@@ -13,6 +13,7 @@ spec:
       labels:
         app: plex
     spec:
+      runtimeClassName: nvidia
       containers:
         - name: plex
           image: plexinc/pms-docker:latest
@@ -25,6 +26,13 @@ spec:
               value: "1027"
             - name: PLEX_GID
               value: "100"
+            - name: NVIDIA_VISIBLE_DEVICES
+              value: "all"
+            - name: NVIDIA_DRIVER_CAPABILITIES
+              value: "compute,video,utility"
+          resources:
+            limits:
+              nvidia.com/gpu: 1
           volumeMounts:
             - name: data
               mountPath: /config/Library/Application Support
@@ -82,13 +90,28 @@ kind: Service
 metadata:
   name: plex
   namespace: plex
-  annotations:
-    tailscale.com/expose: "true"
-    tailscale.com/hostname: "plex"
 spec:
   type: LoadBalancer
   selector:
     app: plex
   ports:
-    - port: 32400
+    - name: plex
+      port: 32400
+      targetPort: 32400
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: plex-ts
+  namespace: plex
+  annotations:
+    tailscale.com/expose: "true"
+    tailscale.com/hostname: "plex"
+spec:
+  type: ClusterIP
+  selector:
+    app: plex
+  ports:
+    - name: https
+      port: 443
       targetPort: 32400
