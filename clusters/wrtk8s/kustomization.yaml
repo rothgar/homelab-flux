@@ -23,6 +23,7 @@ resources:
   - nvidia-system
   - ollama
   - reaparr
+  - registry
   - reloader
   - tailscale-operator
   - talos-remote-config
