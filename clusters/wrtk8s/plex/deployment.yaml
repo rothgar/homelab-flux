@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: plex
+  namespace: plex
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: plex
+  template:
+    metadata:
+      labels:
+        app: plex
+    spec:
+      containers:
+        - name: plex
+          image: plexinc/pms-docker:latest
+          ports:
+            - containerPort: 32400
+          env:
+            - name: TZ
+              value: "America/Los_Angeles"
+            - name: PLEX_UID
+              value: "1027"
+            - name: PLEX_GID
+              value: "100"
+          volumeMounts:
+            - name: data
+              mountPath: /config
+            - name: transcode
+              mountPath: /transcode
+            - name: movies
+              mountPath: /data/movies
+            - name: music
+              mountPath: /data/music
+            - name: pictures
+              mountPath: /data/pictures
+            - name: tv
+              mountPath: /data/tv
+            - name: audiobooks
+              mountPath: /data/audiobooks
+            - name: education
+              mountPath: /data/education
+            - name: shorts
+              mountPath: /data/shorts
+            - name: soundtracks
+              mountPath: /data/soundtracks
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: plex-data
+        - name: transcode
+          emptyDir: {}
+        - name: movies
+          persistentVolumeClaim:
+            claimName: plex-movies
+        - name: music
+          persistentVolumeClaim:
+            claimName: plex-music
+        - name: pictures
+          persistentVolumeClaim:
+            claimName: plex-pictures
+        - name: tv
+          persistentVolumeClaim:
+            claimName: plex-tv
+        - name: audiobooks
+          persistentVolumeClaim:
+            claimName: plex-audiobooks
+        - name: education
+          persistentVolumeClaim:
+            claimName: plex-education
+        - name: shorts
+          persistentVolumeClaim:
+            claimName: plex-shorts
+        - name: soundtracks
+          persistentVolumeClaim:
+            claimName: plex-soundtracks
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: plex
+  namespace: plex
+  annotations:
+    tailscale.com/expose: "true"
+    tailscale.com/hostname: "plex"
+spec:
+  type: LoadBalancer
+  selector:
+    app: plex
+  ports:
+    - port: 32400
+      targetPort: 32400
