@@ -233,7 +233,7 @@ spec:
     - ReadWriteMany
   nfs:
     server: 10.1.1.4
-    path: /volume1/Plex
+    path: /volume1/Plex/AppData
   persistentVolumeReclaimPolicy: Retain
 ---
 apiVersion: v1

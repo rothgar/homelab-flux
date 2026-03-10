@@ -27,7 +27,7 @@ spec:
               value: "100"
           volumeMounts:
             - name: data
-              mountPath: /config
+              mountPath: /config/Library/Application Support
             - name: transcode
               mountPath: /transcode
             - name: movies
