@@ -4,7 +4,7 @@ metadata:
   name: plex
   namespace: plex
 spec:
-  replicas: 0
+  replicas: 1
   selector:
     matchLabels:
       app: plex
