@@ -13,6 +13,7 @@ spec:
       labels:
         app: plex
     spec:
+      priorityClassName: plex-high-priority
       runtimeClassName: nvidia
       affinity:
         nodeAffinity:
