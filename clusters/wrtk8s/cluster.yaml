@@ -6,6 +6,8 @@ talos:
   version: v1.12.4
 features:
   enableWorkloadProxy: true
+patches:
+  - file: patches/mirrors.yaml
 ---
 kind: ControlPlane
 machines:
