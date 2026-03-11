@@ -32,3 +32,21 @@ spec:
               resources:
                 - name: nvidia.com/gpu
                   replicas: 2
+        mini: |-
+          version: v1
+          sharing:
+            timeSlicing:
+              resources:
+                - name: nvidia.com/gpu
+                  replicas: 4
+        spark: |-
+          version: v1
+          sharing:
+            timeSlicing:
+              resources:
+                - name: nvidia.com/gpu
+                  replicas: 6
+    nodeSelector:
+      nvidia.com/gpu: "true"
+    gfd:
+      enabled: true
