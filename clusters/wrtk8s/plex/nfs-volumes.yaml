@@ -7,6 +7,13 @@ spec:
     storage: 1Ti
   accessModes:
     - ReadWriteMany
+  mountOptions:
+    - nfsvers=4.1
+    - rsize=1048576
+    - wsize=1048576
+    - hard
+    - noatime
+    - nodiratime
   nfs:
     server: 10.1.1.4
     path: /volume1/movies
@@ -35,6 +42,13 @@ spec:
     storage: 1Ti
   accessModes:
     - ReadWriteMany
+  mountOptions:
+    - nfsvers=4.1
+    - rsize=1048576
+    - wsize=1048576
+    - hard
+    - noatime
+    - nodiratime
   nfs:
     server: 10.1.1.4
     path: /volume1/music
@@ -63,6 +77,13 @@ spec:
     storage: 1Ti
   accessModes:
     - ReadWriteMany
+  mountOptions:
+    - nfsvers=4.1
+    - rsize=1048576
+    - wsize=1048576
+    - hard
+    - noatime
+    - nodiratime
   nfs:
     server: 10.1.1.4
     path: /volume1/pictures
@@ -91,6 +112,13 @@ spec:
     storage: 1Ti
   accessModes:
     - ReadWriteMany
+  mountOptions:
+    - nfsvers=4.1
+    - rsize=1048576
+    - wsize=1048576
+    - hard
+    - noatime
+    - nodiratime
   nfs:
     server: 10.1.1.4
     path: /volume1/tv
@@ -119,6 +147,13 @@ spec:
     storage: 1Ti
   accessModes:
     - ReadWriteMany
+  mountOptions:
+    - nfsvers=4.1
+    - rsize=1048576
+    - wsize=1048576
+    - hard
+    - noatime
+    - nodiratime
   nfs:
     server: 10.1.1.4
     path: /volume1/audiobooks
@@ -147,6 +182,13 @@ spec:
     storage: 1Ti
   accessModes:
     - ReadWriteMany
+  mountOptions:
+    - nfsvers=4.1
+    - rsize=1048576
+    - wsize=1048576
+    - hard
+    - noatime
+    - nodiratime
   nfs:
     server: 10.1.1.4
     path: /volume1/education
@@ -175,6 +217,13 @@ spec:
     storage: 1Ti
   accessModes:
     - ReadWriteMany
+  mountOptions:
+    - nfsvers=4.1
+    - rsize=1048576
+    - wsize=1048576
+    - hard
+    - noatime
+    - nodiratime
   nfs:
     server: 10.1.1.4
     path: /volume1/shorts
@@ -203,6 +252,13 @@ spec:
     storage: 1Ti
   accessModes:
     - ReadWriteMany
+  mountOptions:
+    - nfsvers=4.1
+    - rsize=1048576
+    - wsize=1048576
+    - hard
+    - noatime
+    - nodiratime
   nfs:
     server: 10.1.1.4
     path: /volume1/soundtracks
@@ -231,6 +287,13 @@ spec:
     storage: 500Gi
   accessModes:
     - ReadWriteMany
+  mountOptions:
+    - nfsvers=4.1
+    - rsize=1048576
+    - wsize=1048576
+    - hard
+    - noatime
+    - nodiratime
   nfs:
     server: 10.1.1.4
     path: /volume1/Plex/AppData
