@@ -26,7 +26,7 @@ spec:
                       - spark
       containers:
         - name: ollama
-          image: ollama/ollama:latest
+          image: ollama/ollama:v0.17.7
           ports:
             - containerPort: 11434
           env:
