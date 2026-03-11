@@ -3,5 +3,10 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - pvc.yaml
+  - cache-pvc.yaml
   - certificate.yaml
   - deployment.yaml
+  - docker-cache.yaml
+  - k8s-cache.yaml
+  - gcr-cache.yaml
+  - ghcr-cache.yaml

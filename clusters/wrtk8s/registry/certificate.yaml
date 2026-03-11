@@ -9,4 +9,5 @@ spec:
     name: letsencrypt-prod
     kind: ClusterIssuer
   dnsNames:
-    - reg.jgarr.net
+    - cr.jgarr.net
+    - "*.cr.jgarr.net"

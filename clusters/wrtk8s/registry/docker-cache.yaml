@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: registry
+  name: docker-cache
   namespace: registry
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: registry
+      app: docker-cache
   template:
     metadata:
       labels:
-        app: registry
+        app: docker-cache
     spec:
       containers:
         - name: registry
@@ -19,6 +19,8 @@ spec:
           ports:
             - containerPort: 5000
           env:
+            - name: REGISTRY_PROXY_REMOTEURL
+              value: "https://registry-1.docker.io"
             - name: REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY
               value: /var/lib/registry
             - name: REGISTRY_HTTP_TLS_CERTIFICATE
@@ -34,7 +36,7 @@ spec:
       volumes:
         - name: data
           persistentVolumeClaim:
-            claimName: registry-data
+            claimName: docker-cache-data
         - name: certs
           secret:
             secretName: registry-tls
@@ -42,14 +44,14 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: registry
+  name: docker-cache
   namespace: registry
   annotations:
-    external-dns.alpha.kubernetes.io/hostname: cr.jgarr.net
+    external-dns.alpha.kubernetes.io/hostname: docker.cr.jgarr.net
 spec:
   type: LoadBalancer
   selector:
-    app: registry
+    app: docker-cache
   ports:
     - port: 443
       targetPort: 5000
