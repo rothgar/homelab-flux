@@ -5,6 +5,9 @@ metadata:
   namespace: default
   labels:
     app: kvmm
+  annotations:
+    tailscale.com/expose: "true"
+    tailscale.com/hostname: "kvmm"
 spec:
   type: LoadBalancer
   ports:
