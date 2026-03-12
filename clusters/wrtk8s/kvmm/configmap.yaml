@@ -9,6 +9,10 @@ data:
     port = 8080
 
     [[devices]]
+    host = "10.1.1.7"
+    alias = "g-d"
+
+    [[devices]]
     host = "10.1.1.10"
     alias = "spark"
 
