@@ -19,11 +19,13 @@ spec:
           ports:
             - containerPort: 8080
           env:
-            - name: DATABASE_URL
+            - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: miniflux-db-app
-                  key: uri
+                  name: miniflux-db-credentials
+                  key: password
+            - name: DATABASE_URL
+              value: "postgres://miniflux:$(DB_PASSWORD)@miniflux-db-rw:5432/miniflux?sslmode=require"
             - name: RUN_MIGRATIONS
               value: "1"
             - name: CREATE_ADMIN
