@@ -28,9 +28,16 @@ spec:
               value: "1"
             - name: CREATE_ADMIN
               value: "1"
-          envFrom:
-            - secretRef:
-                name: miniflux-app-credentials
+            - name: ADMIN_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: miniflux-app-credentials
+                  key: username
+            - name: ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: miniflux-app-credentials
+                  key: password
 ---
 apiVersion: v1
 kind: Service
