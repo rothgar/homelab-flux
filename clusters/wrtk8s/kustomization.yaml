@@ -20,8 +20,8 @@ resources:
   - miniflux
   - monitoring
   - mqtt
-  - nanoclaw
   - nfs-csi
+  - openclaw
   - nvidia-system
   - ollama
   - omni-cd
