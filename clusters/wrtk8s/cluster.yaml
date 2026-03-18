@@ -7,7 +7,7 @@ talos:
 features:
   enableWorkloadProxy: true
 patches:
-  - file: patches/mirrors.yaml
+  - file: ../patches/mirrors.yaml
 ---
 kind: ControlPlane
 machines:
