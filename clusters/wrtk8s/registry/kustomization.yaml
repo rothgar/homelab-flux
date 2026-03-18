@@ -10,3 +10,5 @@ resources:
   - k8s-cache.yaml
   - gcr-cache.yaml
   - ghcr-cache.yaml
+  - servicemonitor.yaml
+  - dashboard.yaml

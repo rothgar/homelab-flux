@@ -18,6 +18,8 @@ spec:
           image: registry:2
           ports:
             - containerPort: 5000
+            - containerPort: 5001
+              name: metrics
           env:
             - name: REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY
               value: /var/lib/registry
@@ -25,6 +27,10 @@ spec:
               value: /certs/tls.crt
             - name: REGISTRY_HTTP_TLS_KEY
               value: /certs/tls.key
+            - name: REGISTRY_HTTP_DEBUG_ADDR
+              value: "0.0.0.0:5001"
+            - name: REGISTRY_HTTP_DEBUG_PROMETHEUS_ENABLED
+              value: "true"
           volumeMounts:
             - name: data
               mountPath: /var/lib/registry
@@ -53,3 +59,6 @@ spec:
   ports:
     - port: 443
       targetPort: 5000
+    - port: 5001
+      targetPort: 5001
+      name: metrics

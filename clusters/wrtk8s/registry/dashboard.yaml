@@ -1,0 +1,210 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: registry-grafana-dashboard
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+data:
+  docker-registry.json: |
+    {
+      "annotations": {
+        "list": []
+      },
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 1,
+      "links": [],
+      "panels": [
+        {
+          "title": "HTTP Requests Rate",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "stacking": { "mode": "normal" }
+              },
+              "unit": "reqps"
+            },
+            "overrides": []
+          },
+          "targets": [
+            {
+              "expr": "sum(rate(registry_http_requests_total{job=~\"$job\"}[$__rate_interval])) by (handler, method)",
+              "legendFormat": "{{method}} {{handler}}"
+            }
+          ]
+        },
+        {
+          "title": "HTTP Response Codes Rate",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "stacking": { "mode": "normal" }
+              },
+              "unit": "reqps"
+            },
+            "overrides": []
+          },
+          "targets": [
+            {
+              "expr": "sum(rate(registry_http_requests_total{job=~\"$job\"}[$__rate_interval])) by (code)",
+              "legendFormat": "{{code}}"
+            }
+          ]
+        },
+        {
+          "title": "HTTP Request Duration (p50 / p90 / p99)",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "drawStyle": "line", "fillOpacity": 0 },
+              "unit": "s"
+            },
+            "overrides": []
+          },
+          "targets": [
+            {
+              "expr": "histogram_quantile(0.50, sum(rate(registry_http_request_duration_seconds_bucket{job=~\"$job\"}[$__rate_interval])) by (le))",
+              "legendFormat": "p50"
+            },
+            {
+              "expr": "histogram_quantile(0.90, sum(rate(registry_http_request_duration_seconds_bucket{job=~\"$job\"}[$__rate_interval])) by (le))",
+              "legendFormat": "p90"
+            },
+            {
+              "expr": "histogram_quantile(0.99, sum(rate(registry_http_request_duration_seconds_bucket{job=~\"$job\"}[$__rate_interval])) by (le))",
+              "legendFormat": "p99"
+            }
+          ]
+        },
+        {
+          "title": "In-Flight Requests",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "drawStyle": "line", "fillOpacity": 10 },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "targets": [
+            {
+              "expr": "sum(registry_http_in_flight_requests{job=~\"$job\"}) by (job)",
+              "legendFormat": "{{job}}"
+            }
+          ]
+        },
+        {
+          "title": "Storage Action Duration (p50 / p90 / p99)",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": { "drawStyle": "line", "fillOpacity": 0 },
+              "unit": "s"
+            },
+            "overrides": []
+          },
+          "targets": [
+            {
+              "expr": "histogram_quantile(0.50, sum(rate(registry_storage_action_seconds_bucket{job=~\"$job\"}[$__rate_interval])) by (le, action))",
+              "legendFormat": "p50 {{action}}"
+            },
+            {
+              "expr": "histogram_quantile(0.90, sum(rate(registry_storage_action_seconds_bucket{job=~\"$job\"}[$__rate_interval])) by (le, action))",
+              "legendFormat": "p90 {{action}}"
+            },
+            {
+              "expr": "histogram_quantile(0.99, sum(rate(registry_storage_action_seconds_bucket{job=~\"$job\"}[$__rate_interval])) by (le, action))",
+              "legendFormat": "p99 {{action}}"
+            }
+          ]
+        },
+        {
+          "title": "Storage Actions Rate",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "stacking": { "mode": "normal" }
+              },
+              "unit": "ops"
+            },
+            "overrides": []
+          },
+          "targets": [
+            {
+              "expr": "sum(rate(registry_storage_action_seconds_count{job=~\"$job\"}[$__rate_interval])) by (action)",
+              "legendFormat": "{{action}}"
+            }
+          ]
+        },
+        {
+          "title": "HTTP Requests by Instance",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 24, "x": 0, "y": 24 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "stacking": { "mode": "normal" }
+              },
+              "unit": "reqps"
+            },
+            "overrides": []
+          },
+          "targets": [
+            {
+              "expr": "sum(rate(registry_http_requests_total{job=~\"$job\"}[$__rate_interval])) by (job)",
+              "legendFormat": "{{job}}"
+            }
+          ]
+        }
+      ],
+      "schemaVersion": 39,
+      "templating": {
+        "list": [
+          {
+            "name": "datasource",
+            "type": "datasource",
+            "query": "prometheus",
+            "current": { "selected": true, "text": "Prometheus", "value": "prometheus" }
+          },
+          {
+            "name": "job",
+            "type": "query",
+            "datasource": { "type": "prometheus", "uid": "${datasource}" },
+            "query": "label_values(registry_http_requests_total, job)",
+            "multi": true,
+            "includeAll": true,
+            "allValue": ".*",
+            "current": { "selected": true, "text": "All", "value": "$__all" },
+            "refresh": 2
+          }
+        ]
+      },
+      "time": { "from": "now-6h", "to": "now" },
+      "title": "Docker Registry",
+      "uid": "docker-registry"
+    }

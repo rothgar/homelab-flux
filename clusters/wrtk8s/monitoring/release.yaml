@@ -52,6 +52,10 @@ spec:
         enabled: true
         size: 1Gi
         storageClass: nfs-synology
+      sidecar:
+        dashboards:
+          enabled: true
+          searchNamespace: ALL
       defaultDashboardsEnabled: true
       defaultDashboardsTimezone: utc
       service:
