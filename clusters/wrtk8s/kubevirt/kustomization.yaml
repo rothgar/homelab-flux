@@ -5,3 +5,4 @@ resources:
   - operator-kustomization.yaml
   - cr-kustomization.yaml
   - manager-kustomization.yaml
+  - ubuntu-vm.yaml

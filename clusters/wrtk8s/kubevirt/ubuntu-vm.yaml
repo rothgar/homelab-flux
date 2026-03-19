@@ -1,0 +1,96 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ubuntu-home
+  namespace: kubevirt
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: nfs-synology
+  resources:
+    requests:
+      storage: 50Gi
+---
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: ubuntu-boot
+  namespace: kubevirt
+spec:
+  source:
+    registry:
+      url: docker://quay.io/containerdisks/ubuntu:24.04
+  storage:
+    accessModes:
+      - ReadWriteOnce
+    storageClassName: nfs-synology
+    resources:
+      requests:
+        storage: 20Gi
+---
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: ubuntu
+  namespace: kubevirt
+spec:
+  running: true
+  dataVolumeTemplates: []
+  template:
+    metadata:
+      labels:
+        app: ubuntu
+    spec:
+      domain:
+        cpu:
+          cores: 4
+        resources:
+          requests:
+            memory: 8Gi
+        devices:
+          disks:
+            - name: boot
+              disk:
+                bus: virtio
+            - name: home
+              disk:
+                bus: virtio
+            - name: cloudinit
+              disk:
+                bus: virtio
+      volumes:
+        - name: boot
+          dataVolume:
+            name: ubuntu-boot
+        - name: home
+          persistentVolumeClaim:
+            claimName: ubuntu-home
+        - name: cloudinit
+          cloudInitNoCloud:
+            userData: |
+              #cloud-config
+              hostname: ubuntu
+              manage_etc_hosts: true
+              users:
+                - name: ubuntu
+                  sudo: ALL=(ALL) NOPASSWD:ALL
+                  shell: /bin/bash
+                  lock_passwd: false
+                  plain_text_passwd: ubuntu
+              mounts:
+                - [/dev/vdb, /home, ext4, "defaults,nofail", "0", "2"]
+              bootcmd:
+                - |
+                  if ! blkid /dev/vdb; then
+                    mkfs.ext4 /dev/vdb
+                  fi
+              package_update: true
+              packages:
+                - ubuntu-desktop-minimal
+                - spice-vdagent
+                - flatpak
+              runcmd:
+                - systemctl set-default graphical.target
+                - systemctl enable gdm
+                - flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+                - flatpak install -y flathub com.moonlight_stream.Moonlight

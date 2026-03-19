@@ -14,7 +14,7 @@ patches:
       kind: Namespace
       metadata:
         name: kubevirt-manager
-  # Pin image to release version
+  # Pin image to release version and schedule on amd64 nodes
   - target:
       kind: Deployment
       name: kubevirt-manager
@@ -22,6 +22,10 @@ patches:
       - op: replace
         path: /spec/template/spec/containers/0/image
         value: kubevirtmanager/kubevirt-manager:1.5.4
+      - op: add
+        path: /spec/template/spec/nodeSelector
+        value:
+          kubernetes.io/arch: amd64
   # Expose via Tailscale
   - target:
       kind: Service
@@ -30,6 +34,9 @@ patches:
       - op: replace
         path: /spec/type
         value: LoadBalancer
+      - op: replace
+        path: /spec/ports/0/port
+        value: 443
       - op: add
         path: /metadata/annotations/tailscale.com~1expose
         value: "true"
