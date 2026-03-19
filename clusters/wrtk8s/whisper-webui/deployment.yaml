@@ -52,6 +52,6 @@ spec:
   selector:
     app: whisper-webui
   ports:
-    - port: 7860
+    - port: 80
       targetPort: 7860
   type: LoadBalancer
