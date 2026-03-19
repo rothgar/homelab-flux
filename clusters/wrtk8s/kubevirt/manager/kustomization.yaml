@@ -34,9 +34,6 @@ patches:
       - op: replace
         path: /spec/type
         value: LoadBalancer
-      - op: replace
-        path: /spec/ports/0/port
-        value: 443
       - op: add
         path: /metadata/annotations/tailscale.com~1expose
         value: "true"
