@@ -4,5 +4,7 @@ resources:
   - namespace.yaml
   - operator-kustomization.yaml
   - cr-kustomization.yaml
+  - cdi-operator-kustomization.yaml
+  - cdi-cr-kustomization.yaml
   - manager-kustomization.yaml
   - vm-kustomization.yaml
