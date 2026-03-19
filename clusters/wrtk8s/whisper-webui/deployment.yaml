@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: whisper-webui
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: whisper-webui
+  template:
+    metadata:
+      labels:
+        app: whisper-webui
+    spec:
+      runtimeClassName: nvidia
+      containers:
+        - name: whisper-webui
+          image: jhj0517/whisper-webui:v1.0.8-4def223
+          args:
+            - --server_port
+            - "7860"
+            - --server_name
+            - "0.0.0.0"
+          ports:
+            - containerPort: 7860
+          resources:
+            limits:
+              nvidia.com/gpu: 1
+          volumeMounts:
+            - name: models
+              mountPath: /Whisper-WebUI/models
+            - name: outputs
+              mountPath: /Whisper-WebUI/outputs
+      volumes:
+        - name: models
+          persistentVolumeClaim:
+            claimName: whisper-models
+        - name: outputs
+          persistentVolumeClaim:
+            claimName: whisper-outputs
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: whisper-webui
+  namespace: default
+  annotations:
+    tailscale.com/expose: "true"
+    tailscale.com/hostname: "whisper"
+spec:
+  selector:
+    app: whisper-webui
+  ports:
+    - port: 7860
+      targetPort: 7860
+  type: LoadBalancer

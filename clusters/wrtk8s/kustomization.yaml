@@ -32,4 +32,5 @@ resources:
   - tailscale-operator
   - talos-remote-config
   - traefik
+  - whisper-webui
   - plex
