@@ -19,3 +19,7 @@ data:
     [[devices]]
     host = "10.1.1.27"
     alias = "z"
+
+    [[devices]]
+    host = "10.1.1.2"
+    alias = "benchy"
