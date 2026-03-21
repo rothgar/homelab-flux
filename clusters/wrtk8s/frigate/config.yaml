@@ -21,7 +21,6 @@ stringData:
       detectors:
         onnx:
           type: onnx
-          device: cuda
       objects:
         track:
           - person
