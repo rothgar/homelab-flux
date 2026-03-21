@@ -8,7 +8,12 @@ data:
     persistence:
       enabled: true
     service:
-      type: ClusterIP
+      type: LoadBalancer
+      additionalPorts:
+        - name: homekit
+          port: 21063
+          targetPort: 21063
+          protocol: TCP
     configuration:
       enabled: true
       forceInit: true
