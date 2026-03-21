@@ -10,9 +10,17 @@ data:
     service:
       type: LoadBalancer
       additionalPorts:
-        - name: homekit
+        - name: homekit-1
           port: 21063
           targetPort: 21063
+          protocol: TCP
+        - name: homekit-2
+          port: 21064
+          targetPort: 21064
+          protocol: TCP
+        - name: homekit-3
+          port: 21065
+          targetPort: 21065
           protocol: TCP
     configuration:
       enabled: true
