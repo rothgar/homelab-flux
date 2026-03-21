@@ -22,6 +22,36 @@ spec:
         size: 1Gi
       media:
         enabled: true
+    extraInitContainers:
+      - name: build-model
+        image: python:3.11
+        command:
+          - sh
+          - -c
+          - |
+            set -e
+            MODEL=/config/model_cache/yolov9-t-320.onnx
+            if [ -f "$MODEL" ]; then
+              echo "Model already exists, skipping build"
+              exit 0
+            fi
+            echo "Building YOLOv9-t ONNX model..."
+            apt-get update && apt-get install --no-install-recommends -y cmake libgl1
+            pip install --no-cache-dir uv
+            cd /tmp
+            git clone https://github.com/WongKinYiu/yolov9.git
+            cd yolov9
+            uv pip install --system -r requirements.txt
+            uv pip install --system onnx==1.18.0 onnxruntime "onnx-simplifier==0.4.*" onnxscript
+            wget -q https://github.com/WongKinYiu/yolov9/releases/download/v0.1/yolov9-t-converted.pt -O yolov9-t.pt
+            sed -i "s/ckpt = torch.load(attempt_download(w), map_location='cpu')/ckpt = torch.load(attempt_download(w), map_location='cpu', weights_only=False)/g" models/experimental.py
+            python3 export.py --weights ./yolov9-t.pt --imgsz 320 --simplify --include onnx
+            mkdir -p /config/model_cache
+            cp yolov9-t.onnx "$MODEL"
+            echo "Model build complete"
+        volumeMounts:
+          - name: config
+            mountPath: /config
     gpu:
       nvidia:
         enabled: true
