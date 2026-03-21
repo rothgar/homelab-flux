@@ -16,6 +16,8 @@ spec:
     image:
       tag: stable-tensorrt
     persistence:
+      config:
+        enabled: true
       media:
         enabled: true
     gpu:
