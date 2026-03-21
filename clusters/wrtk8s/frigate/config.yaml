@@ -19,8 +19,8 @@ stringData:
       auth:
         enabled: false
       detectors:
-        tensorrt:
-          type: tensorrt
+        cpu:
+          type: cpu
       objects:
         track:
           - person
