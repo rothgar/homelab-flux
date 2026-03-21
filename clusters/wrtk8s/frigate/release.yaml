@@ -14,7 +14,7 @@ spec:
         namespace: frigate
   values:
     image:
-      tag: stable-tensorrt
+      tag: 0.17.0-tensorrt
     persistence:
       config:
         enabled: true
