@@ -19,8 +19,9 @@ stringData:
       auth:
         enabled: false
       detectors:
-        tensorrt:
-          type: tensorrt
+        onnx:
+          type: onnx
+          device: cuda
       objects:
         track:
           - person
