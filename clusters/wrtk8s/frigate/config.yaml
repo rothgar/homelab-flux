@@ -19,8 +19,8 @@ stringData:
       auth:
         enabled: false
       detectors:
-        cpu:
-          type: cpu
+        tensorrt:
+          type: tensorrt
       objects:
         track:
           - person
@@ -34,25 +34,36 @@ stringData:
         bounding_box: true
       record:
         enabled: true
+      go2rtc:
+        streams:
+          front_door:
+            - rtsp://admin:qRU4zLZPtwEJjnHqY@10.1.1.60:554/h264Preview_01_main
+          rear_door:
+            - rtsp://admin:qRU4zLZPtwEJjnHqY@10.1.1.62:554/h264Preview_01_main
+          backyard:
+            - rtsp://admin:qRU4zLZPtwEJjnHqY@10.1.1.61:554/h264Preview_01_main
       cameras:
         front_door:
           ffmpeg:
             inputs:
-              - path: rtsp://admin:qRU4zLZPtwEJjnHqY@10.1.1.60:554/h264Preview_01_main
+              - path: rtsp://127.0.0.1:8554/front_door
+                input_args: preset-rtsp-restream
                 roles:
                   - detect
                   - record
         rear_door:
           ffmpeg:
             inputs:
-              - path: rtsp://admin:qRU4zLZPtwEJjnHqY@10.1.1.62:554/h264Preview_01_main
+              - path: rtsp://127.0.0.1:8554/rear_door
+                input_args: preset-rtsp-restream
                 roles:
                   - detect
                   - record
         backyard:
           ffmpeg:
             inputs:
-              - path: rtsp://admin:qRU4zLZPtwEJjnHqY@10.1.1.61:554/h264Preview_01_main
+              - path: rtsp://127.0.0.1:8554/backyard
+                input_args: preset-rtsp-restream
                 roles:
                   - detect
                   - record
