@@ -25,7 +25,7 @@ spec:
                       - spark
       containers:
         - name: vllm
-          image: vllm/vllm-openai:v0.18.1
+          image: vllm/vllm-openai:v0.18.1-aarch64-cu130
           ports:
             - containerPort: 8000
               name: http
