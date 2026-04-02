@@ -25,17 +25,3 @@ spec:
   resources:
     requests:
       storage: 500Gi
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: vllm-cache
-  namespace: vllm-system
-spec:
-  accessModes:
-    - ReadWriteMany
-  storageClassName: ""
-  volumeName: vllm-models
-  resources:
-    requests:
-      storage: 500Gi

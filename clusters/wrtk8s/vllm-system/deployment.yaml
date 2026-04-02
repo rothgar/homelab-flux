@@ -60,17 +60,15 @@ spec:
           volumeMounts:
             - name: models
               mountPath: /models
-            - name: cache
+            - name: models
               mountPath: /root/.cache
+              subPath: cache
             - name: dshm
               mountPath: /dev/shm
       volumes:
         - name: models
           persistentVolumeClaim:
             claimName: vllm-models
-        - name: cache
-          persistentVolumeClaim:
-            claimName: vllm-cache
         - name: dshm
           emptyDir:
             medium: Memory
