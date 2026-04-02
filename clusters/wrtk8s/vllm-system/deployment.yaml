@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vllm
+  namespace: vllm-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vllm
+  template:
+    metadata:
+      labels:
+        app: vllm
+    spec:
+      runtimeClassName: nvidia
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - spark
+      containers:
+        - name: vllm
+          image: vllm/vllm-openai:v0.17.0
+          ports:
+            - containerPort: 8000
+              name: http
+              protocol: TCP
+          env:
+            - name: HF_HOME
+              value: /models/huggingface
+            - name: TRANSFORMERS_CACHE
+              value: /models/huggingface
+          args:
+            - --model
+            - Qwen/Qwen3-Coder-Next-FP8
+            - --download-dir
+            - /models
+            - --host
+            - "0.0.0.0"
+            - --port
+            - "8000"
+            - --gpu-memory-utilization
+            - "0.95"
+            - --max-model-len
+            - "32768"
+          resources:
+            requests:
+              nvidia.com/gpu: 1
+              memory: 32Gi
+              cpu: 4
+            limits:
+              nvidia.com/gpu: 1
+              memory: 64Gi
+              cpu: 8
+          volumeMounts:
+            - name: models
+              mountPath: /models
+            - name: cache
+              mountPath: /root/.cache
+            - name: dshm
+              mountPath: /dev/shm
+      volumes:
+        - name: models
+          persistentVolumeClaim:
+            claimName: vllm-models
+        - name: cache
+          persistentVolumeClaim:
+            claimName: vllm-cache
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 16Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vllm
+  namespace: vllm-system
+  annotations:
+    tailscale.com/expose: "true"
+    tailscale.com/hostname: "vllm"
+spec:
+  selector:
+    app: vllm
+  ports:
+    - port: 8000
+      targetPort: 8000
+  type: LoadBalancer

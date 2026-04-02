@@ -24,7 +24,7 @@ resources:
   - nfs-csi
   - openclaw
   - nvidia-system
-  - ollama
+
   - omni-cd
   - reaparr
   - registry
@@ -32,5 +32,6 @@ resources:
   - tailscale-operator
   - talos-remote-config
   - traefik
+  - vllm-system
   - whisper-webui
   - plex

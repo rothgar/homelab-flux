@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: open-webui
-  namespace: ollama
+  namespace: vllm-system
 spec:
   replicas: 1
   selector:
@@ -20,7 +20,11 @@ spec:
             - containerPort: 8080
           env:
             - name: OLLAMA_BASE_URL
-              value: "http://ollama:11434"
+              value: ""
+            - name: OPENAI_API_BASE_URL
+              value: "http://vllm.vllm-system.svc.cluster.local:8000/v1"
+            - name: OPENAI_API_KEY
+              value: "none"
             - name: WEBUI_AUTH
               value: "false"
           volumeMounts:
@@ -34,7 +38,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: open-webui
-  namespace: ollama
+  namespace: vllm-system
   annotations:
     tailscale.com/expose: "true"
     tailscale.com/hostname: "ai"
