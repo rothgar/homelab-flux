@@ -22,7 +22,7 @@ resources:
   - monitoring
   - mqtt
   - nfs-csi
-  - openclaw
+
   - nvidia-system
 
   - omni-cd
