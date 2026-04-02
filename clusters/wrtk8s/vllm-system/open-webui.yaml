@@ -22,7 +22,7 @@ spec:
             - name: OLLAMA_BASE_URL
               value: ""
             - name: OPENAI_API_BASE_URL
-              value: "http://vllm.vllm-system.svc.cluster.local:8000/v1"
+              value: "http://vllm-server.vllm-system.svc.cluster.local:8000/v1"
             - name: OPENAI_API_KEY
               value: "none"
             - name: WEBUI_AUTH
