@@ -25,7 +25,7 @@ spec:
                       - spark
       containers:
         - name: vllm
-          image: vllm/vllm-openai:v0.18.1-aarch64-cu130
+          image: nvcr.io/nvidia/vllm:26.03-py3
           ports:
             - containerPort: 8000
               name: http
@@ -38,10 +38,9 @@ spec:
                   key: token
             - name: HF_HOME
               value: /models/huggingface
-            - name: TRANSFORMERS_CACHE
-              value: /models/huggingface
-          args:
-            - --model
+          command:
+            - vllm
+            - serve
             - Qwen/Qwen3-Coder-Next-FP8
             - --download-dir
             - /models
