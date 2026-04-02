@@ -67,8 +67,9 @@ spec:
               mountPath: /dev/shm
       volumes:
         - name: models
-          persistentVolumeClaim:
-            claimName: vllm-models
+          hostPath:
+            path: /var/mnt/longhorn/vllm
+            type: DirectoryOrCreate
         - name: dshm
           emptyDir:
             medium: Memory
