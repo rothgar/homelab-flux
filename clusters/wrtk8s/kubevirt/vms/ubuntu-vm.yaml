@@ -70,6 +70,11 @@ spec:
             claimName: ubuntu-home
         - name: cloudinit
           cloudInitNoCloud:
+            networkData: |
+              version: 2
+              ethernets:
+                enp1s0:
+                  dhcp4: true
             userData: |
               #cloud-config
               hostname: ubuntu
