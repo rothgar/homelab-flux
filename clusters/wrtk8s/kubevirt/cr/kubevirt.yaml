@@ -10,8 +10,8 @@ spec:
       featureGates:
         - GPU
     permittedHostDevices:
-      mediatedDevices: []
-      externalResourceProvider: true
+      externalResourceProvider:
+        - resourceName: nvidia.com/gpu
   customizeComponents: {}
   imagePullPolicy: IfNotPresent
   infra:
