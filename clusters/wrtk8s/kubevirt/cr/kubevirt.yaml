@@ -7,7 +7,11 @@ spec:
   certificateRotateStrategy: {}
   configuration:
     developerConfiguration:
-      featureGates: []
+      featureGates:
+        - GPU
+    permittedHostDevices:
+      mediatedDevices: []
+      externalResourceProvider: true
   customizeComponents: {}
   imagePullPolicy: IfNotPresent
   infra:

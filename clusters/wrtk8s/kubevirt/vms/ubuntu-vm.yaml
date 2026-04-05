@@ -48,6 +48,9 @@ spec:
           requests:
             memory: 8Gi
         devices:
+          gpus:
+            - name: gpu
+              deviceName: nvidia.com/gpu
           disks:
             - name: boot
               disk:
