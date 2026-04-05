@@ -10,8 +10,10 @@ spec:
       featureGates:
         - GPU
     permittedHostDevices:
-      externalResourceProvider:
-        - resourceName: nvidia.com/gpu
+      pciHostDevices:
+        - pciVendorSelector: "10de:"
+          resourceName: nvidia.com/gpu
+          externalResourceProvider: true
   customizeComponents: {}
   imagePullPolicy: IfNotPresent
   infra:
