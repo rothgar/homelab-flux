@@ -10,7 +10,7 @@ data:
 
     [[devices]]
     host = "10.1.1.7"
-    alias = "g-d"
+    alias = "comet-pro"
 
     [[devices]]
     host = "10.1.1.10"
@@ -23,3 +23,7 @@ data:
     [[devices]]
     host = "10.1.1.2"
     alias = "benchy"
+
+    [[devices]]
+    host = "10.1.1.54"
+    alias = "cube"
