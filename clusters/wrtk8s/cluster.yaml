@@ -75,6 +75,9 @@ patches:
 ---
 kind: Machine
 name: c828b893-c76a-4b1c-a7c6-345a6053adf6
+kernelArgs:
+  - amd_iommu=on
+  - iommu=pt
 patches:
   - file: patches/3d.yaml
   - file: patches/3d-vfio.yaml

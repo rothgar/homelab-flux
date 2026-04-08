@@ -11,7 +11,7 @@ spec:
         - GPU
     permittedHostDevices:
       pciHostDevices:
-        - pciVendorSelector: "10de:"
+        - pciVendorSelector: "10DE:1B81"
           resourceName: nvidia.com/gpu-passthrough
   customizeComponents: {}
   imagePullPolicy: IfNotPresent
