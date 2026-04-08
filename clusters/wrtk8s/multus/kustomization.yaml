@@ -9,22 +9,5 @@ patches:
       name: kube-multus-ds
     patch: |
       - op: replace
-        path: /spec/template/spec/volumes/3/hostPath/path
+        path: /spec/template/spec/volumes/9/hostPath/path
         value: /var/run/netns/
-      - op: replace
-        path: /spec/template/spec/initContainers/0/command
-        value:
-          - "/usr/src/multus-cni/bin/install_multus"
-          - "-d"
-          - "/host/opt/cni/bin"
-          - "-t"
-          - "thick"
-      - op: replace
-        path: /spec/template/spec/containers/0/resources
-        value:
-          limits:
-            cpu: 300m
-            memory: 150Mi
-          requests:
-            cpu: 200m
-            memory: 100Mi
