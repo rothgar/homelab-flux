@@ -74,12 +74,8 @@ patches:
   - file: patches/kubelet.yaml
 ---
 kind: Machine
-systemExtensions:
-  - siderolabs/nvidia-container-toolkit-lts
-  - siderolabs/nonfree-kmod-nvidia-lts
 name: c828b893-c76a-4b1c-a7c6-345a6053adf6
 patches:
   - file: patches/3d.yaml
-  - file: patches/nvidia.yaml
-  - file: patches/gpu-labels.yaml
+  - file: patches/3d-vfio.yaml
   - file: patches/kubelet.yaml

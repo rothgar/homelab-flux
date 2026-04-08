@@ -41,6 +41,8 @@ spec:
       labels:
         app: ubuntu
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: 3d
       domain:
         cpu:
           cores: 4
@@ -50,7 +52,7 @@ spec:
         devices:
           gpus:
             - name: gpu
-              deviceName: nvidia.com/gpu
+              deviceName: nvidia.com/gpu-passthrough
           disks:
             - name: boot
               disk:

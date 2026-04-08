@@ -12,8 +12,7 @@ spec:
     permittedHostDevices:
       pciHostDevices:
         - pciVendorSelector: "10de:"
-          resourceName: nvidia.com/gpu
-          externalResourceProvider: true
+          resourceName: nvidia.com/gpu-passthrough
   customizeComponents: {}
   imagePullPolicy: IfNotPresent
   infra:

@@ -1,0 +1,7 @@
+machine:
+  kernel:
+    modules:
+      - name: vfio
+      - name: vfio_pci
+        parameters:
+          - "ids=10de:1b81,10de:10f0"
