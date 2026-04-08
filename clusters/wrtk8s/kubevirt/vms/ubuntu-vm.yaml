@@ -53,6 +53,9 @@ spec:
           gpus:
             - name: gpu
               deviceName: nvidia.com/gpu-passthrough
+          interfaces:
+            - name: default
+              masquerade: {}
           disks:
             - name: boot
               disk:
@@ -63,6 +66,9 @@ spec:
             - name: cloudinit
               disk:
                 bus: virtio
+      networks:
+        - name: default
+          pod: {}
       volumes:
         - name: boot
           dataVolume:
