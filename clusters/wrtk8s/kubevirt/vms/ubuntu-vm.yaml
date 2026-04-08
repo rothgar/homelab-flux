@@ -109,6 +109,7 @@ spec:
                   fi
               package_update: true
               packages:
+                - qemu-guest-agent
                 - ubuntu-desktop-minimal
                 - spice-vdagent
                 - flatpak
