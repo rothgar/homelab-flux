@@ -56,6 +56,8 @@ spec:
           interfaces:
             - name: default
               masquerade: {}
+            - name: lan
+              bridge: {}
           disks:
             - name: boot
               disk:
@@ -69,6 +71,9 @@ spec:
       networks:
         - name: default
           pod: {}
+        - name: lan
+          multus:
+            networkName: br0
       volumes:
         - name: boot
           dataVolume:
@@ -82,6 +87,8 @@ spec:
               version: 2
               ethernets:
                 enp1s0:
+                  dhcp4: true
+                enp2s0:
                   dhcp4: true
             userData: |
               #cloud-config

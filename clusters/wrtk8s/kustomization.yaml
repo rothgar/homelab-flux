@@ -17,6 +17,7 @@ resources:
   - kvmm
   - local-path-provisioner
   - metallb
+  - multus
   - metrics-server
   - miniflux
   - monitoring
