@@ -57,6 +57,7 @@ spec:
             - name: default
               masquerade: {}
             - name: lan
+              macAddress: "9a:85:55:74:10:98"
               bridge: {}
           disks:
             - name: boot
@@ -94,12 +95,15 @@ spec:
               #cloud-config
               hostname: ubuntu
               manage_etc_hosts: true
+              ssh_pwauth: true
               users:
                 - name: ubuntu
                   sudo: ALL=(ALL) NOPASSWD:ALL
                   shell: /bin/bash
                   lock_passwd: false
                   plain_text_passwd: ubuntu
+                  ssh_import_id:
+                    - gh:rothgar
               mounts:
                 - [/dev/vdb, /home, ext4, "defaults,nofail", "0", "2"]
               bootcmd:

@@ -26,7 +26,7 @@ patches:
         path: /spec/template/spec/nodeSelector
         value:
           kubernetes.io/arch: amd64
-  # Expose via Tailscale
+  # Expose via Tailscale on port 443
   - target:
       kind: Service
       name: kubevirt-manager
@@ -34,6 +34,13 @@ patches:
       - op: replace
         path: /spec/type
         value: LoadBalancer
+      - op: replace
+        path: /spec/ports
+        value:
+          - name: https
+            port: 443
+            targetPort: 8080
+            protocol: TCP
       - op: add
         path: /metadata/annotations/tailscale.com~1expose
         value: "true"
