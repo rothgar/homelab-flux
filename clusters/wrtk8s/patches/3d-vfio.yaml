@@ -1,13 +1,4 @@
 machine:
-  network:
-    interfaces:
-      - interface: br0
-        dhcp: true
-        bridge:
-          stp:
-            enabled: true
-          interfaces:
-            - enp37s0
   kernel:
     modules:
       - name: vfio
@@ -15,3 +6,16 @@ machine:
       - name: vfio_pci
         parameters:
           - "ids=10de:1b81,10de:10f0"
+---
+apiVersion: v1alpha1
+kind: BridgeConfig
+name: br0
+links:
+  - enp37s0
+stp:
+  enabled: true
+up: true
+---
+apiVersion: v1alpha1
+kind: DHCPv4Config
+name: br0
