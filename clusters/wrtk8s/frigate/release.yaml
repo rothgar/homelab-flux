@@ -17,11 +17,19 @@ spec:
       tag: 0.17.0-tensorrt
     persistence:
       config:
-        enabled: true
-        storageClass: local-path
-        size: 1Gi
+        enabled: false
       media:
         enabled: true
+        storageClass: nfs-synology
+        size: 50Gi
+    extraVolumes:
+      - name: config
+        hostPath:
+          path: /var/lib/frigate/config
+          type: DirectoryOrCreate
+    extraVolumeMounts:
+      - name: config
+        mountPath: /config
     extraInitContainers:
       - name: build-model
         image: python:3.11

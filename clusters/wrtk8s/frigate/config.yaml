@@ -21,6 +21,7 @@ stringData:
       detectors:
         onnx:
           type: onnx
+          device: cuda
       model:
         model_type: yolo-generic
         width: 320
@@ -42,6 +43,8 @@ stringData:
         bounding_box: true
       record:
         enabled: true
+        retain:
+          days: 14
       go2rtc:
         streams:
           front_door:
@@ -53,6 +56,7 @@ stringData:
       cameras:
         front_door:
           ffmpeg:
+            hwaccel_args: preset-nvidia
             inputs:
               - path: rtsp://127.0.0.1:8554/front_door
                 input_args: preset-rtsp-restream
@@ -61,6 +65,7 @@ stringData:
                   - record
         rear_door:
           ffmpeg:
+            hwaccel_args: preset-nvidia
             inputs:
               - path: rtsp://127.0.0.1:8554/rear_door
                 input_args: preset-rtsp-restream
@@ -69,6 +74,7 @@ stringData:
                   - record
         backyard:
           ffmpeg:
+            hwaccel_args: preset-nvidia
             inputs:
               - path: rtsp://127.0.0.1:8554/backyard
                 input_args: preset-rtsp-restream
