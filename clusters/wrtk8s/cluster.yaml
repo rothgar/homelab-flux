@@ -80,5 +80,4 @@ kernelArgs:
   - iommu=pt
 patches:
   - file: patches/3d.yaml
-  - file: patches/3d-vfio.yaml
   - file: patches/kubelet.yaml
