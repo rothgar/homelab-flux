@@ -1,16 +1,3 @@
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: ubuntu-home
-  namespace: kubevirt
-spec:
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: nfs-synology
-  resources:
-    requests:
-      storage: 50Gi
----
 apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
@@ -46,9 +33,6 @@ spec:
             - name: boot
               disk:
                 bus: virtio
-            - name: home
-              disk:
-                bus: virtio
             - name: smb-credentials
               disk:
                 bus: virtio
@@ -66,9 +50,6 @@ spec:
         - name: boot
           persistentVolumeClaim:
             claimName: ubuntu-boot-local
-        - name: home
-          persistentVolumeClaim:
-            claimName: ubuntu-home
         - name: smb-credentials
           secret:
             secretName: ubuntu-smb-credentials

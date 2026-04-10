@@ -11,25 +11,17 @@ stringData:
     manage_etc_hosts: true
     ssh_pwauth: true
     users:
-      - name: jgarr
+      - name: ubuntu
         sudo: ALL=(ALL) NOPASSWD:ALL
         shell: /bin/bash
         lock_passwd: false
+        plain_text_passwd: ubuntu
         ssh_authorized_keys:
           - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDCn/WYbUnsZCXLPkEhRNBH3wkrkxZGu+sOlVVeqhvsdIRq0E6H8SOglYRJmt/sKgBNt8x+aFkW8rRGUMiGz46XBgx+gGnUBW5WVVPdQ3dKLBLchhyoh6jZc1kFpYpLb+QonWr7ne3FzgyEegUq9qkOcJpDqFJ7IKSlIiPxLb/6ztKRjEhcSHjSBeCYfQddatspaJP2/ei7LV85EsLykAYfIRs/pX0BkuHivC75eOfcs86P9bKnLJm0uWQ62Fkx684fzPPM18AhIEiojkBkluVFSXLI5VxKI58incVMmJ1CBReFg8oqTvSKtQ+rabRX71uGcf0SOM3GCmBJwFUf6noj
           - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINK1AyRqlsnygTUljmL7cXgHkFsb3mDU6gb0MIwZnZ0O
         ssh_import_id:
           - gh:rothgar
-      - name: logan
-        shell: /bin/bash
-        lock_passwd: false
-    mounts:
-      - [/dev/vdb, /home, ext4, "defaults,nofail", "0", "2"]
     bootcmd:
-      - |
-        if ! blkid /dev/vdb; then
-          mkfs.ext4 /dev/vdb
-        fi
       - mkdir -p /mnt/smb-credentials
       - mount /dev/$(lsblk -o NAME,SERIAL | grep SMBCREDS | awk '{print $1}') /mnt/smb-credentials
     package_update: true
@@ -49,6 +41,12 @@ stringData:
       - libxcb-cursor0
       - libxcb-xinput0
       - libxcb-xinerama0
+      - libavcodec-extra
+      - gstreamer1.0-plugins-bad
+      - gstreamer1.0-plugins-ugly
+      - gstreamer1.0-libav
+      - ffmpeg
+      - nfs-kernel-server
     write_files:
       - path: /etc/X11/xorg.conf.d/10-nvidia-virtual.conf
         content: |
@@ -84,7 +82,7 @@ stringData:
           [daemon]
           WaylandEnable=false
           AutomaticLoginEnable=true
-          AutomaticLogin=jgarr
+          AutomaticLogin=ubuntu
 
           [security]
 
@@ -93,20 +91,50 @@ stringData:
           [chooser]
 
           [debug]
+      - path: /etc/exports
+        append: true
+        content: |
+          /home/ubuntu/Videos 10.1.0.0/22(rw,sync,no_subtree_check,no_root_squash)
+      - path: /etc/dconf/profile/user
+        content: |
+          user-db:user
+          system-db:local
+      - path: /etc/dconf/db/local.d/00-vm-defaults
+        content: |
+          [org/gnome/desktop/input-sources]
+          sources=[('xkb', 'us+dvorak'), ('xkb', 'us')]
+
+          [org/gnome/desktop/screensaver]
+          lock-enabled=false
+
+          [org/gnome/desktop/session]
+          idle-delay=uint32 0
     runcmd:
       - systemctl enable --now qemu-guest-agent
+      - exportfs -ra
+      - systemctl enable --now nfs-kernel-server
       - systemctl set-default graphical.target
       - systemctl enable gdm
       - wget -O /tmp/sunshine.deb https://github.com/LizardByte/Sunshine/releases/latest/download/sunshine-ubuntu-24.04-amd64.deb
       - apt install -y /tmp/sunshine.deb
       - rm /tmp/sunshine.deb
-      - loginctl enable-linger jgarr
-      - sudo -u jgarr bash -c 'mkdir -p /home/jgarr/.config/sunshine && echo "capture = x11" > /home/jgarr/.config/sunshine/sunshine.conf'
-      - sudo -u jgarr bash -c 'XDG_RUNTIME_DIR=/run/user/1000 systemctl --user enable sunshine'
+      - loginctl enable-linger ubuntu
+      - sudo -u ubuntu bash -c 'mkdir -p /home/ubuntu/.config/sunshine && echo "capture = x11" > /home/ubuntu/.config/sunshine/sunshine.conf'
+      - sudo -u ubuntu bash -c 'XDG_RUNTIME_DIR=/run/user/1000 systemctl --user enable sunshine'
       - setcap cap_sys_admin+p $(readlink -f $(which sunshine)) || true
       - mkdir -p /mnt/d/public /mnt/d/video
       - echo '//10.1.1.4/public /mnt/d/public cifs credentials=/mnt/smb-credentials/credentials,uid=1000,gid=1000,nofail 0 0' >> /etc/fstab
       - echo '//10.1.1.4/video /mnt/d/video cifs credentials=/mnt/smb-credentials/credentials,uid=1000,gid=1000,nofail 0 0' >> /etc/fstab
       - mount -a
+      - dconf update
+      # Install Steam
+      - dpkg --add-architecture i386
+      - apt update
+      - DEBIAN_FRONTEND=noninteractive apt install -y steam-installer
+      # Install DaVinci Resolve Studio from SMB share
+      - SKIP_PACKAGE_CHECK=1 /mnt/d/public/install/resolve/DaVinci_Resolve_Studio_20.3.1_Linux.run -i -a -y
+      - mkdir -p /opt/resolve/libs/disabled
+      - mv /opt/resolve/libs/libglib-2.0.so* /opt/resolve/libs/libgio-2.0.so* /opt/resolve/libs/libgobject-2.0.so* /opt/resolve/libs/libgmodule-2.0.so* /opt/resolve/libs/disabled/
+      # Flatpak
       - flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
       - flatpak install -y flathub com.moonlight_stream.Moonlight

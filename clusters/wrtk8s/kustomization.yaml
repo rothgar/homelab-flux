@@ -29,6 +29,7 @@ resources:
   - omni-cd
   - reaparr
   - registry
+  - resolve-db
   - reloader
   - tailscale-operator
   - talos-remote-config
