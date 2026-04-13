@@ -49,10 +49,16 @@ stringData:
         streams:
           front_door:
             - rtsp://admin:qRU4zLZPtwEJjnHqY@10.1.1.60:554/h264Preview_01_main
+          front_door_sub:
+            - rtsp://admin:qRU4zLZPtwEJjnHqY@10.1.1.60:554/h264Preview_01_sub
           rear_door:
             - rtsp://admin:qRU4zLZPtwEJjnHqY@10.1.1.62:554/h264Preview_01_main
+          rear_door_sub:
+            - rtsp://admin:qRU4zLZPtwEJjnHqY@10.1.1.62:554/h264Preview_01_sub
           backyard:
             - rtsp://admin:qRU4zLZPtwEJjnHqY@10.1.1.61:554/h264Preview_01_main
+          backyard_sub:
+            - rtsp://admin:qRU4zLZPtwEJjnHqY@10.1.1.61:554/h264Preview_01_sub
       cameras:
         front_door:
           ffmpeg:
@@ -61,8 +67,11 @@ stringData:
               - path: rtsp://127.0.0.1:8554/front_door
                 input_args: preset-rtsp-restream
                 roles:
-                  - detect
                   - record
+              - path: rtsp://127.0.0.1:8554/front_door_sub
+                input_args: preset-rtsp-restream
+                roles:
+                  - detect
         rear_door:
           ffmpeg:
             hwaccel_args: preset-nvidia
@@ -70,8 +79,11 @@ stringData:
               - path: rtsp://127.0.0.1:8554/rear_door
                 input_args: preset-rtsp-restream
                 roles:
-                  - detect
                   - record
+              - path: rtsp://127.0.0.1:8554/rear_door_sub
+                input_args: preset-rtsp-restream
+                roles:
+                  - detect
         backyard:
           ffmpeg:
             hwaccel_args: preset-nvidia
@@ -79,5 +91,8 @@ stringData:
               - path: rtsp://127.0.0.1:8554/backyard
                 input_args: preset-rtsp-restream
                 roles:
-                  - detect
                   - record
+              - path: rtsp://127.0.0.1:8554/backyard_sub
+                input_args: preset-rtsp-restream
+                roles:
+                  - detect
