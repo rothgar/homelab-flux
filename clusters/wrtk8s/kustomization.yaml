@@ -19,6 +19,7 @@ resources:
   - metallb
   - multus
   - metrics-server
+  - minecraft
   - miniflux
   - monitoring
   - mqtt

@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bedrock
+  namespace: minecraft
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bedrock
+  template:
+    metadata:
+      labels:
+        app: bedrock
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      containers:
+        - name: bedrock
+          image: itzg/minecraft-bedrock-server:latest
+          ports:
+            - containerPort: 19132
+              protocol: UDP
+          env:
+            - name: EULA
+              value: "TRUE"
+            - name: SERVER_NAME
+              value: "wrtk8s"
+            - name: GAMEMODE
+              value: creative
+            - name: DIFFICULTY
+              value: normal
+            - name: ALLOW_CHEATS
+              value: "true"
+            - name: MAX_PLAYERS
+              value: "10"
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          resources:
+            requests:
+              memory: 512Mi
+              cpu: 500m
+            limits:
+              memory: 2Gi
+        - name: playit
+          image: ghcr.io/playit-cloud/playit-agent:0.17
+          env:
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: playit-secret
+                  key: SECRET_KEY
+          resources:
+            requests:
+              memory: 64Mi
+              cpu: 50m
+            limits:
+              memory: 128Mi
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: bedrock-data
