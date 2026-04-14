@@ -4,7 +4,7 @@ metadata:
   name: ubuntu-boot-local
 spec:
   capacity:
-    storage: 232Gi
+    storage: 1Ti
   volumeMode: Block
   accessModes:
     - ReadWriteOnce
@@ -34,4 +34,4 @@ spec:
   volumeName: ubuntu-boot-local
   resources:
     requests:
-      storage: 232Gi
+      storage: 1Ti
