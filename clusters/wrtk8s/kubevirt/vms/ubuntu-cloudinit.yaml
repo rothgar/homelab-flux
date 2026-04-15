@@ -120,7 +120,9 @@ stringData:
       - rm /tmp/sunshine.deb
       - loginctl enable-linger ubuntu
       - sudo -u ubuntu bash -c 'mkdir -p /home/ubuntu/.config/sunshine && echo "capture = x11" > /home/ubuntu/.config/sunshine/sunshine.conf'
-      - sudo -u ubuntu bash -c 'XDG_RUNTIME_DIR=/run/user/1000 systemctl --user enable sunshine'
+      # Wait for user@1000 manager to be ready, then enable+start sunshine with proper dbus session
+      - until [ -S /run/user/1000/bus ]; do sleep 1; done
+      - sudo -u ubuntu XDG_RUNTIME_DIR=/run/user/1000 DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus systemctl --user enable --now sunshine
       - setcap cap_sys_admin+p $(readlink -f $(which sunshine)) || true
       - mkdir -p /mnt/d/public /mnt/d/video
       - echo '//10.1.1.4/public /mnt/d/public cifs credentials=/mnt/smb-credentials/credentials,uid=1000,gid=1000,nofail 0 0' >> /etc/fstab
@@ -131,10 +133,12 @@ stringData:
       - dpkg --add-architecture i386
       - apt update
       - DEBIAN_FRONTEND=noninteractive apt install -y steam-installer
-      # Install DaVinci Resolve Studio from SMB share
-      - SKIP_PACKAGE_CHECK=1 /mnt/d/public/install/resolve/DaVinci_Resolve_Studio_20.3.1_Linux.run -i -a -y
+      # Install DaVinci Resolve Studio from SMB share.
+      # Note: recent Blackmagic installers refuse to run as root — install manually
+      # after first boot if this step fails.
+      - SKIP_PACKAGE_CHECK=1 /mnt/d/public/install/resolve/DaVinci_Resolve_Studio_20.3.1_Linux.run -i -a -y || true
       - mkdir -p /opt/resolve/libs/disabled
-      - mv /opt/resolve/libs/libglib-2.0.so* /opt/resolve/libs/libgio-2.0.so* /opt/resolve/libs/libgobject-2.0.so* /opt/resolve/libs/libgmodule-2.0.so* /opt/resolve/libs/disabled/
+      - mv /opt/resolve/libs/libglib-2.0.so* /opt/resolve/libs/libgio-2.0.so* /opt/resolve/libs/libgobject-2.0.so* /opt/resolve/libs/libgmodule-2.0.so* /opt/resolve/libs/disabled/ 2>/dev/null || true
       # Flatpak
       - flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
       - flatpak install -y flathub com.moonlight_stream.Moonlight
