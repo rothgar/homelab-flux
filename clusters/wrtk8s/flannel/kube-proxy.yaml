@@ -70,7 +70,7 @@ spec:
           effect: NoExecute
       containers:
         - name: kube-proxy
-          image: registry.k8s.io/kube-proxy:v1.35.1
+          image: registry.k8s.io/kube-proxy:v1.35.4
           command:
             - /usr/local/bin/kube-proxy
             - --config=/var/lib/kube-proxy/config.conf
