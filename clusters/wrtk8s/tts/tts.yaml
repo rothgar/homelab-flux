@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tts
+  namespace: tts
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tts
+  template:
+    metadata:
+      labels:
+        app: tts
+    spec:
+      containers:
+        - name: tts
+          image: ghcr.io/matatonic/openedai-speech
+          ports:
+            - containerPort: 8000
+          env:
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: tts-api-key
+                  key: api-key
+          volumeMounts:
+            - name: voices
+              mountPath: /app/voices
+            - name: config
+              mountPath: /app/config
+      volumes:
+        - name: voices
+          emptyDir: {}
+        - name: config
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tts
+  namespace: tts
+spec:
+  selector:
+    app: tts
+  ports:
+    - port: 8000
+      targetPort: 8000

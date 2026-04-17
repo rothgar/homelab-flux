@@ -33,6 +33,7 @@ resources:
   - resolve-db
   - reloader
   - tailscale-operator
+  - tts
   - talos-remote-config
   - traefik
   - vllm-system
