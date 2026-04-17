@@ -18,3 +18,12 @@ spec:
       additionalLabels:
         release: kube-prometheus-stack
     runtimeClassName: nvidia
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: nvidia.com/gpu
+                  operator: In
+                  values:
+                    - "true"
