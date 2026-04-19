@@ -1,0 +1,114 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: romm-resources
+  namespace: romm
+spec:
+  storageClassName: local-path
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: romm-redis
+  namespace: romm
+spec:
+  storageClassName: local-path
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: romm-assets
+  namespace: romm
+spec:
+  storageClassName: local-path
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: romm-config
+  namespace: romm
+spec:
+  storageClassName: local-path
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: romm
+  namespace: romm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: romm
+  template:
+    metadata:
+      labels:
+        app: romm
+    spec:
+      containers:
+        - name: romm
+          image: rommapp/romm:latest
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - secretRef:
+                name: romm-credentials
+          volumeMounts:
+            - name: resources
+              mountPath: /romm/resources
+            - name: redis-data
+              mountPath: /redis-data
+            - name: library
+              mountPath: /romm/library
+            - name: assets
+              mountPath: /romm/assets
+            - name: config
+              mountPath: /romm/config
+      volumes:
+        - name: resources
+          persistentVolumeClaim:
+            claimName: romm-resources
+        - name: redis-data
+          persistentVolumeClaim:
+            claimName: romm-redis
+        - name: library
+          persistentVolumeClaim:
+            claimName: romm-roms
+        - name: assets
+          persistentVolumeClaim:
+            claimName: romm-assets
+        - name: config
+          persistentVolumeClaim:
+            claimName: romm-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: romm
+  namespace: romm
+spec:
+  selector:
+    app: romm
+  ports:
+    - port: 8080
+      targetPort: 8080

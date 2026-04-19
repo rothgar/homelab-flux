@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: romm
+  namespace: romm
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    external-dns.alpha.kubernetes.io/hostname: rom.jgarr.net
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: rom.jgarr.net
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: romm
+                port:
+                  number: 8080
+  tls:
+    - hosts:
+        - rom.jgarr.net
+      secretName: romm-tls
