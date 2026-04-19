@@ -4,7 +4,7 @@ metadata:
   name: romm-resources
   namespace: romm
 spec:
-  storageClassName: local-path
+  storageClassName: nfs-synology
   accessModes:
     - ReadWriteOnce
   resources:
@@ -17,7 +17,7 @@ metadata:
   name: romm-redis
   namespace: romm
 spec:
-  storageClassName: local-path
+  storageClassName: nfs-synology
   accessModes:
     - ReadWriteOnce
   resources:
@@ -30,7 +30,7 @@ metadata:
   name: romm-assets
   namespace: romm
 spec:
-  storageClassName: local-path
+  storageClassName: nfs-synology
   accessModes:
     - ReadWriteOnce
   resources:
@@ -43,7 +43,7 @@ metadata:
   name: romm-config
   namespace: romm
 spec:
-  storageClassName: local-path
+  storageClassName: nfs-synology
   accessModes:
     - ReadWriteOnce
   resources:

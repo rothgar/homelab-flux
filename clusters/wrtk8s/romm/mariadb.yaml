@@ -4,7 +4,7 @@ metadata:
   name: romm-db
   namespace: romm
 spec:
-  storageClassName: local-path
+  storageClassName: nfs-synology
   accessModes:
     - ReadWriteOnce
   resources:
