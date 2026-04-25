@@ -2,3 +2,10 @@ apiVersion: v1alpha1
 kind: HostnameConfig
 auto: "off"
 hostname: benchy
+---
+apiVersion: v1alpha1
+kind: VolumeConfig
+name: EPHEMERAL
+provisioning:
+  diskSelector:
+    match: disk.transport == "sata"

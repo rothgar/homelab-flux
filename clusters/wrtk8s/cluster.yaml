@@ -35,6 +35,8 @@ systemExtensions:
   - siderolabs/nvidia-container-toolkit-lts
   - siderolabs/nonfree-kmod-nvidia-lts
 name: 0564bde4-47b8-c3bd-79e6-63e7a2badf27
+kernelArgs:
+  - talos.dashboard.disabled=1
 patches:
   - file: patches/z.yaml
   - file: patches/coretemp.yaml
@@ -50,6 +52,8 @@ systemExtensions:
   - siderolabs/nvidia-container-toolkit-lts
   - siderolabs/nonfree-kmod-nvidia-lts
 name: 6ad2ae00-11cb-11ef-83fc-64bc3f0e2e00
+kernelArgs:
+  - talos.dashboard.disabled=1
 patches:
   - file: patches/mini.yaml
   - file: patches/k10temp.yaml
@@ -63,6 +67,10 @@ systemExtensions:
   - siderolabs/nvidia-container-toolkit-lts
   - siderolabs/nonfree-kmod-nvidia-lts
 name: d057a478-09c5-430f-9759-d05099df2199
+kernelArgs:
+  - talos.dashboard.disabled=1
+install:
+  disk: /dev/disk/by-id/wwn-0x500a075110d1a30a
 patches:
   - file: patches/benchy.yaml
   - file: patches/nvidia.yaml
@@ -72,6 +80,7 @@ patches:
 kind: Machine
 name: c828b893-c76a-4b1c-a7c6-345a6053adf6
 kernelArgs:
+  - talos.dashboard.disabled=1
   - amd_iommu=on
   - iommu=pt
 patches:
