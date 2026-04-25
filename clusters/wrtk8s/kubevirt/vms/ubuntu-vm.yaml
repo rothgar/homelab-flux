@@ -11,6 +11,7 @@ spec:
       labels:
         app: ubuntu
     spec:
+      priorityClassName: kubevirt-cluster-critical
       nodeSelector:
         kubernetes.io/hostname: 3d
       domain:
@@ -18,7 +19,7 @@ spec:
           cores: 4
         resources:
           requests:
-            memory: 8Gi
+            memory: 12Gi
         devices:
           gpus:
             - name: gpu
