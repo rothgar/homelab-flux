@@ -11,6 +11,8 @@ data:
     dnsPolicy: ClusterFirstWithHostNet
     service:
       type: ClusterIP
+    ingress:
+      external: true
     configuration:
       enabled: true
       forceInit: true
