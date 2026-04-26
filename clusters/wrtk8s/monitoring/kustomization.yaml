@@ -7,5 +7,6 @@ resources:
   - httproute.yaml
   - alerting-rules.yaml
   - tailscale-ingress.yaml
+  - poditlater-egress.yaml
   - poditlater-scrapeconfig.yaml
   - poditlater-dashboard.yaml
