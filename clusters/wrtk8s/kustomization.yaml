@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - cloudnative-pg
   - cert-manager
+  - controld-exporter
   - dcgm-exporter
   - descheduler
   - external-dns
@@ -29,7 +30,6 @@ resources:
 
   - omni-cd
   - reaparr
-  - romm
   - registry
   - resolve-db
   - reloader
