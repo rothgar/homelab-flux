@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: ScrapeConfig
+metadata:
+  name: controld-exporter
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  metricsPath: /metrics
+  scrapeInterval: 60s
+  staticConfigs:
+    - targets:
+        - "controld-exporter.controld-exporter.svc.cluster.local:10034"
+      labels:
+        job: controld-exporter

@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: controld-exporter
+  namespace: controld-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: controld-exporter
+  template:
+    metadata:
+      labels:
+        app: controld-exporter
+    spec:
+      containers:
+        - name: controld-exporter
+          image: ghcr.io/umatare5/controld-exporter:latest
+          ports:
+            - containerPort: 10034
+              protocol: TCP
+          env:
+            - name: CTRLD_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: controld-api-key
+                  key: api-key
+          resources:
+            requests:
+              memory: 64Mi
+              cpu: 50m
+            limits:
+              memory: 128Mi
