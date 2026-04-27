@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: controld-exporter
-          image: ghcr.io/umatare5/controld-exporter:v1.1.0
+          image: ghcr.io/rothgar/controld-exporter:latest
           ports:
             - containerPort: 10034
               protocol: TCP
