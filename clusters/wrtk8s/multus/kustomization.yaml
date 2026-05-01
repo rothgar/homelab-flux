@@ -11,3 +11,12 @@ patches:
       - op: replace
         path: /spec/template/spec/volumes/9/hostPath/path
         value: /var/run/netns/
+  # Only run multus on 3d - the only node running VMs
+  - target:
+      kind: DaemonSet
+      name: kube-multus-ds
+    patch: |
+      - op: add
+        path: /spec/template/spec/nodeSelector
+        value:
+          kubernetes.io/hostname: 3d
