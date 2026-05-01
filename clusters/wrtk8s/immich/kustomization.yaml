@@ -9,3 +9,4 @@ resources:
   - release.yaml
   - httproute.yaml
   - tailscale-ingress.yaml
+  - external-secret.yaml

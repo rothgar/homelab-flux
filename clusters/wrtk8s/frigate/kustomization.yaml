@@ -5,3 +5,4 @@ resources:
   - source.yaml
   - config.yaml
   - release.yaml
+  - external-secret.yaml

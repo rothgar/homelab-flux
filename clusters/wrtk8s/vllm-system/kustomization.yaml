@@ -5,3 +5,4 @@ resources:
   - deployment.yaml
   - open-webui.yaml
   - httproute.yaml
+  - external-secret.yaml

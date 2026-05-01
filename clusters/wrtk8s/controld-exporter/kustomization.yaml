@@ -6,3 +6,4 @@ resources:
   - service.yaml
   - scrapeconfig.yaml
   - dashboard.yaml
+  - external-secret.yaml

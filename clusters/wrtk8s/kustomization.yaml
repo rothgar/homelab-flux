@@ -6,6 +6,7 @@ resources:
   - controld-exporter
   - descheduler
   - external-dns
+  - external-secrets
   - flannel
   - flux-system
   - frigate

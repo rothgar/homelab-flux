@@ -5,3 +5,4 @@ resources:
   - postgres.yaml
   - miniflux.yaml
   - tailscale-ingress.yaml
+  - external-secrets.yaml
