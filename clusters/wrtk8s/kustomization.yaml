@@ -38,5 +38,6 @@ resources:
   - talos-remote-config
   - traefik
   - vllm-system
+  - volsync
   - whisper-webui
   - plex

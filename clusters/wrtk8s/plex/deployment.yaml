@@ -15,15 +15,34 @@ spec:
     spec:
       priorityClassName: plex-high-priority
       runtimeClassName: nvidia
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                  - key: kubernetes.io/hostname
-                    operator: In
-                    values:
-                      - spark
+      nodeSelector:
+        nvidia.com/gpu: "true"
+      initContainers:
+        - name: restore-backup
+          image: restic/restic:latest
+          command:
+            - sh
+            - -c
+            - |
+              if [ -d "/config/Library" ] && [ "$(ls -A /config/Library 2>/dev/null)" ]; then
+                echo "Config already exists, skipping restore"
+                exit 0
+              fi
+              echo "Config is empty, attempting restore from backup..."
+              export RESTIC_REPOSITORY=/backup
+              export RESTIC_PASSWORD=plex-volsync-backup
+              if restic snapshots --json | grep -q '"time"'; then
+                echo "Found snapshots, restoring latest..."
+                restic restore latest --target /
+                echo "Restore complete"
+              else
+                echo "No snapshots found, starting fresh"
+              fi
+          volumeMounts:
+            - name: data
+              mountPath: /config/Library/Application Support
+            - name: backup
+              mountPath: /backup
       containers:
         - name: plex
           image: lscr.io/linuxserver/plex:1.43.0.10492-121068a07-ls295
@@ -68,9 +87,11 @@ spec:
               mountPath: /data/soundtracks
       volumes:
         - name: data
-          hostPath:
-            path: /var/mnt/plex
-            type: Directory
+          persistentVolumeClaim:
+            claimName: plex-config
+        - name: backup
+          persistentVolumeClaim:
+            claimName: plex-config-backup
         - name: transcode
           emptyDir: {}
         - name: movies
