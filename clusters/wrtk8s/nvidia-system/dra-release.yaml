@@ -1,0 +1,29 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: nvidia-dra-driver-gpu
+  namespace: nvidia-system
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: nvidia-dra-driver-gpu
+      sourceRef:
+        kind: HelmRepository
+        name: nvidia-gpu-operator
+        namespace: nvidia-system
+  values:
+    resources:
+      gpus:
+        enabled: true
+    nvidiaDriverRoot: /usr/local
+    gpuResourcesEnabledOverride: true
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: nvidia.com/gpu.machine
+                  operator: NotIn
+                  values:
+                    - NVIDIA DGX Spark

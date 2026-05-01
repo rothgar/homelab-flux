@@ -2,3 +2,21 @@ apiVersion: v1alpha1
 kind: HostnameConfig
 auto: "off"
 hostname: spark
+---
+apiVersion: v1alpha1
+kind: VolumeConfig
+name: EPHEMERAL
+provisioning:
+  diskSelector:
+    match: disk.transport == "nvme"
+  maxSize: 100GiB
+---
+apiVersion: v1alpha1
+kind: UserVolumeConfig
+name: longhorn
+volumeType: partition
+provisioning:
+  diskSelector:
+    match: disk.transport == "nvme"
+  maxSize: 2TiB
+  minSize: 1TiB

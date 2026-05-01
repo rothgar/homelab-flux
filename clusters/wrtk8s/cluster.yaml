@@ -25,7 +25,7 @@ kind: Workers
 machines:
   - 0564bde4-47b8-c3bd-79e6-63e7a2badf27
   - c828b893-c76a-4b1c-a7c6-345a6053adf6
-  - d057a478-09c5-430f-9759-d05099df2199
+  - 4c5615cc-1dd2-11b2-8000-4cbb47001716
 ---
 kind: Machine
 systemExtensions:
@@ -61,16 +61,14 @@ patches:
 ---
 kind: Machine
 systemExtensions:
-  - siderolabs/amd-ucode
-  - siderolabs/nvidia-container-toolkit-lts
-  - siderolabs/nonfree-kmod-nvidia-lts
-name: d057a478-09c5-430f-9759-d05099df2199
+  - siderolabs/nvidia-container-toolkit-production
+  - siderolabs/nonfree-kmod-nvidia-production
+name: 4c5615cc-1dd2-11b2-8000-4cbb47001716
 kernelArgs:
   - talos.dashboard.disabled=1
-install:
-  disk: /dev/disk/by-id/wwn-0x500a075110d1a30a
+  - arm64.nobti
 patches:
-  - file: patches/benchy.yaml
+  - file: patches/spark.yaml
   - file: patches/nvidia.yaml
   - file: patches/kubelet.yaml
 ---

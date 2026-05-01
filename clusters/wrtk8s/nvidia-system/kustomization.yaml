@@ -5,3 +5,5 @@ resources:
   - runtimeclass.yaml
   - source.yaml
   - release.yaml
+  - dra-release.yaml
+  - device-plugin-spark.yaml

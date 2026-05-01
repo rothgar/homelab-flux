@@ -1,52 +1,24 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: nvidia-device-plugin
+  name: gpu-operator
   namespace: nvidia-system
 spec:
   interval: 5m
   chart:
     spec:
-      chart: nvidia-device-plugin
+      chart: gpu-operator
+      version: ">=26.3.1"
       sourceRef:
         kind: HelmRepository
-        name: nvidia
+        name: nvidia-gpu-operator
         namespace: nvidia-system
   values:
-    runtimeClassName: nvidia
-    affinity:
-      nodeAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          nodeSelectorTerms:
-            - matchExpressions:
-                - key: nvidia.com/gpu
-                  operator: In
-                  values:
-                    - "true"
-    config:
-      map:
-        default: |-
-          version: v1
-          sharing:
-            timeSlicing:
-              resources:
-                - name: nvidia.com/gpu
-                  replicas: 2
-        mini: |-
-          version: v1
-          sharing:
-            timeSlicing:
-              resources:
-                - name: nvidia.com/gpu
-                  replicas: 4
-        spark: |-
-          version: v1
-          sharing:
-            timeSlicing:
-              resources:
-                - name: nvidia.com/gpu
-                  replicas: 6
-    nodeSelector:
-      nvidia.com/gpu: "true"
-    gfd:
-      enabled: true
+    driver:
+      enabled: false
+    toolkit:
+      enabled: false
+    devicePlugin:
+      enabled: false
+    hostPaths:
+      driverInstallDir: /usr/local
