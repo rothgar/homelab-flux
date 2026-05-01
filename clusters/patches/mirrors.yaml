@@ -33,15 +33,18 @@ kind: RegistryMirrorConfig
 name: docker.io
 endpoints:
   - url: https://docker.cr.jgarr.net
+  - url: https://registry-1.docker.io
 ---
 apiVersion: v1alpha1
 kind: RegistryMirrorConfig
 name: ghcr.io
 endpoints:
   - url: https://ghcr.cr.jgarr.net
+  - url: https://ghcr.io
 ---
 apiVersion: v1alpha1
 kind: RegistryMirrorConfig
 name: registry.k8s.io
 endpoints:
   - url: https://k8s.cr.jgarr.net
+  - url: https://registry.k8s.io
