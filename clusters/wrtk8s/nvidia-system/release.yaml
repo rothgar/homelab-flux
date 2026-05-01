@@ -22,3 +22,8 @@ spec:
       enabled: false
     hostPaths:
       driverInstallDir: /usr/local
+    dcgmExporter:
+      serviceMonitor:
+        enabled: true
+        additionalLabels:
+          release: kube-prometheus-stack
