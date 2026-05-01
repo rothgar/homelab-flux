@@ -17,9 +17,41 @@ data:
       "links": [],
       "panels": [
         {
+          "title": "Data Pulled",
+          "type": "stat",
+          "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "bytes",
+              "thresholds": {
+                "steps": [
+                  { "color": "blue", "value": null }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "reduceOptions": {
+              "calcs": ["diff"],
+              "fields": "",
+              "values": false
+            },
+            "textMode": "auto",
+            "colorMode": "value"
+          },
+          "targets": [
+            {
+              "expr": "sum(registry_http_response_size_bytes_sum{job=~\"$job\"})",
+              "legendFormat": "pulled"
+            }
+          ]
+        },
+        {
           "title": "HTTP Requests Rate",
           "type": "timeseries",
-          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
           "fieldConfig": {
             "defaults": {
@@ -42,7 +74,7 @@ data:
         {
           "title": "HTTP Response Codes Rate",
           "type": "timeseries",
-          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
           "fieldConfig": {
             "defaults": {
@@ -65,7 +97,7 @@ data:
         {
           "title": "HTTP Request Duration (p50 / p90 / p99)",
           "type": "timeseries",
-          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
           "fieldConfig": {
             "defaults": {
@@ -92,7 +124,7 @@ data:
         {
           "title": "In-Flight Requests",
           "type": "timeseries",
-          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
           "fieldConfig": {
             "defaults": {
@@ -111,7 +143,7 @@ data:
         {
           "title": "Storage Action Duration (p50 / p90 / p99)",
           "type": "timeseries",
-          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 },
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
           "fieldConfig": {
             "defaults": {
@@ -138,7 +170,7 @@ data:
         {
           "title": "Storage Actions Rate",
           "type": "timeseries",
-          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 20 },
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
           "fieldConfig": {
             "defaults": {
@@ -161,7 +193,7 @@ data:
         {
           "title": "HTTP Requests by Instance",
           "type": "timeseries",
-          "gridPos": { "h": 8, "w": 24, "x": 0, "y": 24 },
+          "gridPos": { "h": 8, "w": 24, "x": 0, "y": 28 },
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
           "fieldConfig": {
             "defaults": {
