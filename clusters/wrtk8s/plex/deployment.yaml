@@ -15,19 +15,8 @@ spec:
     spec:
       priorityClassName: plex-high-priority
       runtimeClassName: nvidia
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                  - key: nvidia.com/gpu
-                    operator: In
-                    values:
-                      - "true"
-                  - key: kubernetes.io/hostname
-                    operator: NotIn
-                    values:
-                      - spark
+      nodeSelector:
+        nvidia.com/gpu: "true"
       initContainers:
         - name: restore-backup
           image: restic/restic:latest
