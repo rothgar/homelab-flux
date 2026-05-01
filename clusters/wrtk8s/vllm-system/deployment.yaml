@@ -15,6 +15,7 @@ spec:
       labels:
         app: vllm
     spec:
+      terminationGracePeriodSeconds: 15
       runtimeClassName: nvidia
       tolerations:
         - key: nvidia.com/gpu
