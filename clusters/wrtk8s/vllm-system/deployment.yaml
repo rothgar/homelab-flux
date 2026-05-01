@@ -89,6 +89,9 @@ spec:
           volumeMounts:
             - name: models
               mountPath: /models
+            - name: models
+              mountPath: /root/.cache
+              subPath: cache
             - name: shm
               mountPath: /dev/shm
       volumes:
