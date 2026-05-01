@@ -5,6 +5,8 @@ metadata:
   namespace: vllm-system
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: vllm
@@ -14,6 +16,10 @@ spec:
         app: vllm
     spec:
       runtimeClassName: nvidia
+      tolerations:
+        - key: nvidia.com/gpu
+          operator: Exists
+          effect: NoSchedule
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -25,23 +31,7 @@ spec:
                       - spark
       containers:
         - name: vllm
-          image: nvcr.io/nvidia/vllm:26.03-py3
-          ports:
-            - containerPort: 8000
-              name: http
-              protocol: TCP
-          env:
-            - name: NVIDIA_VISIBLE_DEVICES
-              value: "all"
-            - name: NVIDIA_DRIVER_CAPABILITIES
-              value: "compute,utility"
-            - name: HF_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: hf-token
-                  key: token
-            - name: HF_HOME
-              value: /models/huggingface
+          image: nvcr.io/nvidia/vllm:26.04-py3
           command:
             - vllm
             - serve
@@ -56,29 +46,57 @@ spec:
             - "0.95"
             - --max-model-len
             - "32768"
+            - --enable-auto-tool-choice
+            - --enable-prefix-caching
+            - --kv-cache-dtype
+            - fp8
+          env:
+            - name: HF_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: hf-token
+                  key: token
+            - name: HF_HOME
+              value: /models/huggingface
+          ports:
+            - containerPort: 8000
+              name: http
+          startupProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 180
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
           resources:
-            requests:
-              nvidia.com/gpu: 1
-              memory: 32Gi
-              cpu: 4
             limits:
               nvidia.com/gpu: 1
-              memory: 64Gi
-              cpu: 8
           volumeMounts:
             - name: models
               mountPath: /models
-            - name: models
-              mountPath: /root/.cache
-              subPath: cache
-            - name: dshm
+            - name: shm
               mountPath: /dev/shm
       volumes:
         - name: models
           hostPath:
             path: /var/mnt/longhorn/vllm
             type: DirectoryOrCreate
-        - name: dshm
+        - name: shm
           emptyDir:
             medium: Memory
             sizeLimit: 16Gi
@@ -96,5 +114,5 @@ spec:
     app: vllm
   ports:
     - port: 8000
-      targetPort: 8000
+      targetPort: http
   type: LoadBalancer
