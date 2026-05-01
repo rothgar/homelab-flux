@@ -4,4 +4,4 @@ resources:
   - namespace.yaml
   - source.yaml
   - release.yaml
-  - cluster-secret-store.yaml
+  - eso-config-kustomization.yaml
