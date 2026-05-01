@@ -5,4 +5,5 @@ resources:
   - deployment.yaml
   - open-webui.yaml
   - httproute.yaml
+  - tailscale-ingress.yaml
   - external-secret.yaml

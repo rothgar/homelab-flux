@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: open-webui-tailscale
+  namespace: vllm-system
+spec:
+  ingressClassName: tailscale
+  rules:
+    - host: ai
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: open-webui
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - ai
