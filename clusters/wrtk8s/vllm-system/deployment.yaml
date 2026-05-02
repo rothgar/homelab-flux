@@ -52,8 +52,6 @@ spec:
             - --enable-auto-tool-choice
             - --tool-call-parser
             - qwen3_coder
-            - --attention-backend
-            - flashinfer
             - --enable-prefix-caching
             - --kv-cache-dtype
             - fp8
