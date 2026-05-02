@@ -43,14 +43,22 @@ spec:
             - "0.0.0.0"
             - --port
             - "8000"
+            - --served-model-name
+            - qwen3-coder-next
             - --gpu-memory-utilization
-            - "0.95"
+            - "0.90"
             - --max-model-len
-            - "32768"
+            - "170000"
             - --enable-auto-tool-choice
+            - --tool-call-parser
+            - qwen3_coder
+            - --attention-backend
+            - flashinfer
             - --enable-prefix-caching
             - --kv-cache-dtype
             - fp8
+            - --max-num-seqs
+            - "1"
           env:
             - name: HF_TOKEN
               valueFrom:
