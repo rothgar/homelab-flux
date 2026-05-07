@@ -104,12 +104,13 @@ spec:
         - name: install-deps
           image: python:3.11-slim
           command:
-            - pip
-            - install
-            - --quiet
-            - --target=/deps
-            - tt-smi
-            - prometheus-client
+            - /bin/bash
+            - -c
+            - |
+              apt-get update -qq && apt-get install -y -qq libatomic1
+              mkdir -p /deps/lib
+              cp /usr/lib/x86_64-linux-gnu/libatomic.so.1* /deps/lib/
+              pip install --quiet --target=/deps tt-smi prometheus-client
           volumeMounts:
             - name: deps
               mountPath: /deps
@@ -122,6 +123,8 @@ spec:
           env:
             - name: PYTHONPATH
               value: /deps
+            - name: LD_LIBRARY_PATH
+              value: /deps/lib
           ports:
             - containerPort: 9090
               name: metrics
