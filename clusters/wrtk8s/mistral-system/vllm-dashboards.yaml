@@ -1013,9 +1013,7 @@ data:
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "description": "99th percentile of Iteration Latency over the selected time range.
-    
-    ",
+          "description": "99th percentile of Iteration Latency over the selected time range.\n\n",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -1363,39 +1361,19 @@ data:
           },
           {
             "current": {
-              "text": "avg : Average
-    0.50 : P50
-    0.90 : P90
-    0.99 : P99
-    0.999 : Max (Approx)",
-              "value": "avg : Average
-    0.50 : P50
-    0.90 : P90
-    0.99 : P99
-    0.999 : Max (Approx)"
+              "text": "avg : Average\n0.50 : P50\n0.90 : P90\n0.99 : P99\n0.999 : Max (Approx)",
+              "value": "avg : Average\n0.50 : P50\n0.90 : P90\n0.99 : P99\n0.999 : Max (Approx)"
             },
             "label": "Aggregation",
             "name": "agg_method",
             "options": [
               {
                 "selected": true,
-                "text": "avg : Average
-    0.50 : P50
-    0.90 : P90
-    0.99 : P99
-    0.999 : Max (Approx)",
-                "value": "avg : Average
-    0.50 : P50
-    0.90 : P90
-    0.99 : P99
-    0.999 : Max (Approx)"
+                "text": "avg : Average\n0.50 : P50\n0.90 : P90\n0.99 : P99\n0.999 : Max (Approx)",
+                "value": "avg : Average\n0.50 : P50\n0.90 : P90\n0.99 : P99\n0.999 : Max (Approx)"
               }
             ],
-            "query": "avg : Average
-    0.50 : P50
-    0.90 : P90
-    0.99 : P99
-    0.999 : Max (Approx)",
+            "query": "avg : Average\n0.50 : P50\n0.90 : P90\n0.99 : P99\n0.999 : Max (Approx)",
             "type": "custom"
           },
           {
@@ -1470,17 +1448,27 @@ data:
       "panels": [
         {
           "collapsed": true,
-          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 0
+          },
           "id": 20,
           "panels": [],
           "title": "Request Over Time",
           "type": "row"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
           "fieldConfig": {
             "defaults": {
-              "color": { "mode": "palette-classic" },
+              "color": {
+                "mode": "palette-classic"
+              },
               "custom": {
                 "axisBorderShow": false,
                 "axisCenteredZero": false,
@@ -1492,40 +1480,74 @@ data:
                 "drawStyle": "line",
                 "fillOpacity": 0,
                 "gradientMode": "none",
-                "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
                 "insertNulls": false,
                 "lineInterpolation": "linear",
                 "lineWidth": 1,
                 "pointSize": 5,
-                "scaleDistribution": { "type": "linear" },
+                "scaleDistribution": {
+                  "type": "linear"
+                },
                 "showPoints": "auto",
                 "spanNulls": false,
-                "stacking": { "group": "A", "mode": "none" },
-                "thresholdsStyle": { "mode": "off" }
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               },
               "mappings": [],
               "thresholds": {
                 "mode": "absolute",
-                "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 80 }]
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
               },
               "unit": "req/s"
             },
             "overrides": []
           },
-          "gridPos": { "h": 6, "w": 10, "x": 0, "y": 1 },
+          "gridPos": {
+            "h": 6,
+            "w": 10,
+            "x": 0,
+            "y": 1
+          },
           "id": 1,
           "options": {
-            "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true },
-            "tooltip": { "mode": "single", "sort": "none" }
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
           },
           "pluginVersion": "11.3.0",
           "targets": [
             {
-              "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+              "datasource": {
+                "type": "prometheus",
+                "uid": "${DS_PROMETHEUS}"
+              },
               "editorMode": "code",
-              "expr": "sum by (model_name) (
-      rate(vllm:request_success_total{model_name=~\"$Deployment_id\"}[$__rate_interval])
-    )",
+              "expr": "sum by (model_name) (\n  rate(vllm:request_success_total{model_name=~\"$Deployment_id\"}[$__rate_interval])\n)",
               "interval": "1",
               "legendFormat": "{{model_name}}",
               "range": true,
@@ -1536,20 +1558,39 @@ data:
           "type": "timeseries"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
           "fieldConfig": {
             "defaults": {
-              "color": { "mode": "thresholds" },
+              "color": {
+                "mode": "thresholds"
+              },
               "mappings": [],
               "thresholds": {
                 "mode": "absolute",
-                "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 80 }]
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
               },
               "unit": "req/s"
             },
             "overrides": []
           },
-          "gridPos": { "h": 3, "w": 7, "x": 10, "y": 1 },
+          "gridPos": {
+            "h": 3,
+            "w": 7,
+            "x": 10,
+            "y": 1
+          },
           "id": 2,
           "options": {
             "colorMode": "value",
@@ -1557,7 +1598,13 @@ data:
             "justifyMode": "auto",
             "orientation": "auto",
             "percentChangeColorMode": "standard",
-            "reduceOptions": { "calcs": ["mean"], "fields": "", "values": false },
+            "reduceOptions": {
+              "calcs": [
+                "mean"
+              ],
+              "fields": "",
+              "values": false
+            },
             "showPercentChange": false,
             "textMode": "auto",
             "wideLayout": true
@@ -1576,22 +1623,49 @@ data:
           "type": "stat"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
           "fieldConfig": {
             "defaults": {
-              "color": { "mode": "thresholds" },
+              "color": {
+                "mode": "thresholds"
+              },
               "mappings": [
-                { "options": { "Calcultaions": { "index": 0, "text": "Last (not null)" } }, "type": "value" }
+                {
+                  "options": {
+                    "Calcultaions": {
+                      "index": 0,
+                      "text": "Last (not null)"
+                    }
+                  },
+                  "type": "value"
+                }
               ],
               "thresholds": {
                 "mode": "absolute",
-                "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 80 }]
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
               },
               "unit": "ms"
             },
             "overrides": []
           },
-          "gridPos": { "h": 3, "w": 7, "x": 17, "y": 1 },
+          "gridPos": {
+            "h": 3,
+            "w": 7,
+            "x": 17,
+            "y": 1
+          },
           "id": 3,
           "options": {
             "colorMode": "value",
@@ -1599,7 +1673,13 @@ data:
             "justifyMode": "auto",
             "orientation": "auto",
             "percentChangeColorMode": "standard",
-            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
             "showPercentChange": false,
             "textMode": "auto",
             "wideLayout": true
@@ -1618,22 +1698,49 @@ data:
           "type": "stat"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
           "fieldConfig": {
             "defaults": {
-              "color": { "mode": "thresholds" },
+              "color": {
+                "mode": "thresholds"
+              },
               "mappings": [
-                { "options": { "Calculation": { "index": 0, "text": "Last (not null)" } }, "type": "value" }
+                {
+                  "options": {
+                    "Calculation": {
+                      "index": 0,
+                      "text": "Last (not null)"
+                    }
+                  },
+                  "type": "value"
+                }
               ],
               "thresholds": {
                 "mode": "absolute",
-                "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 80 }]
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
               },
               "unit": "ms"
             },
             "overrides": []
           },
-          "gridPos": { "h": 3, "w": 7, "x": 10, "y": 4 },
+          "gridPos": {
+            "h": 3,
+            "w": 7,
+            "x": 10,
+            "y": 4
+          },
           "id": 4,
           "options": {
             "colorMode": "value",
@@ -1641,7 +1748,13 @@ data:
             "justifyMode": "auto",
             "orientation": "auto",
             "percentChangeColorMode": "standard",
-            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
             "showPercentChange": false,
             "textMode": "auto",
             "wideLayout": true
@@ -1660,22 +1773,49 @@ data:
           "type": "stat"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
           "fieldConfig": {
             "defaults": {
-              "color": { "mode": "thresholds" },
+              "color": {
+                "mode": "thresholds"
+              },
               "mappings": [
-                { "options": { "Calculation": { "index": 0, "text": "Last (not null)" } }, "type": "value" }
+                {
+                  "options": {
+                    "Calculation": {
+                      "index": 0,
+                      "text": "Last (not null)"
+                    }
+                  },
+                  "type": "value"
+                }
               ],
               "thresholds": {
                 "mode": "absolute",
-                "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 80 }]
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
               },
               "unit": "ms"
             },
             "overrides": []
           },
-          "gridPos": { "h": 3, "w": 7, "x": 17, "y": 4 },
+          "gridPos": {
+            "h": 3,
+            "w": 7,
+            "x": 17,
+            "y": 4
+          },
           "id": 5,
           "options": {
             "colorMode": "value",
@@ -1683,7 +1823,13 @@ data:
             "justifyMode": "auto",
             "orientation": "auto",
             "percentChangeColorMode": "standard",
-            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
             "showPercentChange": false,
             "textMode": "auto",
             "wideLayout": true
@@ -1703,38 +1849,77 @@ data:
         },
         {
           "collapsed": false,
-          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 7 },
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 7
+          },
           "id": 19,
           "panels": [],
           "title": "Size Distribution",
           "type": "row"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
           "fieldConfig": {
             "defaults": {
-              "color": { "mode": "palette-classic" },
+              "color": {
+                "mode": "palette-classic"
+              },
               "custom": {
                 "fillOpacity": 80,
                 "gradientMode": "none",
-                "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
                 "lineWidth": 1,
-                "stacking": { "group": "A", "mode": "none" }
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                }
               },
               "mappings": [],
               "thresholds": {
                 "mode": "absolute",
-                "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 80 }]
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
               },
               "unit": "cps"
             },
             "overrides": []
           },
-          "gridPos": { "h": 6, "w": 10, "x": 0, "y": 8 },
+          "gridPos": {
+            "h": 6,
+            "w": 10,
+            "x": 0,
+            "y": 8
+          },
           "id": 6,
           "options": {
-            "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true },
-            "tooltip": { "mode": "single", "sort": "none" }
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
           },
           "pluginVersion": "11.3.0",
           "targets": [
@@ -1750,22 +1935,49 @@ data:
           "type": "histogram"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
           "fieldConfig": {
             "defaults": {
-              "color": { "mode": "thresholds" },
+              "color": {
+                "mode": "thresholds"
+              },
               "mappings": [
-                { "options": { "calculation ": { "index": 0, "text": "Last (not null)" } }, "type": "value" }
+                {
+                  "options": {
+                    "calculation ": {
+                      "index": 0,
+                      "text": "Last (not null)"
+                    }
+                  },
+                  "type": "value"
+                }
               ],
               "thresholds": {
                 "mode": "absolute",
-                "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 80 }]
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
               },
               "unit": "cps"
             },
             "overrides": []
           },
-          "gridPos": { "h": 3, "w": 7, "x": 10, "y": 8 },
+          "gridPos": {
+            "h": 3,
+            "w": 7,
+            "x": 10,
+            "y": 8
+          },
           "id": 9,
           "options": {
             "colorMode": "value",
@@ -1773,7 +1985,13 @@ data:
             "justifyMode": "auto",
             "orientation": "auto",
             "percentChangeColorMode": "standard",
-            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
             "showPercentChange": false,
             "textMode": "auto",
             "wideLayout": true
@@ -1792,22 +2010,49 @@ data:
           "type": "stat"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
           "fieldConfig": {
             "defaults": {
-              "color": { "mode": "thresholds" },
+              "color": {
+                "mode": "thresholds"
+              },
               "mappings": [
-                { "options": { "Calculation": { "index": 0, "text": "Last (not null)" } }, "type": "value" }
+                {
+                  "options": {
+                    "Calculation": {
+                      "index": 0,
+                      "text": "Last (not null)"
+                    }
+                  },
+                  "type": "value"
+                }
               ],
               "thresholds": {
                 "mode": "absolute",
-                "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 80 }]
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
               },
               "unit": "cps"
             },
             "overrides": []
           },
-          "gridPos": { "h": 3, "w": 7, "x": 17, "y": 8 },
+          "gridPos": {
+            "h": 3,
+            "w": 7,
+            "x": 17,
+            "y": 8
+          },
           "id": 8,
           "options": {
             "colorMode": "value",
@@ -1815,7 +2060,13 @@ data:
             "justifyMode": "auto",
             "orientation": "auto",
             "percentChangeColorMode": "standard",
-            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
             "showPercentChange": false,
             "textMode": "auto",
             "wideLayout": true
@@ -1834,22 +2085,49 @@ data:
           "type": "stat"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
           "fieldConfig": {
             "defaults": {
-              "color": { "mode": "thresholds" },
+              "color": {
+                "mode": "thresholds"
+              },
               "mappings": [
-                { "options": { "Calcultaion": { "index": 0, "text": "mean" } }, "type": "value" }
+                {
+                  "options": {
+                    "Calcultaion": {
+                      "index": 0,
+                      "text": "mean"
+                    }
+                  },
+                  "type": "value"
+                }
               ],
               "thresholds": {
                 "mode": "absolute",
-                "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 80 }]
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
               },
               "unit": "cps"
             },
             "overrides": []
           },
-          "gridPos": { "h": 3, "w": 7, "x": 10, "y": 11 },
+          "gridPos": {
+            "h": 3,
+            "w": 7,
+            "x": 10,
+            "y": 11
+          },
           "id": 7,
           "options": {
             "colorMode": "value",
@@ -1857,7 +2135,13 @@ data:
             "justifyMode": "auto",
             "orientation": "auto",
             "percentChangeColorMode": "standard",
-            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
             "showPercentChange": false,
             "textMode": "auto",
             "wideLayout": true
@@ -1866,9 +2150,7 @@ data:
           "targets": [
             {
               "editorMode": "code",
-              "expr": "sum(rate(vllm:prompt_tokens_total{model_name=~\"$Deployment_id\"}[$__rate_interval]))
-    /
-    sum(rate(vllm:request_success_total{model_name=~\"$Deployment_id\"}[$__rate_interval]))",
+              "expr": "sum(rate(vllm:prompt_tokens_total{model_name=~\"$Deployment_id\"}[$__rate_interval]))\n/\nsum(rate(vllm:request_success_total{model_name=~\"$Deployment_id\"}[$__rate_interval]))",
               "legendFormat": "__auto",
               "range": true,
               "refId": "A"
@@ -1878,22 +2160,49 @@ data:
           "type": "stat"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
           "fieldConfig": {
             "defaults": {
-              "color": { "mode": "thresholds" },
+              "color": {
+                "mode": "thresholds"
+              },
               "mappings": [
-                { "options": { "Calculation": { "index": 0, "text": "Last (not null)" } }, "type": "value" }
+                {
+                  "options": {
+                    "Calculation": {
+                      "index": 0,
+                      "text": "Last (not null)"
+                    }
+                  },
+                  "type": "value"
+                }
               ],
               "thresholds": {
                 "mode": "absolute",
-                "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 80 }]
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
               },
               "unit": "cps"
             },
             "overrides": []
           },
-          "gridPos": { "h": 3, "w": 7, "x": 17, "y": 11 },
+          "gridPos": {
+            "h": 3,
+            "w": 7,
+            "x": 17,
+            "y": 11
+          },
           "id": 10,
           "options": {
             "colorMode": "value",
@@ -1901,7 +2210,13 @@ data:
             "justifyMode": "auto",
             "orientation": "auto",
             "percentChangeColorMode": "standard",
-            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
             "showPercentChange": false,
             "textMode": "auto",
             "wideLayout": true
@@ -1921,17 +2236,27 @@ data:
         },
         {
           "collapsed": true,
-          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 14 },
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 14
+          },
           "id": 18,
           "panels": [],
           "title": "Input Token Over Time",
           "type": "row"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
           "fieldConfig": {
             "defaults": {
-              "color": { "mode": "palette-classic" },
+              "color": {
+                "mode": "palette-classic"
+              },
               "custom": {
                 "axisBorderShow": false,
                 "axisCenteredZero": false,
@@ -1943,31 +2268,64 @@ data:
                 "drawStyle": "line",
                 "fillOpacity": 0,
                 "gradientMode": "none",
-                "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
                 "insertNulls": false,
                 "lineInterpolation": "linear",
                 "lineWidth": 1,
                 "pointSize": 5,
-                "scaleDistribution": { "type": "linear" },
+                "scaleDistribution": {
+                  "type": "linear"
+                },
                 "showPoints": "auto",
                 "spanNulls": false,
-                "stacking": { "group": "A", "mode": "none" },
-                "thresholdsStyle": { "mode": "off" }
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               },
               "mappings": [],
               "thresholds": {
                 "mode": "absolute",
-                "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 80 }]
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
               },
               "unit": "cps"
             },
             "overrides": []
           },
-          "gridPos": { "h": 6, "w": 10, "x": 0, "y": 15 },
+          "gridPos": {
+            "h": 6,
+            "w": 10,
+            "x": 0,
+            "y": 15
+          },
           "id": 11,
           "options": {
-            "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true },
-            "tooltip": { "mode": "single", "sort": "none" }
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
           },
           "pluginVersion": "11.3.0",
           "targets": [
@@ -1983,22 +2341,49 @@ data:
           "type": "timeseries"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
           "fieldConfig": {
             "defaults": {
-              "color": { "mode": "thresholds" },
+              "color": {
+                "mode": "thresholds"
+              },
               "mappings": [
-                { "options": { "Calculation": { "index": 0, "text": "mean" } }, "type": "value" }
+                {
+                  "options": {
+                    "Calculation": {
+                      "index": 0,
+                      "text": "mean"
+                    }
+                  },
+                  "type": "value"
+                }
               ],
               "thresholds": {
                 "mode": "absolute",
-                "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 80 }]
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
               },
               "unit": "cps"
             },
             "overrides": []
           },
-          "gridPos": { "h": 3, "w": 7, "x": 10, "y": 15 },
+          "gridPos": {
+            "h": 3,
+            "w": 7,
+            "x": 10,
+            "y": 15
+          },
           "id": 12,
           "options": {
             "colorMode": "value",
@@ -2006,7 +2391,13 @@ data:
             "justifyMode": "auto",
             "orientation": "auto",
             "percentChangeColorMode": "standard",
-            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
             "showPercentChange": false,
             "textMode": "auto",
             "wideLayout": true
@@ -2026,17 +2417,27 @@ data:
         },
         {
           "collapsed": false,
-          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 21 },
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 21
+          },
           "id": 17,
           "panels": [],
           "title": "Output Token Over Time",
           "type": "row"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
           "fieldConfig": {
             "defaults": {
-              "color": { "mode": "palette-classic" },
+              "color": {
+                "mode": "palette-classic"
+              },
               "custom": {
                 "axisBorderShow": false,
                 "axisCenteredZero": false,
@@ -2048,31 +2449,64 @@ data:
                 "drawStyle": "line",
                 "fillOpacity": 0,
                 "gradientMode": "none",
-                "hideFrom": { "legend": false, "tooltip": false, "viz": false },
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
                 "insertNulls": false,
                 "lineInterpolation": "linear",
                 "lineWidth": 1,
                 "pointSize": 5,
-                "scaleDistribution": { "type": "linear" },
+                "scaleDistribution": {
+                  "type": "linear"
+                },
                 "showPoints": "auto",
                 "spanNulls": false,
-                "stacking": { "group": "A", "mode": "none" },
-                "thresholdsStyle": { "mode": "off" }
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               },
               "mappings": [],
               "thresholds": {
                 "mode": "absolute",
-                "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 80 }]
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
               },
               "unit": "cps"
             },
             "overrides": []
           },
-          "gridPos": { "h": 6, "w": 10, "x": 0, "y": 22 },
+          "gridPos": {
+            "h": 6,
+            "w": 10,
+            "x": 0,
+            "y": 22
+          },
           "id": 13,
           "options": {
-            "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true },
-            "tooltip": { "mode": "single", "sort": "none" }
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
           },
           "pluginVersion": "11.3.0",
           "targets": [
@@ -2088,22 +2522,49 @@ data:
           "type": "timeseries"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
           "fieldConfig": {
             "defaults": {
-              "color": { "mode": "thresholds" },
+              "color": {
+                "mode": "thresholds"
+              },
               "mappings": [
-                { "options": { "Calculation": { "index": 0, "text": "mean" } }, "type": "value" }
+                {
+                  "options": {
+                    "Calculation": {
+                      "index": 0,
+                      "text": "mean"
+                    }
+                  },
+                  "type": "value"
+                }
               ],
               "thresholds": {
                 "mode": "absolute",
-                "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 80 }]
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
               },
               "unit": "cps"
             },
             "overrides": []
           },
-          "gridPos": { "h": 3, "w": 7, "x": 10, "y": 22 },
+          "gridPos": {
+            "h": 3,
+            "w": 7,
+            "x": 10,
+            "y": 22
+          },
           "id": 14,
           "options": {
             "colorMode": "value",
@@ -2111,7 +2572,13 @@ data:
             "justifyMode": "auto",
             "orientation": "auto",
             "percentChangeColorMode": "standard",
-            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
             "showPercentChange": false,
             "textMode": "auto",
             "wideLayout": true
@@ -2136,7 +2603,10 @@ data:
       "templating": {
         "list": [
           {
-            "current": { "text": "Prometheus", "value": "4184fc20-68a7-483a-8d9b-7caa59c680dd" },
+            "current": {
+              "text": "Prometheus",
+              "value": "4184fc20-68a7-483a-8d9b-7caa59c680dd"
+            },
             "label": "datasource",
             "name": "DS_PROMETHEUS",
             "options": [],
@@ -2145,7 +2615,14 @@ data:
             "type": "datasource"
           },
           {
-            "current": { "text": ["All"], "value": ["$__all"] },
+            "current": {
+              "text": [
+                "All"
+              ],
+              "value": [
+                "$__all"
+              ]
+            },
             "definition": "label_values(vllm:request_success_total,model_name)",
             "includeAll": true,
             "label": "Deployment_ID",
@@ -2163,32 +2640,61 @@ data:
             "type": "query"
           },
           {
-            "current": { "text": "All hours", "value": "All hours" },
+            "current": {
+              "text": "All hours",
+              "value": "All hours"
+            },
             "hide": 2,
             "label": "Rush Hours Only",
             "name": "rush_hours",
             "options": [
-              { "selected": true, "text": "false", "value": "All hours" },
-              { "selected": false, "text": "true", "value": "Rush hours" }
+              {
+                "selected": true,
+                "text": "false",
+                "value": "All hours"
+              },
+              {
+                "selected": false,
+                "text": "true",
+                "value": "Rush hours"
+              }
             ],
             "query": "false : All hours, true : Rush hours",
             "type": "custom"
           },
           {
-            "current": { "text": "All", "value": "All" },
+            "current": {
+              "text": "All",
+              "value": "All"
+            },
             "hide": 2,
             "label": "Rush Hours Type",
             "name": "rush_hours_type",
             "options": [
-              { "selected": true, "text": "^All__.*$", "value": "All" },
-              { "selected": false, "text": "^Static__.*$", "value": "Static" },
-              { "selected": false, "text": "^Dynamic__.*$", "value": "Dynamic" }
+              {
+                "selected": true,
+                "text": "^All__.*$",
+                "value": "All"
+              },
+              {
+                "selected": false,
+                "text": "^Static__.*$",
+                "value": "Static"
+              },
+              {
+                "selected": false,
+                "text": "^Dynamic__.*$",
+                "value": "Dynamic"
+              }
             ],
             "query": "^All__.*$ : All, ^Static__.*$ : Static, ^Dynamic__.*$ : Dynamic",
             "type": "custom"
           },
           {
-            "current": { "text": "", "value": "" },
+            "current": {
+              "text": "",
+              "value": ""
+            },
             "hide": 2,
             "name": "query0",
             "options": [],
@@ -2199,7 +2705,10 @@ data:
           }
         ]
       },
-      "time": { "from": "now-12h", "to": "now" },
+      "time": {
+        "from": "now-12h",
+        "to": "now"
+      },
       "timepicker": {},
       "timezone": "browser",
       "title": "Query Statistics_New4",
