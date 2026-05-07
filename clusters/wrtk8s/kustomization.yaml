@@ -21,6 +21,7 @@ resources:
   - multus
   - metrics-server
   - minecraft
+  - agent-sandbox
   - mistral-system
   - miniflux
   - tenstorrent-system
