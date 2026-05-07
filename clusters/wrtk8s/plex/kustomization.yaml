@@ -5,5 +5,4 @@ resources:
   - priority-class.yaml
   - nfs-volumes.yaml
   - plex-config-pvc.yaml
-  - volsync.yaml
   - deployment.yaml
