@@ -4,6 +4,8 @@ auto: "off"
 hostname: 3d
 ---
 machine:
+  nodeLabels:
+    nvidia.com/gpu.deploy.operands: "false"
   kernel:
     modules:
       - name: loop
