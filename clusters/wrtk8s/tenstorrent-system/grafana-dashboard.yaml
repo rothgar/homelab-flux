@@ -59,7 +59,9 @@ data:
               "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 60 }, { "color": "red", "value": 80 }] }
             }
           },
-          "targets": [{ "expr": "tenstorrent_asic_temperature_celsius{device=\"0\"}", "legendFormat": "" }]
+          "targets": [
+            { "expr": "max(tenstorrent_asic_temperature_celsius)", "legendFormat": "" }
+          ]
         },
         {
           "id": 4,
@@ -77,7 +79,9 @@ data:
               "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 150 }, { "color": "red", "value": 200 }] }
             }
           },
-          "targets": [{ "expr": "tenstorrent_power_watts{device=\"0\"}", "legendFormat": "" }]
+          "targets": [
+            { "expr": "sum(tenstorrent_power_watts)", "legendFormat": "" }
+          ]
         },
         {
           "id": 5,
@@ -95,7 +99,9 @@ data:
               "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }] }
             }
           },
-          "targets": [{ "expr": "tenstorrent_aiclk_mhz{device=\"0\"}", "legendFormat": "" }]
+          "targets": [
+            { "expr": "avg(tenstorrent_aiclk_mhz)", "legendFormat": "" }
+          ]
         },
         {
           "id": 6,
@@ -114,7 +120,9 @@ data:
               "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }] }
             }
           },
-          "targets": [{ "expr": "tenstorrent_voltage_volts{device=\"0\"}", "legendFormat": "" }]
+          "targets": [
+            { "expr": "avg(tenstorrent_voltage_volts)", "legendFormat": "" }
+          ]
         },
         {
           "id": 7,
@@ -133,7 +141,9 @@ data:
               "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }] }
             }
           },
-          "targets": [{ "expr": "tenstorrent_current_amps{device=\"0\"}", "legendFormat": "" }]
+          "targets": [
+            { "expr": "sum(tenstorrent_current_amps)", "legendFormat": "" }
+          ]
         },
         {
           "id": 8,
@@ -149,8 +159,9 @@ data:
             ]
           },
           "targets": [
-            { "expr": "tenstorrent_asic_temperature_celsius{device=\"0\"}", "legendFormat": "Temperature (°C)" },
-            { "expr": "tenstorrent_power_watts{device=\"0\"}", "legendFormat": "Power (W)" }
+            { "expr": "tenstorrent_asic_temperature_celsius{device=\"0\"}", "legendFormat": "Temp die-0 (°C)" },
+            { "expr": "tenstorrent_asic_temperature_celsius{device=\"1\"}", "legendFormat": "Temp die-1 (°C)" },
+            { "expr": "sum(tenstorrent_power_watts)", "legendFormat": "Total Power (W)" }
           ]
         },
         {
@@ -167,8 +178,9 @@ data:
             ]
           },
           "targets": [
-            { "expr": "tenstorrent_aiclk_mhz{device=\"0\"}", "legendFormat": "AI Clock (MHz)" },
-            { "expr": "tenstorrent_voltage_volts{device=\"0\"}", "legendFormat": "Voltage (V)" }
+            { "expr": "tenstorrent_aiclk_mhz{device=\"0\"}", "legendFormat": "AI Clock die-0 (MHz)" },
+            { "expr": "tenstorrent_aiclk_mhz{device=\"1\"}", "legendFormat": "AI Clock die-1 (MHz)" },
+            { "expr": "avg(tenstorrent_voltage_volts)", "legendFormat": "Voltage (V)" }
           ]
         },
         {
