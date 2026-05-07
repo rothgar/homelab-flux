@@ -16,7 +16,7 @@ spec:
       runtimeClassName: nvidia
       containers:
         - name: whisper-webui
-          image: jhj0517/whisper-webui:v1.0.8-4def223
+          image: ghcr.io/rothgar/whisper-webui:v0.0.0-d2bdcf7
           args:
             - --server_port
             - "7860"
