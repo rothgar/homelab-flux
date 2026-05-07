@@ -34,7 +34,7 @@ data:
     def collect():
         try:
             result = subprocess.run(
-                ['tt-smi', '-s', '--snapshot_no_tty'],
+                ['/deps/bin/tt-smi', '-s', '--snapshot_no_tty'],
                 capture_output=True, text=True, timeout=30,
             )
             data = json.loads(result.stdout)
