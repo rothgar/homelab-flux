@@ -21,10 +21,10 @@ spec:
           env:
             - name: OLLAMA_BASE_URL
               value: ""
-            - name: OPENAI_API_BASE_URL
-              value: "http://vllm-server.vllm-system.svc.cluster.local:8000/v1"
-            - name: OPENAI_API_KEY
-              value: "none"
+            - name: OPENAI_API_BASE_URLS
+              value: "http://vllm-server.vllm-system.svc.cluster.local:8000/v1;http://mistral-server.mistral-system.svc.cluster.local:8000/v1"
+            - name: OPENAI_API_KEYS
+              value: "none;none"
             - name: WEBUI_AUTH
               value: "false"
           volumeMounts:

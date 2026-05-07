@@ -1,0 +1,107 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mistral-cache
+  namespace: mistral-system
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi
+  storageClassName: local-path
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mistral
+  namespace: mistral-system
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: mistral
+  template:
+    metadata:
+      labels:
+        app: mistral
+    spec:
+      terminationGracePeriodSeconds: 30
+      hostIPC: true
+      nodeSelector:
+        kubernetes.io/hostname: benchy
+      containers:
+        - name: mistral
+          image: ghcr.io/tenstorrent/tt-inference-server/vllm-tt-metal-src-release-ubuntu-22.04-amd64:0.9.0-9b67e09-a91b644
+          args:
+            - --model
+            - Mistral-7B-Instruct-v0.3
+            - --tt-device
+            - n150
+          env:
+            - name: HF_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: hf-token
+                  key: token
+          ports:
+            - containerPort: 8000
+              name: http
+          startupProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 120
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+            limits:
+              hugepages-1Gi: 4Gi
+            requests:
+              hugepages-1Gi: 4Gi
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: tenstorrent
+              mountPath: /dev/tenstorrent
+            - name: hugepages
+              mountPath: /dev/hugepages-1G
+            - name: model-cache
+              mountPath: /home/container_app_user/cache_root
+      volumes:
+        - name: tenstorrent
+          hostPath:
+            path: /dev/tenstorrent
+            type: Directory
+        - name: hugepages
+          emptyDir:
+            medium: HugePages-1Gi
+        - name: model-cache
+          persistentVolumeClaim:
+            claimName: mistral-cache
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mistral-server
+  namespace: mistral-system
+  annotations:
+    tailscale.com/expose: "true"
+    tailscale.com/hostname: "mistral"
+spec:
+  selector:
+    app: mistral
+  ports:
+    - port: 8000
+      targetPort: http
+  type: LoadBalancer

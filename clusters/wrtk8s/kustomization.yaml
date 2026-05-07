@@ -21,6 +21,7 @@ resources:
   - multus
   - metrics-server
   - minecraft
+  - mistral-system
   - miniflux
   - monitoring
   - mqtt
