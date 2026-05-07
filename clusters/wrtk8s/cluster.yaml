@@ -93,6 +93,9 @@ systemExtensions:
 name: d057a478-09c5-430f-9759-d05099df2199
 kernelArgs:
   - talos.dashboard.disabled=1
+  - hugepagesz=1G
+  - hugepages=4
+  - default_hugepagesz=1G
 patches:
   - file: patches/benchy.yaml
   - file: patches/kubelet.yaml

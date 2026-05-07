@@ -9,10 +9,3 @@ name: EPHEMERAL
 provisioning:
   diskSelector:
     match: disk.transport == "sata"
----
-machine:
-  install:
-    extraKernelArgs:
-      - hugepagesz=1G
-      - hugepages=4
-      - default_hugepagesz=1G
