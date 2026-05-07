@@ -83,6 +83,8 @@ metadata:
   namespace: kube-system
   labels:
     app.kubernetes.io/name: tt-smi-exporter
+  annotations:
+    reloader.stakater.com/auto: "true"
 spec:
   selector:
     matchLabels:
