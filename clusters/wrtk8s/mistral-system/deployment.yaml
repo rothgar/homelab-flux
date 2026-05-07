@@ -67,8 +67,10 @@ spec:
           resources:
             limits:
               hugepages-1Gi: 4Gi
+              memory: 16Gi
             requests:
               hugepages-1Gi: 4Gi
+              memory: 16Gi
           securityContext:
             privileged: true
           volumeMounts:
