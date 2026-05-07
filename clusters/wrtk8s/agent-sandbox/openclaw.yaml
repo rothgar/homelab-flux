@@ -109,7 +109,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: openclaw
+  name: openclaw-gateway
   namespace: openclaw
   annotations:
     tailscale.com/expose: "true"
