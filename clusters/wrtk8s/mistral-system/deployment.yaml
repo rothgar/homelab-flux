@@ -33,6 +33,20 @@ spec:
       nodeSelector:
         kubernetes.io/hostname: benchy
       initContainers:
+        - name: reset-tt-device
+          image: ghcr.io/tenstorrent/tt-inference-server/vllm-tt-metal-src-release-ubuntu-22.04-amd64:0.9.0-9b67e09-a91b644
+          command:
+            - /bin/bash
+            - -c
+            - |
+              echo "Resetting Tenstorrent devices..."
+              /home/container_app_user/tt-metal/python_env/bin/tt-smi -r 0,1 --no_reinit || true
+              echo "Device reset complete"
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: tenstorrent
+              mountPath: /dev/tenstorrent
         - name: download-weights
           image: ghcr.io/tenstorrent/tt-inference-server/vllm-tt-metal-src-release-ubuntu-22.04-amd64:0.9.0-9b67e09-a91b644
           command:

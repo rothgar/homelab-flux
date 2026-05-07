@@ -18,6 +18,7 @@ data:
         "VLLM_RPC_TIMEOUT": "300000"
       },
       "device_model_spec": {
+        "max_context": 32768,
         "vllm_args": {
           "model": "mistralai/Mistral-7B-Instruct-v0.3",
           "max-model-len": "32768",
@@ -26,7 +27,7 @@ data:
         }
       },
       "cli_args": {
-        "disable_trace_capture": true
+        "disable_trace_capture": false
       },
       "supported_modalities": ["text"]
     }
