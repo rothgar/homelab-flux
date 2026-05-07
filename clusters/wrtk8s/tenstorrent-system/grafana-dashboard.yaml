@@ -1,0 +1,326 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tenstorrent-dashboard
+  namespace: kube-system
+  labels:
+    grafana_dashboard: "1"
+data:
+  tenstorrent.json: |
+    {
+      "title": "Tenstorrent n300d",
+      "uid": "tenstorrent-n300d",
+      "schemaVersion": 39,
+      "version": 1,
+      "refresh": "30s",
+      "time": { "from": "now-1h", "to": "now" },
+      "panels": [
+        {
+          "id": 1,
+          "type": "row",
+          "title": "Hardware",
+          "gridPos": { "x": 0, "y": 0, "w": 24, "h": 1 },
+          "collapsed": false
+        },
+        {
+          "id": 2,
+          "type": "stat",
+          "title": "Device Status",
+          "gridPos": { "x": 0, "y": 1, "w": 3, "h": 4 },
+          "options": {
+            "reduceOptions": { "calcs": ["lastNotNull"] },
+            "colorMode": "background",
+            "graphMode": "none",
+            "textMode": "auto"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "mappings": [
+                { "type": "value", "options": { "1": { "text": "UP", "color": "green" }, "0": { "text": "DOWN", "color": "red" } } }
+              ],
+              "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
+            }
+          },
+          "targets": [{ "expr": "tenstorrent_up", "legendFormat": "" }]
+        },
+        {
+          "id": 3,
+          "type": "stat",
+          "title": "ASIC Temperature",
+          "gridPos": { "x": 3, "y": 1, "w": 3, "h": 4 },
+          "options": {
+            "reduceOptions": { "calcs": ["lastNotNull"] },
+            "colorMode": "background",
+            "graphMode": "area"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "celsius",
+              "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 60 }, { "color": "red", "value": 80 }] }
+            }
+          },
+          "targets": [{ "expr": "tenstorrent_asic_temperature_celsius{device=\"0\"}", "legendFormat": "" }]
+        },
+        {
+          "id": 4,
+          "type": "stat",
+          "title": "Power",
+          "gridPos": { "x": 6, "y": 1, "w": 3, "h": 4 },
+          "options": {
+            "reduceOptions": { "calcs": ["lastNotNull"] },
+            "colorMode": "background",
+            "graphMode": "area"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "watt",
+              "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 150 }, { "color": "red", "value": 200 }] }
+            }
+          },
+          "targets": [{ "expr": "tenstorrent_power_watts{device=\"0\"}", "legendFormat": "" }]
+        },
+        {
+          "id": 5,
+          "type": "stat",
+          "title": "AI Clock",
+          "gridPos": { "x": 9, "y": 1, "w": 3, "h": 4 },
+          "options": {
+            "reduceOptions": { "calcs": ["lastNotNull"] },
+            "colorMode": "value",
+            "graphMode": "area"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "MHz",
+              "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }] }
+            }
+          },
+          "targets": [{ "expr": "tenstorrent_aiclk_mhz{device=\"0\"}", "legendFormat": "" }]
+        },
+        {
+          "id": 6,
+          "type": "stat",
+          "title": "Voltage",
+          "gridPos": { "x": 12, "y": 1, "w": 3, "h": 4 },
+          "options": {
+            "reduceOptions": { "calcs": ["lastNotNull"] },
+            "colorMode": "value",
+            "graphMode": "area"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "volt",
+              "decimals": 3,
+              "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }] }
+            }
+          },
+          "targets": [{ "expr": "tenstorrent_voltage_volts{device=\"0\"}", "legendFormat": "" }]
+        },
+        {
+          "id": 7,
+          "type": "stat",
+          "title": "Current",
+          "gridPos": { "x": 15, "y": 1, "w": 3, "h": 4 },
+          "options": {
+            "reduceOptions": { "calcs": ["lastNotNull"] },
+            "colorMode": "value",
+            "graphMode": "area"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "amp",
+              "decimals": 1,
+              "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }] }
+            }
+          },
+          "targets": [{ "expr": "tenstorrent_current_amps{device=\"0\"}", "legendFormat": "" }]
+        },
+        {
+          "id": 8,
+          "type": "timeseries",
+          "title": "Temperature & Power over Time",
+          "gridPos": { "x": 0, "y": 5, "w": 12, "h": 8 },
+          "options": { "legend": { "displayMode": "list", "placement": "bottom" } },
+          "fieldConfig": {
+            "defaults": { "custom": { "lineWidth": 2 } },
+            "overrides": [
+              { "matcher": { "id": "byName", "options": "Power (W)" }, "properties": [{ "id": "unit", "value": "watt" }, { "id": "custom.axisPlacement", "value": "right" }] },
+              { "matcher": { "id": "byName", "options": "Temperature (°C)" }, "properties": [{ "id": "unit", "value": "celsius" }] }
+            ]
+          },
+          "targets": [
+            { "expr": "tenstorrent_asic_temperature_celsius{device=\"0\"}", "legendFormat": "Temperature (°C)" },
+            { "expr": "tenstorrent_power_watts{device=\"0\"}", "legendFormat": "Power (W)" }
+          ]
+        },
+        {
+          "id": 9,
+          "type": "timeseries",
+          "title": "AI Clock & Voltage over Time",
+          "gridPos": { "x": 12, "y": 5, "w": 12, "h": 8 },
+          "options": { "legend": { "displayMode": "list", "placement": "bottom" } },
+          "fieldConfig": {
+            "defaults": { "custom": { "lineWidth": 2 } },
+            "overrides": [
+              { "matcher": { "id": "byName", "options": "AI Clock (MHz)" }, "properties": [{ "id": "unit", "value": "MHz" }] },
+              { "matcher": { "id": "byName", "options": "Voltage (V)" }, "properties": [{ "id": "unit", "value": "volt" }, { "id": "custom.axisPlacement", "value": "right" }] }
+            ]
+          },
+          "targets": [
+            { "expr": "tenstorrent_aiclk_mhz{device=\"0\"}", "legendFormat": "AI Clock (MHz)" },
+            { "expr": "tenstorrent_voltage_volts{device=\"0\"}", "legendFormat": "Voltage (V)" }
+          ]
+        },
+        {
+          "id": 10,
+          "type": "row",
+          "title": "Mistral vLLM",
+          "gridPos": { "x": 0, "y": 13, "w": 24, "h": 1 },
+          "collapsed": false
+        },
+        {
+          "id": 11,
+          "type": "stat",
+          "title": "KV Cache Usage",
+          "gridPos": { "x": 0, "y": 14, "w": 4, "h": 4 },
+          "options": {
+            "reduceOptions": { "calcs": ["lastNotNull"] },
+            "colorMode": "background",
+            "graphMode": "area"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "percentunit",
+              "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 0.7 }, { "color": "red", "value": 0.9 }] }
+            }
+          },
+          "targets": [{ "expr": "vllm:gpu_cache_usage_perc", "legendFormat": "" }]
+        },
+        {
+          "id": 12,
+          "type": "stat",
+          "title": "Running Requests",
+          "gridPos": { "x": 4, "y": 14, "w": 4, "h": 4 },
+          "options": {
+            "reduceOptions": { "calcs": ["lastNotNull"] },
+            "colorMode": "background",
+            "graphMode": "area"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 20 }, { "color": "red", "value": 30 }] }
+            }
+          },
+          "targets": [{ "expr": "vllm:num_requests_running", "legendFormat": "" }]
+        },
+        {
+          "id": 13,
+          "type": "stat",
+          "title": "Waiting Requests",
+          "gridPos": { "x": 8, "y": 14, "w": 4, "h": 4 },
+          "options": {
+            "reduceOptions": { "calcs": ["lastNotNull"] },
+            "colorMode": "background",
+            "graphMode": "area"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 5 }, { "color": "red", "value": 15 }] }
+            }
+          },
+          "targets": [{ "expr": "vllm:num_requests_waiting", "legendFormat": "" }]
+        },
+        {
+          "id": 14,
+          "type": "stat",
+          "title": "Token Throughput (gen)",
+          "gridPos": { "x": 12, "y": 14, "w": 4, "h": 4 },
+          "options": {
+            "reduceOptions": { "calcs": ["lastNotNull"] },
+            "colorMode": "value",
+            "graphMode": "area"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "reqps",
+              "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }] }
+            }
+          },
+          "targets": [{ "expr": "rate(vllm:generation_tokens_total[2m])", "legendFormat": "" }]
+        },
+        {
+          "id": 15,
+          "type": "stat",
+          "title": "Request Rate",
+          "gridPos": { "x": 16, "y": 14, "w": 4, "h": 4 },
+          "options": {
+            "reduceOptions": { "calcs": ["lastNotNull"] },
+            "colorMode": "value",
+            "graphMode": "area"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "reqps",
+              "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }] }
+            }
+          },
+          "targets": [{ "expr": "rate(vllm:request_success_total[2m])", "legendFormat": "" }]
+        },
+        {
+          "id": 16,
+          "type": "timeseries",
+          "title": "KV Cache & Request Queue over Time",
+          "gridPos": { "x": 0, "y": 18, "w": 12, "h": 8 },
+          "options": { "legend": { "displayMode": "list", "placement": "bottom" } },
+          "fieldConfig": {
+            "defaults": { "custom": { "lineWidth": 2 } },
+            "overrides": [
+              { "matcher": { "id": "byName", "options": "KV Cache %" }, "properties": [{ "id": "unit", "value": "percentunit" }] },
+              { "matcher": { "id": "byName", "options": "Running" }, "properties": [{ "id": "custom.axisPlacement", "value": "right" }] },
+              { "matcher": { "id": "byName", "options": "Waiting" }, "properties": [{ "id": "custom.axisPlacement", "value": "right" }] }
+            ]
+          },
+          "targets": [
+            { "expr": "vllm:gpu_cache_usage_perc", "legendFormat": "KV Cache %" },
+            { "expr": "vllm:num_requests_running", "legendFormat": "Running" },
+            { "expr": "vllm:num_requests_waiting", "legendFormat": "Waiting" }
+          ]
+        },
+        {
+          "id": 17,
+          "type": "timeseries",
+          "title": "Latency (p50 / p99)",
+          "gridPos": { "x": 12, "y": 18, "w": 12, "h": 8 },
+          "options": { "legend": { "displayMode": "list", "placement": "bottom" } },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s",
+              "custom": { "lineWidth": 2 }
+            }
+          },
+          "targets": [
+            { "expr": "histogram_quantile(0.50, rate(vllm:e2e_request_latency_seconds_bucket[2m]))", "legendFormat": "e2e p50" },
+            { "expr": "histogram_quantile(0.99, rate(vllm:e2e_request_latency_seconds_bucket[2m]))", "legendFormat": "e2e p99" },
+            { "expr": "histogram_quantile(0.50, rate(vllm:time_to_first_token_seconds_bucket[2m]))", "legendFormat": "TTFT p50" },
+            { "expr": "histogram_quantile(0.99, rate(vllm:time_to_first_token_seconds_bucket[2m]))", "legendFormat": "TTFT p99" }
+          ]
+        },
+        {
+          "id": 18,
+          "type": "timeseries",
+          "title": "Token Throughput over Time",
+          "gridPos": { "x": 0, "y": 26, "w": 24, "h": 6 },
+          "options": { "legend": { "displayMode": "list", "placement": "bottom" } },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "reqps",
+              "custom": { "lineWidth": 2 }
+            }
+          },
+          "targets": [
+            { "expr": "rate(vllm:prompt_tokens_total[2m])", "legendFormat": "Prompt tokens/s" },
+            { "expr": "rate(vllm:generation_tokens_total[2m])", "legendFormat": "Generation tokens/s" }
+          ]
+        }
+      ]
+    }

@@ -5,3 +5,4 @@ resources:
   - model-spec-configmap.yaml
   - deployment.yaml
   - external-secret.yaml
+  - podmonitor.yaml

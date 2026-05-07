@@ -1,0 +1,171 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tt-smi-exporter-script
+  namespace: kube-system
+data:
+  exporter.py: |
+    #!/usr/bin/env python3
+    import json
+    import subprocess
+    import time
+    from prometheus_client import start_http_server, Gauge
+
+    LABELS = ['device']
+
+    g_voltage = Gauge('tenstorrent_voltage_volts', 'Device core voltage in volts', LABELS)
+    g_current = Gauge('tenstorrent_current_amps', 'Device current draw in amps', LABELS)
+    g_aiclk   = Gauge('tenstorrent_aiclk_mhz', 'AI clock frequency in MHz', LABELS)
+    g_power   = Gauge('tenstorrent_power_watts', 'Device power consumption in watts', LABELS)
+    g_asic_temp = Gauge('tenstorrent_asic_temperature_celsius', 'ASIC temperature in Celsius', LABELS)
+    g_up      = Gauge('tenstorrent_up', 'Whether tt-smi scrape succeeded (1=ok, 0=error)')
+
+
+    def parse_float(s):
+        """Parse numeric value from strings like '1.8 V', '1000 MHz', '75 W', '45 C'."""
+        if not s:
+            return None
+        try:
+            return float(str(s).split()[0])
+        except (ValueError, IndexError):
+            return None
+
+
+    def collect():
+        try:
+            result = subprocess.run(
+                ['tt-smi', '-s', '--snapshot_no_tty'],
+                capture_output=True, text=True, timeout=30,
+            )
+            data = json.loads(result.stdout)
+            devices = data.get('device_info', [])
+            for i, dev in enumerate(devices):
+                label = str(i)
+                telem = dev.get('telemetry', {})
+
+                v = parse_float(telem.get('voltage'))
+                if v is not None:
+                    g_voltage.labels(device=label).set(v)
+
+                c = parse_float(telem.get('current'))
+                if c is not None:
+                    g_current.labels(device=label).set(c)
+
+                clk = parse_float(telem.get('aiclk'))
+                if clk is not None:
+                    g_aiclk.labels(device=label).set(clk)
+
+                p = parse_float(telem.get('power'))
+                if p is not None:
+                    g_power.labels(device=label).set(p)
+
+                t = parse_float(telem.get('asic_temperature'))
+                if t is not None:
+                    g_asic_temp.labels(device=label).set(t)
+
+            g_up.set(1)
+        except Exception as e:
+            print(f"scrape error: {e}", flush=True)
+            g_up.set(0)
+
+
+    if __name__ == '__main__':
+        start_http_server(9090)
+        print("tt-smi exporter listening on :9090", flush=True)
+        while True:
+            collect()
+            time.sleep(15)
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: tt-smi-exporter
+  namespace: kube-system
+  labels:
+    app.kubernetes.io/name: tt-smi-exporter
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tt-smi-exporter
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: tt-smi-exporter
+    spec:
+      priorityClassName: system-node-critical
+      nodeSelector:
+        kubernetes.io/hostname: benchy
+      tolerations:
+        - operator: Exists
+          effect: NoExecute
+        - operator: Exists
+          effect: NoSchedule
+      initContainers:
+        - name: install-deps
+          image: python:3.11-slim
+          command:
+            - pip
+            - install
+            - --quiet
+            - --target=/deps
+            - tt-smi
+            - prometheus-client
+          volumeMounts:
+            - name: deps
+              mountPath: /deps
+      containers:
+        - name: exporter
+          image: python:3.11-slim
+          command:
+            - python
+            - /etc/tt-exporter/exporter.py
+          env:
+            - name: PYTHONPATH
+              value: /deps
+          ports:
+            - containerPort: 9090
+              name: metrics
+          securityContext:
+            privileged: true
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
+          volumeMounts:
+            - name: tenstorrent
+              mountPath: /dev/tenstorrent
+            - name: script
+              mountPath: /etc/tt-exporter
+            - name: deps
+              mountPath: /deps
+      volumes:
+        - name: tenstorrent
+          hostPath:
+            path: /dev/tenstorrent
+            type: Directory
+        - name: script
+          configMap:
+            name: tt-smi-exporter-script
+        - name: deps
+          emptyDir: {}
+  updateStrategy:
+    type: RollingUpdate
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: tt-smi-exporter
+  namespace: kube-system
+  labels:
+    release: kube-prometheus-stack
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tt-smi-exporter
+  podMetricsEndpoints:
+    - port: metrics
+      interval: 30s
+      path: /metrics

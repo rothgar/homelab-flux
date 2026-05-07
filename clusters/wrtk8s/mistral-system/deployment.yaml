@@ -44,9 +44,9 @@ spec:
               echo "Device reset complete"
           securityContext:
             privileged: true
-          volumeMounts:
-            - name: tenstorrent
-              mountPath: /dev/tenstorrent
+          resources:
+            limits:
+              devic.es/tenstorrent: 1
         - name: download-weights
           image: ghcr.io/tenstorrent/tt-inference-server/vllm-tt-metal-src-release-ubuntu-22.04-amd64:0.9.0-9b67e09-a91b644
           command:
@@ -113,14 +113,13 @@ spec:
             limits:
               hugepages-1Gi: 4Gi
               memory: 16Gi
+              devic.es/tenstorrent: 1
             requests:
               hugepages-1Gi: 4Gi
               memory: 16Gi
           securityContext:
             privileged: true
           volumeMounts:
-            - name: tenstorrent
-              mountPath: /dev/tenstorrent
             - name: hugepages
               mountPath: /dev/hugepages-1G
             - name: model-cache
@@ -128,10 +127,6 @@ spec:
             - name: model-spec
               mountPath: /etc/tt-inference
       volumes:
-        - name: tenstorrent
-          hostPath:
-            path: /dev/tenstorrent
-            type: Directory
         - name: hugepages
           emptyDir:
             medium: HugePages-1Gi

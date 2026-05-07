@@ -23,6 +23,7 @@ resources:
   - minecraft
   - mistral-system
   - miniflux
+  - tenstorrent-system
   - monitoring
   - mqtt
   - nfs-csi
