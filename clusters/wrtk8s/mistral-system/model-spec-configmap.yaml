@@ -14,7 +14,8 @@ data:
       "env_vars": {
         "MESH_DEVICE": "N300",
         "MODEL_WEIGHTS_PATH": "/home/container_app_user/cache_root/weights/Mistral-7B-Instruct-v0.3",
-        "TT_CACHE_PATH": "/home/container_app_user/cache_root/tt_cache"
+        "TT_CACHE_PATH": "/home/container_app_user/cache_root/tt_cache",
+        "VLLM_RPC_TIMEOUT": "300000"
       },
       "device_model_spec": {
         "vllm_args": {
