@@ -1408,7 +1408,7 @@ data:
       },
       "timezone": "browser",
       "uid": "performance-statistics",
-      "title": "Performance Statistics",
+      "title": "vLLM Performance Statistics",
       "version": 40,
       "weekStart": ""
     }
@@ -2711,7 +2711,7 @@ data:
       },
       "timepicker": {},
       "timezone": "browser",
-      "title": "Query Statistics_New4",
+      "title": "vLLM Query Statistics",
       "uid": "query-statistics4",
       "version": 2,
       "weekStart": ""
