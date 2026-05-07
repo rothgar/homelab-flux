@@ -19,7 +19,8 @@ data:
       "device_model_spec": {
         "vllm_args": {
           "model": "mistralai/Mistral-7B-Instruct-v0.3",
-          "max-model-len": "32768"
+          "max-model-len": "32768",
+          "max-num-seqs": "32"
         }
       },
       "cli_args": {
