@@ -6,3 +6,4 @@ resources:
   - deployment.yaml
   - external-secret.yaml
   - podmonitor.yaml
+  - vllm-dashboards.yaml
