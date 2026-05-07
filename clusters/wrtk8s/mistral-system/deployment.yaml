@@ -32,20 +32,51 @@ spec:
       hostIPC: true
       nodeSelector:
         kubernetes.io/hostname: benchy
-      containers:
-        - name: mistral
+      initContainers:
+        - name: download-weights
           image: ghcr.io/tenstorrent/tt-inference-server/vllm-tt-metal-src-release-ubuntu-22.04-amd64:0.9.0-9b67e09-a91b644
-          args:
-            - --model
-            - Mistral-7B-Instruct-v0.3
-            - --tt-device
-            - n150
+          command:
+            - /bin/bash
+            - -c
+            - |
+              set -e
+              WEIGHTS_DIR=/home/container_app_user/cache_root/weights/Mistral-7B-Instruct-v0.3
+              if [ -f "${WEIGHTS_DIR}/config.json" ]; then
+                echo "Model weights already present, skipping download"
+                exit 0
+              fi
+              mkdir -p "${WEIGHTS_DIR}"
+              echo "Downloading Mistral-7B-Instruct-v0.3 weights..."
+              /home/container_app_user/tt-metal/python_env/bin/huggingface-cli download \
+                mistralai/Mistral-7B-Instruct-v0.3 \
+                --local-dir "${WEIGHTS_DIR}" \
+                --token "${HF_TOKEN}"
+              echo "Download complete"
           env:
             - name: HF_TOKEN
               valueFrom:
                 secretKeyRef:
                   name: hf-token
                   key: token
+          volumeMounts:
+            - name: model-cache
+              mountPath: /home/container_app_user/cache_root
+      containers:
+        - name: mistral
+          image: ghcr.io/tenstorrent/tt-inference-server/vllm-tt-metal-src-release-ubuntu-22.04-amd64:0.9.0-9b67e09-a91b644
+          args:
+            - /home/container_app_user/tt-metal/python_env/bin/python
+            - /home/container_app_user/app/src/run_vllm_api_server.py
+          env:
+            - name: HF_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: hf-token
+                  key: token
+            - name: CACHE_ROOT
+              value: /home/container_app_user/cache_root
+            - name: TT_MODEL_SPEC_JSON_PATH
+              value: /etc/tt-inference/model-spec.json
           ports:
             - containerPort: 8000
               name: http
@@ -80,6 +111,8 @@ spec:
               mountPath: /dev/hugepages-1G
             - name: model-cache
               mountPath: /home/container_app_user/cache_root
+            - name: model-spec
+              mountPath: /etc/tt-inference
       volumes:
         - name: tenstorrent
           hostPath:
@@ -91,6 +124,9 @@ spec:
         - name: model-cache
           persistentVolumeClaim:
             claimName: mistral-cache
+        - name: model-spec
+          configMap:
+            name: mistral-model-spec
 ---
 apiVersion: v1
 kind: Service

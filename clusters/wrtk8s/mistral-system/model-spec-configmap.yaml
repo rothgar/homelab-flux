@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mistral-model-spec
+  namespace: mistral-system
+data:
+  model-spec.json: |
+    {
+      "model_id": "Mistral-7B-Instruct-v0.3",
+      "hf_model_repo": "mistralai/Mistral-7B-Instruct-v0.3",
+      "impl": {
+        "impl_id": "tt_transformers"
+      },
+      "env_vars": {
+        "MESH_DEVICE": "N300",
+        "MODEL_WEIGHTS_PATH": "/home/container_app_user/cache_root/weights/Mistral-7B-Instruct-v0.3",
+        "TT_CACHE_PATH": "/home/container_app_user/cache_root/tt_cache"
+      },
+      "device_model_spec": {
+        "vllm_args": {
+          "model": "mistralai/Mistral-7B-Instruct-v0.3",
+          "max-model-len": "32768"
+        }
+      },
+      "cli_args": {
+        "disable_trace_capture": true
+      },
+      "supported_modalities": ["text"]
+    }
