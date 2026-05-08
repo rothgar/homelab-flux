@@ -51,7 +51,7 @@ spec:
         fsGroup: 1000
       containers:
         - name: openclaw
-          image: ghcr.io/openclaw/openclaw:2026.3.23
+          image: ghcr.io/openclaw/openclaw:2026.5.7
           imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false
@@ -86,12 +86,10 @@ spec:
             - mountPath: /home/node/.openclaw/workspace
               name: workspaces-pvc
             - mountPath: /home/node/.openclaw
-              name: config-volume
+              name: config-pvc
             - mountPath: /etc/openclaw
               name: cm-volume
       volumes:
-        - name: config-volume
-          emptyDir: {}
         - name: cm-volume
           configMap:
             name: openclaw-config
@@ -104,19 +102,46 @@ spec:
         resources:
           requests:
             storage: 2Gi
+    - metadata:
+        name: config-pvc
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: openclaw-gateway
   namespace: openclaw
-  annotations:
-    tailscale.com/expose: "true"
-    tailscale.com/hostname: "openclaw"
 spec:
   selector:
     app: openclaw
   ports:
     - port: 80
       targetPort: 18789
-  type: LoadBalancer
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: openclaw-tailscale
+  namespace: openclaw
+spec:
+  ingressClassName: tailscale
+  rules:
+    - host: openclaw
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: openclaw-gateway
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - openclaw
