@@ -146,7 +146,7 @@ spec:
             - name: HTTPS_PROXY
               value: "http://127.0.0.1:1055"
             - name: NO_PROXY
-              value: "localhost,127.0.0.1,10.0.0.0/8,10.244.0.0/16"
+              value: "localhost,127.0.0.1,10.0.0.0/8,10.244.0.0/16,.cluster.local,.svc"
           command:
             - node
             - dist/index.js
