@@ -126,7 +126,7 @@ spec:
             capabilities:
               drop:
                 - ALL
-          command: ["sh", "-c", "cp /config/openclaw.json /etc/openclaw/openclaw.json"]
+          command: ["sh", "-c", "cp /config/openclaw.json /etc/openclaw/openclaw.json && mkdir -p /etc/openclaw/npm"]
           volumeMounts:
             - name: cm-volume
               mountPath: /config
