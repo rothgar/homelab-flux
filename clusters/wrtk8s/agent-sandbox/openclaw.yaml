@@ -19,7 +19,7 @@ data:
       "models": {
         "providers": {
           "vllm": {
-            "baseUrl": "http://aperture.gerbil-dragon.ts.net/v1",
+            "baseUrl": "http://aperture/v1",
             "apiKey": "${VLLM_API_KEY}",
             "api": "openai-completions",
             "models": [{"id": "qwen3-coder-next", "name": "qwen3-coder-next"}, {"id": "mistralai/Mistral-7B-Instruct-v0.3", "name": "Mistral-7B-Instruct-v0.3"}]
@@ -32,6 +32,21 @@ data:
         }
       }
     }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aperture
+  namespace: openclaw
+  annotations:
+    tailscale.com/tailnet-ip: "100.84.217.36"
+spec:
+  type: ExternalName
+  externalName: placeholder
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
