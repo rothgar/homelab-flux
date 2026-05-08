@@ -33,6 +33,19 @@ data:
       }
     }
 ---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: openclaw-config-pvc
+  namespace: openclaw
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: local-path
+---
 apiVersion: agents.x-k8s.io/v1alpha1
 kind: Sandbox
 metadata:
@@ -90,6 +103,9 @@ spec:
             - mountPath: /etc/openclaw
               name: cm-volume
       volumes:
+        - name: config-pvc
+          persistentVolumeClaim:
+            claimName: openclaw-config-pvc
         - name: cm-volume
           configMap:
             name: openclaw-config
@@ -102,14 +118,6 @@ spec:
         resources:
           requests:
             storage: 2Gi
-    - metadata:
-        name: config-pvc
-      spec:
-        accessModes:
-          - ReadWriteOnce
-        resources:
-          requests:
-            storage: 1Gi
 ---
 apiVersion: v1
 kind: Service
