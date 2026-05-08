@@ -56,6 +56,19 @@ data:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  name: openclaw-tailscale-pvc
+  namespace: openclaw
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+  storageClassName: local-path
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
   name: openclaw-config-pvc
   namespace: openclaw
 spec:
@@ -162,9 +175,8 @@ spec:
           volumeMounts:
             - name: tailscale-serve
               mountPath: /etc/tailscale
-            - name: config-pvc
+            - name: tailscale-state-pvc
               mountPath: /var/lib/tailscale
-              subPath: tailscale-state
       volumes:
         - name: config-pvc
           persistentVolumeClaim:
@@ -175,6 +187,9 @@ spec:
         - name: tailscale-serve
           configMap:
             name: tailscale-serve-config
+        - name: tailscale-state-pvc
+          persistentVolumeClaim:
+            claimName: openclaw-tailscale-pvc
   volumeClaimTemplates:
     - metadata:
         name: workspaces-pvc
