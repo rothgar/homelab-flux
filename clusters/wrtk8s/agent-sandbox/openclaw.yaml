@@ -116,6 +116,22 @@ spec:
       serviceAccountName: openclaw-ts
       securityContext:
         fsGroup: 1000
+      initContainers:
+        - name: copy-config
+          image: busybox
+          securityContext:
+            runAsUser: 1000
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          command: ["sh", "-c", "cp /config/openclaw.json /etc/openclaw/openclaw.json"]
+          volumeMounts:
+            - name: cm-volume
+              mountPath: /config
+            - name: openclaw-etc
+              mountPath: /etc/openclaw
       containers:
         - name: openclaw
           image: ghcr.io/openclaw/openclaw:2026.5.7
@@ -165,7 +181,7 @@ spec:
             - mountPath: /home/node/.openclaw
               name: config-pvc
             - mountPath: /etc/openclaw
-              name: cm-volume
+              name: openclaw-etc
         - name: tailscale
           image: ghcr.io/tailscale/tailscale:stable
           securityContext:
@@ -203,6 +219,8 @@ spec:
         - name: cm-volume
           configMap:
             name: openclaw-config
+        - name: openclaw-etc
+          emptyDir: {}
         - name: tailscale-serve
           configMap:
             name: tailscale-serve-config
