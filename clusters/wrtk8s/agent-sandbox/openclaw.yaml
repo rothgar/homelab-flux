@@ -36,7 +36,7 @@ data:
       },
       "agents": {
         "defaults": {
-          "model": { "primary": "qwen3/qwen3-coder-next", "fallback": "mistral/mistralai/Mistral-7B-Instruct-v0.3" }
+          "model": { "primary": "qwen3/qwen3-coder-next" }
         }
       }
     }
