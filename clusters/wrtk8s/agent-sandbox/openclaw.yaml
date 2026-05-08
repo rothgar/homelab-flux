@@ -20,17 +20,23 @@ data:
       },
       "models": {
         "providers": {
-          "vllm": {
-            "baseUrl": "http://aperture.gerbil-dragon.ts.net/v1",
+          "qwen3": {
+            "baseUrl": "http://vllm-server.vllm-system:8000/v1",
             "apiKey": "${VLLM_API_KEY}",
             "api": "openai-completions",
-            "models": [{"id": "qwen3-coder-next", "name": "qwen3-coder-next"}, {"id": "mistralai/Mistral-7B-Instruct-v0.3", "name": "Mistral-7B-Instruct-v0.3"}]
+            "models": [{"id": "qwen3-coder-next", "name": "qwen3-coder-next"}]
+          },
+          "mistral": {
+            "baseUrl": "http://mistral-server.mistral-system:8000/v1",
+            "apiKey": "${VLLM_API_KEY}",
+            "api": "openai-completions",
+            "models": [{"id": "mistralai/Mistral-7B-Instruct-v0.3", "name": "Mistral-7B-Instruct-v0.3"}]
           }
         }
       },
       "agents": {
         "defaults": {
-          "model": { "primary": "vllm/qwen3-coder-next" }
+          "model": { "primary": "qwen3/qwen3-coder-next" }
         }
       }
     }
