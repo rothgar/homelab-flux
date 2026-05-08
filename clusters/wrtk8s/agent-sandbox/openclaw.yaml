@@ -153,6 +153,11 @@ spec:
                   key: gateway-token
             - name: VLLM_API_KEY
               value: "local"
+            - name: BEEPER_BACKUP_CODE
+              valueFrom:
+                secretKeyRef:
+                  name: openclaw-beeper-backup
+                  key: BEEPER_BACKUP_CODE
             - name: OPENCLAW_CONFIG_PATH
               value: "/etc/openclaw/openclaw.json"
             - name: NODE_USE_ENV_PROXY
