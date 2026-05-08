@@ -146,7 +146,7 @@ spec:
                   name: openclaw-tailscale-auth
                   key: authkey
             - name: TS_STATE
-              value: "mem:"
+              value: "file:/var/lib/tailscale/tailscaled.state"
             - name: TS_USERSPACE
               value: "true"
             - name: TS_ACCEPT_DNS
@@ -162,6 +162,9 @@ spec:
           volumeMounts:
             - name: tailscale-serve
               mountPath: /etc/tailscale
+            - name: config-pvc
+              mountPath: /var/lib/tailscale
+              subPath: tailscale-state
       volumes:
         - name: config-pvc
           persistentVolumeClaim:
