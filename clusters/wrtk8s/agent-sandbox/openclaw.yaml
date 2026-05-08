@@ -92,6 +92,19 @@ subjects:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  name: openclaw-etc-pvc
+  namespace: openclaw
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 256Mi
+  storageClassName: nfs-synology
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
   name: openclaw-config-pvc
   namespace: openclaw
 spec:
@@ -126,7 +139,7 @@ spec:
             capabilities:
               drop:
                 - ALL
-          command: ["sh", "-c", "cp /config/openclaw.json /etc/openclaw/openclaw.json && mkdir -p /etc/openclaw/npm"]
+          command: ["sh", "-c", "mkdir -p /etc/openclaw/npm && [ -f /etc/openclaw/openclaw.json ] || cp /config/openclaw.json /etc/openclaw/openclaw.json"]
           volumeMounts:
             - name: cm-volume
               mountPath: /config
@@ -225,7 +238,8 @@ spec:
           configMap:
             name: openclaw-config
         - name: openclaw-etc
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: openclaw-etc-pvc
         - name: tailscale-serve
           configMap:
             name: tailscale-serve-config
