@@ -54,17 +54,34 @@ data:
     }
 ---
 apiVersion: v1
-kind: PersistentVolumeClaim
+kind: ServiceAccount
 metadata:
-  name: openclaw-tailscale-pvc
+  name: openclaw-ts
   namespace: openclaw
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 100Mi
-  storageClassName: local-path
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: openclaw-ts-role
+  namespace: openclaw
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "create", "update", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: openclaw-ts-rolebinding
+  namespace: openclaw
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: openclaw-ts-role
+subjects:
+  - kind: ServiceAccount
+    name: openclaw-ts
+    namespace: openclaw
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -90,7 +107,7 @@ spec:
       labels:
         app: openclaw
     spec:
-      automountServiceAccountToken: false
+      serviceAccountName: openclaw-ts
       securityContext:
         fsGroup: 1000
       containers:
@@ -158,8 +175,6 @@ spec:
                 secretKeyRef:
                   name: openclaw-tailscale-auth
                   key: authkey
-            - name: TS_STATE
-              value: "file:/var/lib/tailscale/tailscaled.state"
             - name: TS_USERSPACE
               value: "true"
             - name: TS_ACCEPT_DNS
@@ -167,7 +182,7 @@ spec:
             - name: TS_HOSTNAME
               value: "openclaw"
             - name: TS_KUBE_SECRET
-              value: ""
+              value: "openclaw-ts-state"
             - name: TS_OUTBOUND_HTTP_PROXY_LISTEN
               value: "127.0.0.1:1055"
             - name: TS_SERVE_CONFIG
@@ -175,8 +190,6 @@ spec:
           volumeMounts:
             - name: tailscale-serve
               mountPath: /etc/tailscale
-            - name: tailscale-state-pvc
-              mountPath: /var/lib/tailscale
       volumes:
         - name: config-pvc
           persistentVolumeClaim:
@@ -187,9 +200,6 @@ spec:
         - name: tailscale-serve
           configMap:
             name: tailscale-serve-config
-        - name: tailscale-state-pvc
-          persistentVolumeClaim:
-            claimName: openclaw-tailscale-pvc
   volumeClaimTemplates:
     - metadata:
         name: workspaces-pvc
