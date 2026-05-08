@@ -22,8 +22,7 @@ data:
             "baseUrl": "http://aperture.gerbil-dragon.ts.net/v1",
             "apiKey": "${VLLM_API_KEY}",
             "api": "openai-completions",
-            "request": { "allowPrivateNetwork": true },
-            "timeoutSeconds": 300
+            "models": [{"id": "qwen3-coder-next", "name": "qwen3-coder-next"}, {"id": "mistralai/Mistral-7B-Instruct-v0.3", "name": "Mistral-7B-Instruct-v0.3"}]
           }
         }
       },
