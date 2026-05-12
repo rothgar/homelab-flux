@@ -14,29 +14,41 @@ data:
   openclaw.json: |
     {
       "gateway": {
+        "mode": "local",
         "controlUi": {
           "dangerouslyAllowHostHeaderOriginFallback": true
         }
       },
       "models": {
         "providers": {
-          "qwen3": {
-            "baseUrl": "http://vllm-server.vllm-system:8000/v1",
+          "aperture": {
+            "baseUrl": "http://aperture.gerbil-dragon.ts.net/v1",
             "apiKey": "${VLLM_API_KEY}",
             "api": "openai-completions",
-            "models": [{"id": "qwen3-coder-next", "name": "qwen3-coder-next"}]
-          },
-          "mistral": {
-            "baseUrl": "http://mistral-server.mistral-system:8000/v1",
-            "apiKey": "${VLLM_API_KEY}",
-            "api": "openai-completions",
-            "models": [{"id": "mistralai/Mistral-7B-Instruct-v0.3", "name": "Mistral-7B-Instruct-v0.3"}]
+            "models": [
+              {"id": "qwen3.6-27b", "name": "qwen3.6-27b"},
+              {"id": "gemini-2.5-flash", "name": "gemini-2.5-flash"},
+              {"id": "gemini-2.5-flash-lite", "name": "gemini-2.5-flash-lite"}
+            ]
           }
         }
       },
       "agents": {
         "defaults": {
-          "model": { "primary": "qwen3/qwen3-coder-next" }
+          "model": { "primary": "aperture/qwen3.6-27b" },
+          "thinkingDefault": "off",
+          "verboseDefault": "off"
+        }
+      },
+      "messages": {
+        "suppressToolErrors": true
+      },
+      "tools": {
+        "profile": "coding",
+        "byProvider": {
+          "aperture": {
+            "profile": "minimal"
+          }
         }
       }
     }
