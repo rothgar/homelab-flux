@@ -36,7 +36,7 @@ spec:
           command:
             - vllm
             - serve
-            - Qwen/Qwen3-Coder-Next-FP8
+            - Qwen/Qwen3.6-27B-FP8
             - --download-dir
             - /models
             - --host
@@ -44,14 +44,14 @@ spec:
             - --port
             - "8000"
             - --served-model-name
-            - qwen3-coder-next
+            - qwen3.6-27b
             - --gpu-memory-utilization
             - "0.85"
             - --max-model-len
             - "65536"
             - --enable-auto-tool-choice
             - --tool-call-parser
-            - qwen3_coder
+            - hermes
             - --enable-prefix-caching
             - --kv-cache-dtype
             - fp8
