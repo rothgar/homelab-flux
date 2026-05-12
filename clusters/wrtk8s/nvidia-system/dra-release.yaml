@@ -26,4 +26,8 @@ spec:
                 - key: nvidia.com/gpu.machine
                   operator: NotIn
                   values:
-                    - NVIDIA DGX Spark
+                    - NVIDIA_DGX_Spark
+                - key: kubernetes.io/hostname
+                  operator: NotIn
+                  values:
+                    - 3d
