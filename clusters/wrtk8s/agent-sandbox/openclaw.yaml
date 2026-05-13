@@ -44,12 +44,7 @@ data:
         "suppressToolErrors": true
       },
       "tools": {
-        "profile": "coding",
-        "byProvider": {
-          "aperture": {
-            "profile": "minimal"
-          }
-        }
+        "profile": "coding"
       }
     }
 ---
