@@ -22,14 +22,36 @@ spec:
             - name: OLLAMA_BASE_URL
               value: ""
             - name: OPENAI_API_BASE_URLS
-              value: "http://vllm-server.vllm-system.svc.cluster.local:8000/v1;http://mistral-server.mistral-system.svc.cluster.local:8000/v1"
+              value: "http://aperture.gerbil-dragon.ts.net/v1"
             - name: OPENAI_API_KEYS
-              value: "none;none"
+              value: "local"
             - name: WEBUI_AUTH
               value: "false"
+            - name: HTTP_PROXY
+              value: "http://127.0.0.1:1055"
+            - name: HTTPS_PROXY
+              value: "http://127.0.0.1:1055"
+            - name: NO_PROXY
+              value: "localhost,127.0.0.1,10.0.0.0/8,10.244.0.0/16,.cluster.local,.svc"
           volumeMounts:
             - name: data
               mountPath: /app/backend/data
+        - name: tailscale
+          image: ghcr.io/tailscale/tailscale:stable
+          env:
+            - name: TS_AUTHKEY
+              valueFrom:
+                secretKeyRef:
+                  name: open-webui-tailscale-auth
+                  key: TS_AUTH
+            - name: TS_USERSPACE
+              value: "true"
+            - name: TS_ACCEPT_DNS
+              value: "true"
+            - name: TS_HOSTNAME
+              value: "open-webui"
+            - name: TS_OUTBOUND_HTTP_PROXY_LISTEN
+              value: "127.0.0.1:1055"
       volumes:
         - name: data
           emptyDir: {}
