@@ -43,4 +43,5 @@ resources:
   - vllm-system
   - volsync
   - whisper-webui
+  - pdfcraft
   - plex

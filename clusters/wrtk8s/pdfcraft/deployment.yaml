@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pdfcraft
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pdfcraft
+  template:
+    metadata:
+      labels:
+        app: pdfcraft
+    spec:
+      containers:
+        - name: pdfcraft
+          image: ghcr.io/pdfcrafttool/pdfcraft:latest
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pdfcraft
+  namespace: default
+spec:
+  selector:
+    app: pdfcraft
+  ports:
+    - port: 80
+      targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pdfcraft
+  namespace: default
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    external-dns.alpha.kubernetes.io/hostname: pdf.jgarr.net
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - pdf.jgarr.net
+      secretName: pdfcraft-tls
+  rules:
+    - host: pdf.jgarr.net
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: pdfcraft
+                port:
+                  number: 80
