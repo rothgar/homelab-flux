@@ -57,7 +57,7 @@ spec:
             - fp8
             - --max-num-seqs
             - "1"
-            - --override-generation-config
+            - --default-chat-template-kwargs
             - '{"enable_thinking": false}'
           env:
             - name: HF_TOKEN
