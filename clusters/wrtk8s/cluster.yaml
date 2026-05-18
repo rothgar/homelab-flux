@@ -72,7 +72,7 @@ kernelArgs:
   - arm64.nobti
 patches:
   - file: patches/spark.yaml
-  - file: patches/nvidia.yaml
+  - file: patches/gb10-nvidia.yaml
   - file: patches/gpu-labels.yaml
   - file: patches/kubelet.yaml
 ---

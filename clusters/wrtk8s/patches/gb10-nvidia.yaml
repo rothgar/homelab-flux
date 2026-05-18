@@ -1,0 +1,9 @@
+machine:
+  kernel:
+    modules:
+      - name: nvidia
+        parameters:
+          - NVreg_CoherentGPUMemoryMode=driver
+      - name: nvidia_uvm
+      - name: nvidia_drm
+      - name: nvidia_modeset
