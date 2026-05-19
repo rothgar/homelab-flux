@@ -3,7 +3,7 @@ name: wrtk8s
 kubernetes:
   version: v1.35.4
 talos:
-  version: v1.13.0
+  version: v1.13.2
 features:
   enableWorkloadProxy: true
 patches:
@@ -84,18 +84,4 @@ kernelArgs:
   - iommu=pt
 patches:
   - file: patches/3d.yaml
-  - file: patches/kubelet.yaml
----
-kind: Machine
-systemExtensions:
-  - siderolabs/amd-ucode
-  - siderolabs/tenstorrent
-name: d057a478-09c5-430f-9759-d05099df2199
-kernelArgs:
-  - talos.dashboard.disabled=1
-  - hugepagesz=1G
-  - hugepages=4
-  - default_hugepagesz=1G
-patches:
-  - file: patches/benchy.yaml
   - file: patches/kubelet.yaml
