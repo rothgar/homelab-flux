@@ -7,7 +7,7 @@ spec:
   interval: 5m
   chart:
     spec:
-      chart: nvidia-dra-driver-gpu
+      chart: dra-driver-nvidia-gpu
       version: 0.4.0
       sourceRef:
         kind: HelmRepository
