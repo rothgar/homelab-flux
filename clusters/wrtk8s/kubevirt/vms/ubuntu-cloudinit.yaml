@@ -129,6 +129,9 @@ stringData:
       - echo '//10.1.1.4/video /mnt/d/video cifs credentials=/mnt/smb-credentials/credentials,uid=1000,gid=1000,nofail 0 0' >> /etc/fstab
       - mount -a
       - dconf update
+      # Remove unneeded GNOME apps pulled in by vanilla-gnome-desktop
+      - apt remove -y evolution gnome-calendar gnome-contacts gnome-maps gnome-music gnome-weather gnome-clocks gnome-software gnome-software-plugin-snap gnome-software-plugin-flatpak || true
+      - apt autoremove -y
       # Install Steam
       - dpkg --add-architecture i386
       - apt update
