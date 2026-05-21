@@ -51,3 +51,6 @@ data:
 
     redis-cluster:
       enabled: false
+
+    valkey-cluster:
+      enabled: false
