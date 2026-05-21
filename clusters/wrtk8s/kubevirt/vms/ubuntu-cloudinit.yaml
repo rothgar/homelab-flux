@@ -120,8 +120,13 @@ stringData:
       - rm /tmp/sunshine.deb
       - loginctl enable-linger ubuntu
       - sudo -u ubuntu bash -c 'mkdir -p /home/ubuntu/.config/sunshine && echo "capture = x11" > /home/ubuntu/.config/sunshine/sunshine.conf'
+      # Fix autostart: graphical-session.target never activates on X11/GDM, use default.target instead
+      - mkdir -p /home/ubuntu/.config/systemd/user/sunshine.service.d
+      - "printf '[Unit]\nAfter=graphical.target\n\n[Install]\nWantedBy=default.target\n' > /home/ubuntu/.config/systemd/user/sunshine.service.d/autostart.conf"
+      - chown -R ubuntu:ubuntu /home/ubuntu/.config/systemd
       # Wait for user@1000 manager to be ready, then enable+start sunshine with proper dbus session
       - until [ -S /run/user/1000/bus ]; do sleep 1; done
+      - sudo -u ubuntu XDG_RUNTIME_DIR=/run/user/1000 DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus systemctl --user daemon-reload
       - sudo -u ubuntu XDG_RUNTIME_DIR=/run/user/1000 DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus systemctl --user enable --now sunshine
       - setcap cap_sys_admin+p $(readlink -f $(which sunshine)) || true
       - mkdir -p /mnt/d/public /mnt/d/video
