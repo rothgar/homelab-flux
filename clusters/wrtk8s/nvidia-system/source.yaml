@@ -6,3 +6,13 @@ metadata:
 spec:
   interval: 1h0m0s
   url: https://helm.ngc.nvidia.com/nvidia
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: dra-driver-nvidia
+  namespace: nvidia-system
+spec:
+  interval: 1h
+  type: oci
+  url: oci://registry.k8s.io/dra-driver-nvidia/charts

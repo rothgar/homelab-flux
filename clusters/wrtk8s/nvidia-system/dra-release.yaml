@@ -8,9 +8,10 @@ spec:
   chart:
     spec:
       chart: nvidia-dra-driver-gpu
+      version: v0.4.0
       sourceRef:
         kind: HelmRepository
-        name: nvidia-gpu-operator
+        name: dra-driver-nvidia
         namespace: nvidia-system
   values:
     resources:
@@ -28,10 +29,6 @@ spec:
                     operator: In
                     values:
                       - "true"
-                  - key: nvidia.com/gpu.machine
-                    operator: NotIn
-                    values:
-                      - NVIDIA_DGX_Spark
                   - key: kubernetes.io/hostname
                     operator: NotIn
                     values:
