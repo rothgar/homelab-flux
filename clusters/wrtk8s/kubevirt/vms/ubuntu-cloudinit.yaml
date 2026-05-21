@@ -110,6 +110,19 @@ stringData:
 
           [org/gnome/desktop/session]
           idle-delay=uint32 0
+
+          [org/gnome/desktop/interface]
+          enable-animations=false
+
+          [org/gnome/mutter]
+          dynamic-workspaces=false
+
+          [org/gnome/desktop/wm/preferences]
+          num-workspaces=1
+
+          [org/gnome/settings-daemon/plugins/power]
+          idle-dim=false
+          sleep-display-ac=0
     runcmd:
       - systemctl enable --now qemu-guest-agent
       - exportfs -ra
@@ -120,7 +133,19 @@ stringData:
       - apt install -y /tmp/sunshine.deb
       - rm /tmp/sunshine.deb
       - loginctl enable-linger ubuntu
-      - sudo -u ubuntu bash -c 'mkdir -p /home/ubuntu/.config/sunshine && echo "capture = x11" > /home/ubuntu/.config/sunshine/sunshine.conf'
+      - mkdir -p /home/ubuntu/.config/sunshine
+      - |
+        cat > /home/ubuntu/.config/sunshine/sunshine.conf << 'EOF'
+        capture = x11
+        nvenc_preset = p4
+        nvenc_twopass = quarter
+        resolutions = [1280x720,1920x1080,2560x1440,3840x2160]
+        fps = [30, 60, 120]
+        min_threads = 2
+        EOF
+      - chown -R ubuntu:ubuntu /home/ubuntu/.config/sunshine
+      # Enable NVIDIA persistence mode for consistent performance
+      - nvidia-smi -pm 1 || true
       # Fix autostart: graphical-session.target never activates on X11/GDM, use default.target instead
       - mkdir -p /home/ubuntu/.config/systemd/user/sunshine.service.d
       - "printf '[Unit]\nAfter=graphical.target\n\n[Install]\nWantedBy=default.target\n' > /home/ubuntu/.config/systemd/user/sunshine.service.d/autostart.conf"
