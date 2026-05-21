@@ -43,5 +43,6 @@ resources:
   - vllm-system
   - volsync
   - whisper-webui
+  - gitea
   - pdfcraft
   - plex
