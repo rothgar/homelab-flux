@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: nvidia-dra-driver-gpu
-      version: v0.4.0
+      version: 0.4.0
       sourceRef:
         kind: HelmRepository
         name: dra-driver-nvidia
