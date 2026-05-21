@@ -47,6 +47,6 @@ spec:
             timeSlicing:
               resources:
                 - name: nvidia.com/gpu
-                  replicas: 6
+                  replicas: 2
     gfd:
       enabled: true
