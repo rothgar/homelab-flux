@@ -27,6 +27,7 @@ machines:
   - c828b893-c76a-4b1c-a7c6-345a6053adf6
   - 4c5615cc-1dd2-11b2-8000-4cbb47001716
   - d057a478-09c5-430f-9759-d05099df2199
+  - 03000200-0400-0500-0006-000700080009
 ---
 kind: Machine
 systemExtensions:
@@ -84,4 +85,15 @@ kernelArgs:
   - iommu=pt
 patches:
   - file: patches/3d.yaml
+  - file: patches/kubelet.yaml
+---
+kind: Machine
+systemExtensions:
+  - siderolabs/intel-ucode
+  - siderolabs/intel-ice-firmware
+name: 03000200-0400-0500-0006-000700080009
+kernelArgs:
+  - talos.dashboard.disabled=1
+patches:
+  - file: patches/iota.yaml
   - file: patches/kubelet.yaml
