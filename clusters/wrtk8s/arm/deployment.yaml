@@ -32,11 +32,6 @@ spec:
                 secretKeyRef:
                   name: arm-api-keys
                   key: OMDB_API_KEY
-            - name: TVDB_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: arm-api-keys
-                  key: TVDB_API_KEY
           securityContext:
             privileged: true
           volumeMounts:
