@@ -41,8 +41,8 @@ spec:
               mountPath: /home/arm/music
             - name: config
               mountPath: /etc/arm/config
-            - name: sr0
-              mountPath: /dev/sr0
+            - name: dev
+              mountPath: /dev
             - name: udev
               mountPath: /run/udev
       volumes:
@@ -55,10 +55,9 @@ spec:
         - name: config
           persistentVolumeClaim:
             claimName: arm-config
-        - name: sr0
+        - name: dev
           hostPath:
-            path: /dev/sr0
-            type: BlockDevice
+            path: /dev
         - name: udev
           hostPath:
             path: /run/udev
