@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: arm
+  namespace: arm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: arm
+  template:
+    metadata:
+      labels:
+        app: arm
+    spec:
+      nodeSelector:
+        arm.io/optical-drive: "true"
+      containers:
+        - name: arm
+          image: automaticrippingmachine/automatic-ripping-machine:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: ARM_UID
+              value: "1000"
+            - name: ARM_GID
+              value: "1000"
+            - name: TZ
+              value: America/Los_Angeles
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: media
+              mountPath: /home/arm/media
+            - name: music
+              mountPath: /home/arm/music
+            - name: config
+              mountPath: /etc/arm/config
+            - name: sr0
+              mountPath: /dev/sr0
+            - name: udev
+              mountPath: /run/udev
+      volumes:
+        - name: media
+          persistentVolumeClaim:
+            claimName: arm-media
+        - name: music
+          persistentVolumeClaim:
+            claimName: arm-music
+        - name: config
+          persistentVolumeClaim:
+            claimName: arm-config
+        - name: sr0
+          hostPath:
+            path: /dev/sr0
+            type: BlockDevice
+        - name: udev
+          hostPath:
+            path: /run/udev

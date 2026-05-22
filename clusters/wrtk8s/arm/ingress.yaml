@@ -1,0 +1,47 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: arm
+  namespace: arm
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    external-dns.alpha.kubernetes.io/hostname: arm.jgarr.net
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - arm.jgarr.net
+      secretName: arm-tls
+  rules:
+    - host: arm.jgarr.net
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: arm
+                port:
+                  number: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: arm-tailscale
+  namespace: arm
+spec:
+  ingressClassName: tailscale
+  rules:
+    - host: arm
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: arm
+                port:
+                  number: 8080
+  tls:
+    - hosts:
+        - arm
