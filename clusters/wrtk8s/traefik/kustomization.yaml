@@ -6,3 +6,4 @@ resources:
   - release.yaml
   - certificate.yaml
   - gateway.yaml
+  - gateway-rbac.yaml
