@@ -24,6 +24,8 @@ spec:
     gatewayClass:
       enabled: true
       name: traefik
+    additionalArguments:
+      - --providers.kubernetesgateway
     ports:
       web:
         redirectTo:
