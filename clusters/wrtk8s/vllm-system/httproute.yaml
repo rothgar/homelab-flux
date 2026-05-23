@@ -5,6 +5,7 @@ metadata:
   namespace: vllm-system
   annotations:
     external-dns.alpha.kubernetes.io/hostname: ollama.jgarr.net
+    external-dns.alpha.kubernetes.io/target: 10.1.1.152
 spec:
   parentRefs:
     - name: traefik
@@ -27,6 +28,7 @@ metadata:
   namespace: vllm-system
   annotations:
     external-dns.alpha.kubernetes.io/hostname: ai.jgarr.net
+    external-dns.alpha.kubernetes.io/target: 10.1.1.152
 spec:
   parentRefs:
     - name: traefik

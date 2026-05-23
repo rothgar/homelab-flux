@@ -5,6 +5,7 @@ metadata:
   namespace: headlamp
   annotations:
     external-dns.alpha.kubernetes.io/hostname: headlamp.jgarr.net
+    external-dns.alpha.kubernetes.io/target: 10.1.1.152
 spec:
   parentRefs:
     - name: traefik

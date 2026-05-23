@@ -5,6 +5,7 @@ metadata:
   namespace: monitoring
   annotations:
     external-dns.alpha.kubernetes.io/hostname: grafana.jgarr.net
+    external-dns.alpha.kubernetes.io/target: 10.1.1.152
 spec:
   parentRefs:
     - name: traefik
