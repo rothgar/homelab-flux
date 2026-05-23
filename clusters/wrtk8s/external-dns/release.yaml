@@ -33,5 +33,4 @@ spec:
     domainFilters: []
     extraArgs:
       - --default-targets=10.1.1.152
-    ingressClassNames:
-      - traefik
+      - --ingress-class=traefik
