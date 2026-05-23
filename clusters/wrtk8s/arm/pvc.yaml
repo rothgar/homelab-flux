@@ -34,74 +34,17 @@ spec:
       storage: 1Ti
 ---
 apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: arm-movies
-spec:
-  capacity:
-    storage: 1Ti
-  accessModes:
-    - ReadWriteMany
-  mountOptions:
-    - nfsvers=4.1
-    - rsize=1048576
-    - wsize=1048576
-    - hard
-    - noatime
-    - nodiratime
-  nfs:
-    server: 10.1.1.4
-    path: /volume1/movies
-  persistentVolumeReclaimPolicy: Retain
----
-apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: arm-movies
+  name: arm-media
   namespace: arm
 spec:
   accessModes:
     - ReadWriteMany
-  storageClassName: ""
-  volumeName: arm-movies
+  storageClassName: nfs-synology
   resources:
     requests:
-      storage: 1Ti
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: arm-tv
-spec:
-  capacity:
-    storage: 1Ti
-  accessModes:
-    - ReadWriteMany
-  mountOptions:
-    - nfsvers=4.1
-    - rsize=1048576
-    - wsize=1048576
-    - hard
-    - noatime
-    - nodiratime
-  nfs:
-    server: 10.1.1.4
-    path: /volume1/tv
-  persistentVolumeReclaimPolicy: Retain
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: arm-tv
-  namespace: arm
-spec:
-  accessModes:
-    - ReadWriteMany
-  storageClassName: ""
-  volumeName: arm-tv
-  resources:
-    requests:
-      storage: 1Ti
+      storage: 2Ti
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
