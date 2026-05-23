@@ -31,5 +31,5 @@ spec:
       - gateway-httproute
     txtOwnerId: wrtk8s
     domainFilters: []
-    defaultTargets:
-      - 10.1.1.152
+    extraArgs:
+      - --default-targets=10.1.1.152
