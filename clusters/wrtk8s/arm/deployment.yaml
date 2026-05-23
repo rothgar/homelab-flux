@@ -15,6 +15,15 @@ spec:
     spec:
       nodeSelector:
         arm.io/optical-drive: "true"
+      initContainers:
+        - name: fix-media-permissions
+          image: busybox
+          command: ["sh", "-c", "chown -R 1000:1000 /media && chmod -R 775 /media"]
+          securityContext:
+            runAsUser: 0
+          volumeMounts:
+            - name: media
+              mountPath: /media
       containers:
         - name: arm
           image: automaticrippingmachine/automatic-ripping-machine:latest
