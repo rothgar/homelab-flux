@@ -26,9 +26,3 @@ spec:
       name: traefik
     additionalArguments:
       - --providers.kubernetesgateway
-    ports:
-      web:
-        redirections:
-          entryPoint:
-            to: websecure
-            scheme: https
