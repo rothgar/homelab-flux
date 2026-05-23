@@ -19,3 +19,25 @@ spec:
       backendRefs:
         - name: open-webui
           port: 80
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: vllm-server
+  namespace: vllm-system
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: ai.jgarr.net
+spec:
+  parentRefs:
+    - name: traefik
+      namespace: traefik
+  hostnames:
+    - ai.jgarr.net
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: vllm-server
+          port: 8000
