@@ -39,6 +39,10 @@ spec:
               mountPath: /home/arm/media
             - name: music
               mountPath: /home/arm/music
+            - name: movies
+              mountPath: /home/arm/movies
+            - name: tv
+              mountPath: /home/arm/tv
             - name: config
               mountPath: /etc/arm/config
             - name: dev
@@ -52,6 +56,12 @@ spec:
         - name: music
           persistentVolumeClaim:
             claimName: arm-music
+        - name: movies
+          persistentVolumeClaim:
+            claimName: arm-movies
+        - name: tv
+          persistentVolumeClaim:
+            claimName: arm-tv
         - name: config
           persistentVolumeClaim:
             claimName: arm-config
