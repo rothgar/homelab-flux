@@ -51,8 +51,7 @@ spec:
               mountPath: /run/udev
       volumes:
         - name: media
-          persistentVolumeClaim:
-            claimName: arm-media
+          emptyDir: {}
         - name: music
           persistentVolumeClaim:
             claimName: arm-music
