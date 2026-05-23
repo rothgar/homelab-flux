@@ -12,6 +12,9 @@ spec:
         kind: HelmRepository
         name: external-dns
         namespace: external-dns
+  upgrade:
+    remediation:
+      retries: -1
   values:
     provider:
       name: cloudflare
