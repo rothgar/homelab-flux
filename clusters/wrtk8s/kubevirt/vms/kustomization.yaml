@@ -4,5 +4,4 @@ resources:
   - net-attach-def.yaml
   - ubuntu-boot-pv.yaml
   - ubuntu-cloudinit.yaml
-  - ubuntu-smb-credentials.yaml
   - ubuntu-vm.yaml
