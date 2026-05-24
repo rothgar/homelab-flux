@@ -18,12 +18,14 @@ spec:
       initContainers:
         - name: fix-media-permissions
           image: busybox
-          command: ["sh", "-c", "chown -R 1000:1000 /media && chmod -R 775 /media"]
+          command: ["sh", "-c", "chown 1000:1000 /media /music && chmod 775 /media /music"]
           securityContext:
             runAsUser: 0
           volumeMounts:
             - name: media
               mountPath: /media
+            - name: music
+              mountPath: /music
       containers:
         - name: arm
           image: automaticrippingmachine/automatic-ripping-machine:latest
