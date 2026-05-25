@@ -43,6 +43,11 @@ spec:
                 secretKeyRef:
                   name: arm-api-keys
                   key: OMDB_API_KEY
+            - name: MAKEMKV_PERMA_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: arm-api-keys
+                  key: MAKEMKV_PERMA_KEY
           securityContext:
             privileged: true
           volumeMounts:
