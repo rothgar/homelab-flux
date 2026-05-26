@@ -17,7 +17,7 @@ metadata:
   name: mistral
   namespace: mistral-system
 spec:
-  replicas: 1
+  replicas: 0
   strategy:
     type: Recreate
   selector:
