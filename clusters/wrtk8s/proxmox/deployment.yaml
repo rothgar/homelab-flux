@@ -56,9 +56,7 @@ spec:
               mountPath: /dev/loop-control
             - name: dev-mapper-control
               mountPath: /dev/mapper/control
-          resources:
-            requests:
-              memory: 2Gi
+          resources: {}
       volumes:
         - name: storage
           emptyDir: {}
