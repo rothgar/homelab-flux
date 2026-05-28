@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: proxmox
+  namespace: proxmox
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: proxmox
+  template:
+    metadata:
+      labels:
+        app: proxmox
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - 3d
+      containers:
+        - name: proxmox
+          image: dockur/proxmox
+          env:
+            - name: PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: proxmox-credentials
+                  key: password
+          ports:
+            - containerPort: 8006
+              name: web
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: storage
+              mountPath: /var/lib/vz
+            - name: config
+              mountPath: /var/lib/pve-cluster
+            - name: dev-kvm
+              mountPath: /dev/kvm
+          resources:
+            requests:
+              memory: 2Gi
+      volumes:
+        - name: storage
+          emptyDir: {}
+        - name: config
+          emptyDir: {}
+        - name: dev-kvm
+          hostPath:
+            path: /dev/kvm
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: proxmox
+  namespace: proxmox
+  annotations:
+    tailscale.com/expose: "true"
+    tailscale.com/hostname: "proxmox"
+spec:
+  selector:
+    app: proxmox
+  ports:
+    - port: 8006
+      targetPort: web
+  type: LoadBalancer
