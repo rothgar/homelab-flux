@@ -38,6 +38,7 @@ spec:
               name: web
           securityContext:
             privileged: true
+            runAsUser: 0
           volumeMounts:
             - name: storage
               mountPath: /var/lib/vz
