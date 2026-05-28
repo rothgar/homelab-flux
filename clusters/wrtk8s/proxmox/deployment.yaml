@@ -33,6 +33,8 @@ spec:
                 secretKeyRef:
                   name: proxmox-credentials
                   key: password
+            - name: DEBUG
+              value: "y"
           ports:
             - containerPort: 8006
               name: web
