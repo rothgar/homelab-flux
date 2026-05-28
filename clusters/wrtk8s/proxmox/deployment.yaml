@@ -39,6 +39,8 @@ spec:
           securityContext:
             privileged: true
             runAsUser: 0
+            capabilities:
+              add: ["ALL"]
           volumeMounts:
             - name: storage
               mountPath: /var/lib/vz
