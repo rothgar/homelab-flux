@@ -48,6 +48,14 @@ spec:
               mountPath: /var/lib/pve-cluster
             - name: dev-kvm
               mountPath: /dev/kvm
+            - name: dev-fuse
+              mountPath: /dev/fuse
+            - name: dev-tun
+              mountPath: /dev/net/tun
+            - name: dev-loop-control
+              mountPath: /dev/loop-control
+            - name: dev-mapper-control
+              mountPath: /dev/mapper/control
           resources:
             requests:
               memory: 2Gi
@@ -59,6 +67,18 @@ spec:
         - name: dev-kvm
           hostPath:
             path: /dev/kvm
+        - name: dev-fuse
+          hostPath:
+            path: /dev/fuse
+        - name: dev-tun
+          hostPath:
+            path: /dev/net/tun
+        - name: dev-loop-control
+          hostPath:
+            path: /dev/loop-control
+        - name: dev-mapper-control
+          hostPath:
+            path: /dev/mapper/control
 ---
 apiVersion: v1
 kind: Service
