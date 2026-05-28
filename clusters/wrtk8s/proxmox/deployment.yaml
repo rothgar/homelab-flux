@@ -26,7 +26,7 @@ spec:
                       - 3d
       containers:
         - name: proxmox
-          image: dockur/proxmox
+          image: dockurr/proxmox
           env:
             - name: PASSWORD
               valueFrom:
