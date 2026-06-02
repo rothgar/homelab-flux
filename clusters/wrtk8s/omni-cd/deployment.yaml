@@ -40,9 +40,6 @@ kind: Service
 metadata:
   name: omni-cd
   namespace: default
-  annotations:
-    tailscale.com/expose: "true"
-    tailscale.com/hostname: "omni-cd"
 spec:
   type: ClusterIP
   selector:
@@ -50,3 +47,25 @@ spec:
   ports:
     - port: 80
       targetPort: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: omni-cd-tailscale
+  namespace: default
+spec:
+  ingressClassName: tailscale
+  rules:
+    - host: omni-cd
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: omni-cd
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - omni-cd
