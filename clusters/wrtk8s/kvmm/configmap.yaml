@@ -27,3 +27,7 @@ data:
     [[devices]]
     host = "10.1.1.54"
     alias = "cube"
+
+    [[devices]]
+    host = "10.1.2.12"
+    alias = "3d"
