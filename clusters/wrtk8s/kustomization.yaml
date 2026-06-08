@@ -14,11 +14,9 @@ resources:
   - home-assistant
   - immich
   - kubelet-csr-approver
-  - kubevirt
   - kvmm
   - local-path-provisioner
   - metallb
-  - multus
   - metrics-server
   - minecraft
   - agent-sandbox
@@ -47,4 +45,3 @@ resources:
   - gitea
   - pdfcraft
   - plex
-  - proxmox

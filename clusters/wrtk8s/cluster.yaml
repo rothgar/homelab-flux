@@ -24,7 +24,6 @@ patches:
 kind: Workers
 machines:
   - 0564bde4-47b8-c3bd-79e6-63e7a2badf27
-  - c828b893-c76a-4b1c-a7c6-345a6053adf6
   - 4c5615cc-1dd2-11b2-8000-4cbb47001716
   - 03000200-0400-0500-0006-000700080009
 ---
@@ -74,16 +73,6 @@ patches:
   - file: patches/spark.yaml
   - file: patches/gb10-nvidia.yaml
   - file: patches/gpu-labels.yaml
-  - file: patches/kubelet.yaml
----
-kind: Machine
-name: c828b893-c76a-4b1c-a7c6-345a6053adf6
-kernelArgs:
-  - talos.dashboard.disabled=1
-  - amd_iommu=on
-  - iommu=pt
-patches:
-  - file: patches/3d.yaml
   - file: patches/kubelet.yaml
 ---
 kind: Machine
