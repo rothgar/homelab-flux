@@ -30,6 +30,7 @@ resources:
   - nvidia-system
 
   - omni-cd
+  - paperless-ngx
   - reaparr
   - registry
   - resolve-db

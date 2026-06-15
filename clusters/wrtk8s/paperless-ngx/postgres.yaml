@@ -1,0 +1,26 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: paperless-db
+  namespace: paperless-ngx
+spec:
+  instances: 1
+  imageName: ghcr.io/cloudnative-pg/postgresql:16
+
+  bootstrap:
+    initdb:
+      database: paperless
+      owner: paperless
+      secret:
+        name: paperless-db-credentials
+
+  storage:
+    size: 10Gi
+    storageClass: nfs-synology
+
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+    limits:
+      memory: 1Gi

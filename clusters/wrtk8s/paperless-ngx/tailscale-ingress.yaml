@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: paperless-tailscale
+  namespace: paperless-ngx
+spec:
+  ingressClassName: tailscale
+  rules:
+    - host: paper
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: paperless-ngx
+                port:
+                  number: 8000
+  tls:
+    - hosts:
+        - paper
