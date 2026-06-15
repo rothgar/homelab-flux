@@ -45,13 +45,32 @@ kind: Service
 metadata:
   name: whisper-webui
   namespace: default
-  annotations:
-    tailscale.com/expose: "true"
-    tailscale.com/hostname: "whisper"
 spec:
+  type: ClusterIP
   selector:
     app: whisper-webui
   ports:
     - port: 80
       targetPort: 7860
-  type: LoadBalancer
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: whisper-webui-tailscale
+  namespace: default
+spec:
+  ingressClassName: tailscale
+  rules:
+    - host: whisper
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: whisper-webui
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - whisper
