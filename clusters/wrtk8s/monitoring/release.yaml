@@ -31,6 +31,13 @@ spec:
       prometheus:
         monitor:
           enabled: true
+          relabelings:
+            - sourceLabels: [__meta_kubernetes_pod_node_name]
+              targetLabel: instance
+              action: replace
+            - sourceLabels: [__meta_kubernetes_pod_node_name]
+              targetLabel: nodename
+              action: replace
 
     # Prometheus configuration
     prometheus:
