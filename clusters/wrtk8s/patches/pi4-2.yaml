@@ -2,21 +2,3 @@ apiVersion: v1alpha1
 kind: HostnameConfig
 auto: "off"
 hostname: pi4-2
----
-apiVersion: v1alpha1
-kind: VolumeConfig
-name: EPHEMERAL
-provisioning:
-  diskSelector:
-    match: disk.transport == "usb"
-  maxSize: 30GiB
-  grow: false
----
-apiVersion: v1alpha1
-kind: UserVolumeConfig
-name: local-path
-provisioning:
-  diskSelector:
-    match: disk.transport == "usb"
-  minSize: 50GiB
-  grow: true
