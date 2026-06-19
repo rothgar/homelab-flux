@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: rpi-led-daemon
+  namespace: kube-system
+  labels:
+    app.kubernetes.io/name: rpi-led-daemon
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: rpi-led-daemon
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: rpi-led-daemon
+      annotations:
+        reloader.stakater.com/auto: "true"
+    spec:
+      nodeSelector:
+        hardware.io/raspberry-pi: "true"
+      hostNetwork: true
+      priorityClassName: system-node-critical
+      tolerations:
+        - operator: Exists
+      containers:
+        - name: led
+          image: python:3.12-slim
+          command: ["python3", "-u", "/scripts/led-daemon.py"]
+          env:
+            - name: LED_NAME
+              value: ACT
+            - name: NET_IFACE
+              value: end0
+            - name: PWM_DUTY
+              value: "0.5"
+            - name: PWM_FREQ_HZ
+              value: "100"
+            - name: POLL_INTERVAL_MS
+              value: "50"
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: sys
+              mountPath: /sys
+            - name: scripts
+              mountPath: /scripts
+              readOnly: true
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+      volumes:
+        - name: sys
+          hostPath:
+            path: /sys
+        - name: scripts
+          configMap:
+            name: rpi-led-daemon-script
+            defaultMode: 0755

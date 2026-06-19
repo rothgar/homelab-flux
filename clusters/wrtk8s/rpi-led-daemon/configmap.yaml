@@ -1,0 +1,123 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rpi-led-daemon-script
+  namespace: kube-system
+data:
+  led-daemon.py: |
+    #!/usr/bin/env python3
+    """LED activity daemon for Raspberry Pi nodes.
+
+    Drives /sys/class/leds/<LED_NAME>/brightness in response to network
+    traffic on NET_IFACE, using software PWM to dim the LED to ~PWM_DUTY
+    perceived brightness.
+    """
+    import os
+    import signal
+    import sys
+    import time
+    from pathlib import Path
+
+    LED_NAME = os.environ.get("LED_NAME", "ACT")
+    NET_IFACE = os.environ.get("NET_IFACE", "end0")
+    PWM_DUTY = float(os.environ.get("PWM_DUTY", "0.5"))
+    PWM_FREQ_HZ = float(os.environ.get("PWM_FREQ_HZ", "100"))
+    POLL_INTERVAL_MS = int(os.environ.get("POLL_INTERVAL_MS", "50"))
+
+    LED_DIR = Path(f"/sys/class/leds/{LED_NAME}")
+    LED_BRIGHTNESS = LED_DIR / "brightness"
+    LED_TRIGGER = LED_DIR / "trigger"
+    NET_STAT = Path(f"/sys/class/net/{NET_IFACE}/statistics")
+
+    PWM_PERIOD = 1.0 / PWM_FREQ_HZ
+    PWM_ON_TIME = PWM_PERIOD * PWM_DUTY
+    PWM_OFF_TIME = PWM_PERIOD - PWM_ON_TIME
+
+    # (packet-delta threshold, burst duration ms)
+    BURST_TIERS = [
+        (5, 40),
+        (50, 80),
+        (float("inf"), 120),
+    ]
+
+
+    def log(msg: str) -> None:
+        print(f"[rpi-led] {msg}", flush=True)
+
+
+    def set_brightness(value: int) -> None:
+        try:
+            LED_BRIGHTNESS.write_text(str(value))
+        except OSError as e:
+            log(f"warn: failed to write brightness: {e}")
+
+
+    def set_trigger(name: str) -> None:
+        try:
+            LED_TRIGGER.write_text(name)
+        except OSError as e:
+            log(f"warn: failed to set trigger {name}: {e}")
+
+
+    def pwm_burst(duration_ms: int) -> None:
+        cycles = max(1, int(duration_ms / 1000.0 * PWM_FREQ_HZ))
+        for _ in range(cycles):
+            set_brightness(1)
+            time.sleep(PWM_ON_TIME)
+            set_brightness(0)
+            time.sleep(PWM_OFF_TIME)
+
+
+    def read_packets() -> int:
+        rx = int((NET_STAT / "rx_packets").read_text().strip())
+        tx = int((NET_STAT / "tx_packets").read_text().strip())
+        return rx + tx
+
+
+    def burst_duration_for(delta: int) -> int:
+        for threshold, duration in BURST_TIERS:
+            if delta < threshold:
+                return duration
+        return BURST_TIERS[-1][1]
+
+
+    def shutdown(signum, _frame):
+        log(f"signal {signum}, restoring trigger to mmc0 and exiting")
+        set_trigger("mmc0")
+        sys.exit(0)
+
+
+    def main():
+        signal.signal(signal.SIGTERM, shutdown)
+        signal.signal(signal.SIGINT, shutdown)
+
+        if not LED_DIR.is_dir():
+            log(f"LED {LED_NAME} not present at {LED_DIR}; idle")
+            signal.pause()
+            return
+        if not NET_STAT.is_dir():
+            log(f"iface {NET_IFACE} not present at {NET_STAT}; idle")
+            signal.pause()
+            return
+
+        log(
+            f"started led={LED_NAME} iface={NET_IFACE} "
+            f"duty={PWM_DUTY:.2f} freq={PWM_FREQ_HZ:.0f}Hz "
+            f"poll={POLL_INTERVAL_MS}ms"
+        )
+        set_trigger("none")
+        set_brightness(0)
+        prev = read_packets()
+        poll_interval = POLL_INTERVAL_MS / 1000.0
+
+        while True:
+            cur = read_packets()
+            delta = cur - prev
+            prev = cur
+            if delta > 0:
+                pwm_burst(burst_duration_for(delta))
+            time.sleep(poll_interval)
+
+
+    if __name__ == "__main__":
+        main()

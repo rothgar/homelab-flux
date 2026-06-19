@@ -35,6 +35,7 @@ resources:
   - registry
   - resolve-db
   - reloader
+  - rpi-led-daemon
   - tailscale-operator
   - tts
   - talos-remote-config
