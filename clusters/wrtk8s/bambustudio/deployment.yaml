@@ -61,15 +61,10 @@ spec:
               value: all
             - name: PIXELFLUX_WAYLAND
               value: "false"
-            # GPU OpenGL via Zink (GL → Vulkan over NVIDIA driver)
-            - name: MESA_LOADER_DRIVER_OVERRIDE
-              value: zink
-            - name: GALLIUM_DRIVER
-              value: zink
-            - name: LIBGL_KOPPER_DRI2
-              value: "1"
             # Hardware video encoding for the Selkies WebRTC stream (NVENC).
             # Without this Selkies uses x264enc on CPU, which dominates latency.
+            # Note: Zink (GL → Vulkan) was tried for the 3D viewport but crashes
+            # Bambu's wxWidgets init — viewport stays on software Mesa.
             - name: SELKIES_ENCODER
               value: nvh264enc
           ports:
