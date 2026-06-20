@@ -21,7 +21,7 @@ spec:
         nvidia.com/gpu: "true"
       containers:
         - name: bambustudio
-          image: lscr.io/linuxserver/bambustudio:latest
+          image: lscr.io/linuxserver/bambustudio:v02.07.01.57-ls150
           env:
             - name: PUID
               value: "1000"
