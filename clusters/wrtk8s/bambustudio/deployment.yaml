@@ -19,6 +19,32 @@ spec:
       nodeSelector:
         kubernetes.io/arch: amd64
         nvidia.com/gpu: "true"
+      initContainers:
+        # NFS mounts /config mode 777. Bambu Studio's bundled libs refuse to
+        # use a world-writable HOME and exit silently — tighten perms first.
+        - name: fix-config-perms
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - chmod 700 /config && chown 1000:1000 /config
+          securityContext:
+            runAsUser: 0
+          volumeMounts:
+            - name: config
+              mountPath: /config
+        # linuxserver image bug: svc-selkies waits forever on /defaults/pid
+        # (svc-de actually writes /de-pid). Pre-touching /dev/shm/audio.lock
+        # short-circuits the whole wait branch in svc-selkies/run.
+        - name: skip-selkies-audio-wait
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - touch /dev/shm/audio.lock
+          volumeMounts:
+            - name: dshm
+              mountPath: /dev/shm
       containers:
         - name: bambustudio
           image: lscr.io/linuxserver/bambustudio:v02.07.01.57-ls150
@@ -35,6 +61,17 @@ spec:
               value: all
             - name: PIXELFLUX_WAYLAND
               value: "false"
+            # GPU OpenGL via Zink (GL → Vulkan over NVIDIA driver)
+            - name: MESA_LOADER_DRIVER_OVERRIDE
+              value: zink
+            - name: GALLIUM_DRIVER
+              value: zink
+            - name: LIBGL_KOPPER_DRI2
+              value: "1"
+            # Hardware video encoding for the Selkies WebRTC stream (NVENC).
+            # Without this Selkies uses x264enc on CPU, which dominates latency.
+            - name: SELKIES_ENCODER
+              value: nvh264enc
           ports:
             - containerPort: 3000
               name: http
