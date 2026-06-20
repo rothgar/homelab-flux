@@ -44,6 +44,7 @@ resources:
   - volsync
   - whisper-webui
   - arm
+  - bambustudio
   - gitea
   - pdfcraft
   - plex

@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bambustudio
+  namespace: default
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: bambustudio
+  template:
+    metadata:
+      labels:
+        app: bambustudio
+    spec:
+      runtimeClassName: nvidia
+      nodeSelector:
+        kubernetes.io/arch: amd64
+        nvidia.com/gpu: "true"
+      containers:
+        - name: bambustudio
+          image: lscr.io/linuxserver/bambustudio:latest
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: America/Los_Angeles
+            - name: NVIDIA_VISIBLE_DEVICES
+              value: all
+            - name: NVIDIA_DRIVER_CAPABILITIES
+              value: all
+          ports:
+            - containerPort: 3000
+              name: http
+          resources:
+            limits:
+              nvidia.com/gpu: 1
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            - name: dshm
+              mountPath: /dev/shm
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: bambustudio-config
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bambustudio
+  namespace: default
+spec:
+  type: ClusterIP
+  selector:
+    app: bambustudio
+  ports:
+    - port: 80
+      targetPort: 3000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: bambustudio-tailscale
+  namespace: default
+spec:
+  ingressClassName: tailscale
+  rules:
+    - host: bambu
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: bambustudio
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - bambu
