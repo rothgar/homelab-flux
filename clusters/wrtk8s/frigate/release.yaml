@@ -33,7 +33,7 @@ spec:
         mountPath: /config
     extraInitContainers:
       - name: build-model
-        image: python:3.11
+        image: python:3.14
         command:
           - sh
           - -c
