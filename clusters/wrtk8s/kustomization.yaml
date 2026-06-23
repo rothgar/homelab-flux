@@ -16,6 +16,7 @@ resources:
   - kubelet-csr-approver
   - kvmm
   - local-path-provisioner
+  - mealie
   - metallb
   - metrics-server
   - minecraft
