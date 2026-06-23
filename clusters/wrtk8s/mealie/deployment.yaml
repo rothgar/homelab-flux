@@ -23,7 +23,7 @@ spec:
           command:
             - sh
             - -c
-            - chown -R 911:911 /app/data
+            - chown -R 1000:1000 /app/data
           securityContext:
             runAsUser: 0
           volumeMounts:
@@ -33,6 +33,10 @@ spec:
         - name: mealie
           image: ghcr.io/mealie-recipes/mealie:v3.19.2
           env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
             - name: TZ
               value: America/Los_Angeles
             - name: BASE_URL
