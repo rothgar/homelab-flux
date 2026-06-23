@@ -54,10 +54,10 @@ spec:
             claimName: reaparr-downloads
         - name: movies
           persistentVolumeClaim:
-            claimName: reaparr-movies
+            claimName: movies
         - name: tvshows
           persistentVolumeClaim:
-            claimName: reaparr-tvshows
+            claimName: tvshows
 ---
 apiVersion: v1
 kind: Service
