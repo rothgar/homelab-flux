@@ -16,7 +16,7 @@ spec:
       runtimeClassName: nvidia
       containers:
       - name: vllm
-        image: vllm/vllm-openai:v0.17.0
+        image: vllm/vllm-openai:v0.24.0
         ports:
         - containerPort: 8000
           name: http
