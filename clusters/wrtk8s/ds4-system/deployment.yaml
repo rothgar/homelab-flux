@@ -32,13 +32,20 @@ spec:
             - -c
             - |
               set -e
-              cd /models
-              MODEL=DeepSeek-V4-Flash-Q4KExperts-F16HC-F16Compressor-F16Indexer-Q8Attn-Q8Shared-Q8Out-chat-v2-imatrix.gguf
-              if [ -s "$MODEL" ]; then
-                echo "model already present"; exit 0
+              MODEL=/models/DeepSeek-V4-Flash-Q4KExperts-F16HC-F16Compressor-F16Indexer-Q8Attn-Q8Shared-Q8Out-chat-v2-imatrix.gguf
+              MIN_BYTES=$((150 * 1024 * 1024 * 1024))
+              if [ -f "$MODEL" ]; then
+                SIZE=$(stat -c %s "$MODEL")
+                if [ "$SIZE" -ge "$MIN_BYTES" ]; then
+                  echo "model already present ($SIZE bytes)"; exit 0
+                fi
+                echo "partial file present ($SIZE bytes), removing"
+                rm -f "$MODEL"
               fi
               DS4_GGUF_DIR=/models /usr/local/bin/download_model.sh q4-imatrix
-              ln -sf "gguf/$MODEL" "$MODEL"
+              SIZE=$(stat -c %s "$MODEL")
+              [ "$SIZE" -ge "$MIN_BYTES" ] || { echo "download too small: $SIZE"; exit 1; }
+              echo "downloaded ok ($SIZE bytes)"
           volumeMounts:
             - name: models
               mountPath: /models
