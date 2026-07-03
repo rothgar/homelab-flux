@@ -1,0 +1,52 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ds4-build
+  namespace: ds4-system
+spec:
+  backoffLimit: 2
+  ttlSecondsAfterFinished: 604800
+  template:
+    spec:
+      restartPolicy: OnFailure
+      nodeSelector:
+        kubernetes.io/hostname: spark
+      tolerations:
+        - key: nvidia.com/gpu
+          operator: Exists
+          effect: NoSchedule
+      initContainers:
+        - name: fetch
+          image: alpine/git:v2.45.2
+          command:
+            - sh
+            - -c
+            - |
+              set -e
+              git clone --depth 1 https://github.com/antirez/ds4.git /workspace/ds4
+              cp /dockerfile/Dockerfile /workspace/ds4/Dockerfile
+              ls /workspace/ds4 | head -20
+          volumeMounts:
+            - name: workspace
+              mountPath: /workspace
+            - name: dockerfile
+              mountPath: /dockerfile
+      containers:
+        - name: kaniko
+          image: gcr.io/kaniko-project/executor:v1.23.2
+          args:
+            - --context=dir:///workspace/ds4
+            - --dockerfile=Dockerfile
+            - --destination=cr.jgarr.net/ds4:latest
+            - --snapshot-mode=redo
+            - --cache=true
+            - --cache-repo=cr.jgarr.net/ds4/cache
+          volumeMounts:
+            - name: workspace
+              mountPath: /workspace
+      volumes:
+        - name: workspace
+          emptyDir: {}
+        - name: dockerfile
+          configMap:
+            name: ds4-dockerfile

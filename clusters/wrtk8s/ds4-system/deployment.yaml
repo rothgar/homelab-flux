@@ -1,0 +1,112 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ds4
+  namespace: ds4-system
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: ds4
+  template:
+    metadata:
+      labels:
+        app: ds4
+    spec:
+      runtimeClassName: nvidia
+      terminationGracePeriodSeconds: 30
+      nodeSelector:
+        kubernetes.io/hostname: spark
+      tolerations:
+        - key: nvidia.com/gpu
+          operator: Exists
+          effect: NoSchedule
+      initContainers:
+        # 153GB — download once to spark's local NVMe. Skip if already present.
+        - name: download-model
+          image: cr.jgarr.net/ds4:latest
+          command:
+            - sh
+            - -c
+            - |
+              set -e
+              cd /models
+              MODEL=DeepSeek-V4-Flash-Q4KExperts-F16HC-F16Compressor-F16Indexer-Q8Attn-Q8Shared-Q8Out-chat-v2-imatrix.gguf
+              if [ -s "$MODEL" ]; then
+                echo "model already present"; exit 0
+              fi
+              DS4_GGUF_DIR=/models /usr/local/bin/download_model.sh q4-imatrix
+              ln -sf "gguf/$MODEL" "$MODEL"
+          volumeMounts:
+            - name: models
+              mountPath: /models
+      containers:
+        - name: ds4-server
+          image: cr.jgarr.net/ds4:latest
+          args:
+            - --host
+            - "0.0.0.0"
+            - --port
+            - "8000"
+            - --model
+            - /models/DeepSeek-V4-Flash-Q4KExperts-F16HC-F16Compressor-F16Indexer-Q8Attn-Q8Shared-Q8Out-chat-v2-imatrix.gguf
+            - --ctx
+            - "32768"
+            - --ssd-streaming
+            - --kv-disk-dir
+            - /kv-cache
+            - --cors
+          env:
+            - name: NVIDIA_VISIBLE_DEVICES
+              value: all
+            - name: NVIDIA_DRIVER_CAPABILITIES
+              value: all
+          ports:
+            - containerPort: 8000
+              name: http
+          resources:
+            limits:
+              nvidia.com/gpu: 1
+          readinessProbe:
+            tcpSocket:
+              port: 8000
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 20
+          livenessProbe:
+            tcpSocket:
+              port: 8000
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 5
+          volumeMounts:
+            - name: models
+              mountPath: /models
+            - name: kv-cache
+              mountPath: /kv-cache
+      volumes:
+        - name: models
+          hostPath:
+            path: /var/mnt/longhorn/ds4/models
+            type: DirectoryOrCreate
+        - name: kv-cache
+          hostPath:
+            path: /var/mnt/longhorn/ds4/kv-cache
+            type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ds4
+  namespace: ds4-system
+spec:
+  type: ClusterIP
+  selector:
+    app: ds4
+  ports:
+    - port: 8000
+      targetPort: 8000
+      name: http

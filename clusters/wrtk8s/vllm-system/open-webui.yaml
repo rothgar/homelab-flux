@@ -53,7 +53,7 @@ spec:
             - name: OLLAMA_BASE_URL
               value: ""
             - name: OPENAI_API_BASE_URLS
-              value: "http://aperture.gerbil-dragon.ts.net/v1"
+              value: "http://ds4.ds4-system.svc.cluster.local:8000/v1"
             - name: OPENAI_API_KEYS
               value: "local"
             - name: WEBUI_AUTH

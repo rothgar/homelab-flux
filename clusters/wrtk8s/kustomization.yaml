@@ -5,6 +5,7 @@ resources:
   - cert-manager
   - controld-exporter
   - descheduler
+  - ds4-system
   - external-dns
   - external-secrets
   - flannel
