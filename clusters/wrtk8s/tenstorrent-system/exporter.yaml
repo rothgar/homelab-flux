@@ -104,7 +104,7 @@ spec:
           effect: NoSchedule
       initContainers:
         - name: install-deps
-          image: python:3.11-slim
+          image: python:3.14-slim
           command:
             - /bin/bash
             - -c
@@ -118,7 +118,7 @@ spec:
               mountPath: /deps
       containers:
         - name: exporter
-          image: python:3.11-slim
+          image: python:3.14-slim
           command:
             - python
             - /etc/tt-exporter/exporter.py
