@@ -11,7 +11,11 @@ data:
         && rm -rf /var/lib/apt/lists/*
     WORKDIR /src
     COPY . /src/
-    RUN make cuda-spark
+    # cuda-spark uses empty CUDA_ARCH so nvcc auto-detects the local GPU. Kaniko
+    # has no GPU visible, so force Blackwell arch flags for GB10; include PTX so
+    # newer chips JIT at runtime.
+    RUN make -B ds4 ds4-server ds4-bench ds4-eval ds4-agent \
+        NVCC_ARCH_FLAGS="-gencode arch=compute_120,code=sm_120 -gencode arch=compute_120,code=compute_120"
 
     FROM nvcr.io/nvidia/cuda:12.9.0-runtime-ubuntu24.04
     RUN apt-get update && apt-get install -y --no-install-recommends \
