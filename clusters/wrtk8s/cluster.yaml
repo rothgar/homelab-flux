@@ -3,7 +3,7 @@ name: wrtk8s
 kubernetes:
   version: v1.35.6
 talos:
-  version: v1.13.4
+  version: v1.13.5
 features:
   enableWorkloadProxy: false
 patches:
@@ -36,8 +36,8 @@ systemExtensions:
   - siderolabs/amd-ucode
   - siderolabs/intel-ice-firmware
   - siderolabs/intel-ucode
-  - siderolabs/nvidia-container-toolkit-lts
-  - siderolabs/nonfree-kmod-nvidia-lts
+  - siderolabs/nvidia-container-toolkit-production
+  - siderolabs/nonfree-kmod-nvidia-production
 name: 0564bde4-47b8-c3bd-79e6-63e7a2badf27
 kernelArgs:
   - talos.dashboard.disabled=1
@@ -54,8 +54,8 @@ systemExtensions:
   - siderolabs/amd-ucode
   - siderolabs/amdgpu
   - siderolabs/iscsi-tools
-  - siderolabs/nvidia-container-toolkit-lts
-  - siderolabs/nonfree-kmod-nvidia-lts
+  - siderolabs/nvidia-container-toolkit-production
+  - siderolabs/nonfree-kmod-nvidia-production
 name: 6ad2ae00-11cb-11ef-83fc-64bc3f0e2e00
 kernelArgs:
   - talos.dashboard.disabled=1
