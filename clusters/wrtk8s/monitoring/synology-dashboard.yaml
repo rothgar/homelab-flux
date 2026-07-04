@@ -46,7 +46,10 @@ data:
       "panels": [
         {
           "collapsed": false,
-          "datasource": "prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
           "gridPos": {
             "h": 1,
             "w": 24,
@@ -60,7 +63,10 @@ data:
           "type": "row"
         },
         {
-          "datasource": "prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
           "description": "",
           "fieldConfig": {
             "defaults": {
@@ -1408,7 +1414,10 @@ data:
           "cacheTimeout": null,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
           "fieldConfig": {
             "defaults": {
               "unit": "percent"
@@ -1553,7 +1562,10 @@ data:
           "cacheTimeout": null,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
           "fieldConfig": {
             "defaults": {
               "unit": "percentunit"
@@ -1699,7 +1711,10 @@ data:
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
           "fieldConfig": {
             "defaults": {
               "unit": "percent"
@@ -1865,7 +1880,10 @@ data:
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
           "fieldConfig": {
             "defaults": {
               "unit": "deckbytes"
@@ -2035,7 +2053,10 @@ data:
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
           "decimals": 2,
           "description": "",
           "fieldConfig": {
@@ -2198,7 +2219,10 @@ data:
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
           "fieldConfig": {
             "defaults": {},
             "overrides": []
@@ -2339,7 +2363,10 @@ data:
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
           "decimals": null,
           "description": "",
           "fieldConfig": {
@@ -2446,7 +2473,10 @@ data:
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
           "decimals": null,
           "description": "",
           "fieldConfig": {
@@ -2551,7 +2581,10 @@ data:
         },
         {
           "collapsed": false,
-          "datasource": "prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
           "gridPos": {
             "h": 1,
             "w": 24,
@@ -2565,7 +2598,10 @@ data:
           "type": "row"
         },
         {
-          "datasource": "prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
           "fieldConfig": {
             "defaults": {
               "custom": {
@@ -2955,7 +2991,10 @@ data:
           "type": "table"
         },
         {
-          "datasource": "prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
           "fieldConfig": {
             "defaults": {
               "custom": {
@@ -3260,7 +3299,10 @@ data:
         },
         {
           "cacheTimeout": null,
-          "datasource": "prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
           "description": "",
           "fieldConfig": {
             "defaults": {
@@ -3516,7 +3558,10 @@ data:
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
           "description": "",
           "fieldConfig": {
             "defaults": {
@@ -3661,7 +3706,10 @@ data:
         },
         {
           "cacheTimeout": null,
-          "datasource": "prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
           "description": "",
           "fieldConfig": {
             "defaults": {
@@ -3726,7 +3774,10 @@ data:
         },
         {
           "cacheTimeout": null,
-          "datasource": "prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
           "description": "",
           "fieldConfig": {
             "defaults": {
@@ -3813,7 +3864,10 @@ data:
           "panels": [
             {
               "cacheTimeout": null,
-              "datasource": "prometheus",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
               "description": "",
               "fieldConfig": {
                 "defaults": {
@@ -3893,7 +3947,10 @@ data:
               "bars": false,
               "dashLength": 10,
               "dashes": false,
-              "datasource": "prometheus",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
               "description": "",
               "fieldConfig": {
                 "defaults": {
@@ -4043,7 +4100,10 @@ data:
             },
             {
               "cacheTimeout": null,
-              "datasource": "prometheus",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
               "description": "",
               "fieldConfig": {
                 "defaults": {
@@ -4131,7 +4191,10 @@ data:
         },
         {
           "collapsed": true,
-          "datasource": "prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
           "gridPos": {
             "h": 1,
             "w": 24,
@@ -4145,7 +4208,10 @@ data:
               "bars": false,
               "dashLength": 10,
               "dashes": false,
-              "datasource": "prometheus",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
               "description": "",
               "fieldConfig": {
                 "defaults": {},
@@ -4265,7 +4331,10 @@ data:
               "bars": false,
               "dashLength": 10,
               "dashes": false,
-              "datasource": "prometheus",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
               "description": "",
               "fieldConfig": {
                 "defaults": {
@@ -4413,7 +4482,10 @@ data:
               "bars": false,
               "dashLength": 10,
               "dashes": false,
-              "datasource": "prometheus",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
               "description": "",
               "fieldConfig": {
                 "defaults": {},
@@ -4550,7 +4622,10 @@ data:
               "bars": false,
               "dashLength": 10,
               "dashes": false,
-              "datasource": "prometheus",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
               "description": "",
               "fieldConfig": {
                 "defaults": {},
@@ -4670,7 +4745,10 @@ data:
               "bars": false,
               "dashLength": 10,
               "dashes": false,
-              "datasource": "prometheus",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
               "description": "",
               "fieldConfig": {
                 "defaults": {},
@@ -4790,7 +4868,10 @@ data:
               "bars": false,
               "dashLength": 10,
               "dashes": false,
-              "datasource": "prometheus",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
               "description": "",
               "fieldConfig": {
                 "defaults": {},
@@ -4910,7 +4991,10 @@ data:
               "bars": false,
               "dashLength": 10,
               "dashes": false,
-              "datasource": "prometheus",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
               "description": "",
               "fieldConfig": {
                 "defaults": {},
@@ -5030,7 +5114,10 @@ data:
               "bars": false,
               "dashLength": 10,
               "dashes": false,
-              "datasource": "prometheus",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
               "description": "",
               "fieldConfig": {
                 "defaults": {},
@@ -5150,7 +5237,10 @@ data:
               "bars": false,
               "dashLength": 10,
               "dashes": false,
-              "datasource": "prometheus",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
               "description": "The number of\ndata writes to SSD\nfor the first time",
               "fieldConfig": {
                 "defaults": {},
@@ -5270,7 +5360,10 @@ data:
           "panels": [
             {
               "cacheTimeout": null,
-              "datasource": "prometheus",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
               "description": "",
               "fieldConfig": {
                 "defaults": {
@@ -5350,7 +5443,10 @@ data:
               "bars": false,
               "dashLength": 10,
               "dashes": false,
-              "datasource": "prometheus",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
               "description": "",
               "fieldConfig": {
                 "defaults": {
@@ -5500,7 +5596,10 @@ data:
             },
             {
               "cacheTimeout": null,
-              "datasource": "prometheus",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
               "description": "",
               "fieldConfig": {
                 "defaults": {
@@ -5588,7 +5687,10 @@ data:
         },
         {
           "collapsed": true,
-          "datasource": "prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
           "gridPos": {
             "h": 1,
             "w": 24,
@@ -5598,7 +5700,10 @@ data:
           "id": 17,
           "panels": [
             {
-              "datasource": "prometheus",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
               "fieldConfig": {
                 "defaults": {
                   "custom": {
@@ -5954,7 +6059,10 @@ data:
               "bars": false,
               "dashLength": 10,
               "dashes": false,
-              "datasource": "prometheus",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
               "description": "",
               "editable": true,
               "error": false,
@@ -6091,7 +6199,10 @@ data:
               "bars": false,
               "dashLength": 10,
               "dashes": false,
-              "datasource": "prometheus",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
               "description": "",
               "editable": true,
               "error": false,
@@ -6249,7 +6360,10 @@ data:
               "bars": false,
               "dashLength": 10,
               "dashes": false,
-              "datasource": "prometheus",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
               "description": "",
               "editable": true,
               "error": false,
@@ -6399,7 +6513,10 @@ data:
         },
         {
           "collapsed": true,
-          "datasource": "prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
           "gridPos": {
             "h": 1,
             "w": 24,
@@ -6413,7 +6530,10 @@ data:
               "bars": false,
               "dashLength": 10,
               "dashes": false,
-              "datasource": "prometheus",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
               "description": "",
               "fieldConfig": {
                 "defaults": {},
@@ -6533,7 +6653,10 @@ data:
               "bars": false,
               "dashLength": 10,
               "dashes": false,
-              "datasource": "prometheus",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
               "fieldConfig": {
                 "defaults": {},
                 "overrides": []
@@ -7165,7 +7288,10 @@ data:
           {
             "allValue": null,
             "current": {},
-            "datasource": "prometheus",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus"
+            },
             "definition": "label_values(ssCpuUser, job)",
             "description": null,
             "error": null,
@@ -7192,7 +7318,10 @@ data:
           {
             "allValue": null,
             "current": {},
-            "datasource": "prometheus",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus"
+            },
             "definition": "query_result(ssCpuUser{job=~'$JobName'})",
             "description": null,
             "error": null,
@@ -7219,7 +7348,10 @@ data:
           {
             "allValue": null,
             "current": {},
-            "datasource": "prometheus",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus"
+            },
             "definition": "label_values(ifName{job=~'$JobName',instance=~'$Device'},ifName)",
             "description": "Regex controls interfaces to show.  Default: ^eth.*|^bond.*|^docker[0-9]",
             "error": null,
@@ -7246,7 +7378,10 @@ data:
           {
             "allValue": null,
             "current": {},
-            "datasource": "prometheus",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus"
+            },
             "definition": "label_values(ifName{job=~'$JobName',instance=~'$Device'},ifName)",
             "description": "Physical Network Interfaces",
             "error": null,
@@ -7273,7 +7408,10 @@ data:
           {
             "allValue": null,
             "current": {},
-            "datasource": "prometheus",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus"
+            },
             "definition": "label_values(ifType_info{job=~'$JobName',instance=~'$Device'},ifName)",
             "description": "Bonds an VLans",
             "error": null,
@@ -7300,7 +7438,10 @@ data:
           {
             "allValue": null,
             "current": {},
-            "datasource": "prometheus",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus"
+            },
             "definition": "label_values(diskID{job=~'$JobName',instance=~'$Device'},diskID)",
             "description": null,
             "error": null,
@@ -7327,7 +7468,10 @@ data:
           {
             "allValue": null,
             "current": {},
-            "datasource": "prometheus",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus"
+            },
             "definition": "label_values(diskID{job=~'$JobName',instance=~'$Device'},diskID)",
             "description": null,
             "error": null,
@@ -7354,7 +7498,10 @@ data:
           {
             "allValue": null,
             "current": {},
-            "datasource": "prometheus",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus"
+            },
             "definition": "label_values(raidName{job=~'$JobName',instance=~'$Device'},raidName)",
             "description": null,
             "error": null,
@@ -7381,7 +7528,10 @@ data:
           {
             "allValue": null,
             "current": {},
-            "datasource": "prometheus",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus"
+            },
             "definition": "label_values(storageIODevice{job=~'$JobName',instance=~'$Device'},storageIODevice)",
             "description": null,
             "error": null,
@@ -7408,7 +7558,10 @@ data:
           {
             "allValue": null,
             "current": {},
-            "datasource": "prometheus",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus"
+            },
             "definition": "label_values(spaceIODevice{job=~'$JobName',instance=~'$Device'},spaceIODevice)",
             "description": null,
             "error": null,
@@ -7435,7 +7588,10 @@ data:
           {
             "allValue": null,
             "current": {},
-            "datasource": "prometheus",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus"
+            },
             "definition": "label_values(hrStorageDescr{job=~'$JobName',instance=~'$Device'},hrStorageDescr)",
             "description": "Regex controls the hrStorageDescr devices  to hide.  Memory is hidden here and used in the \"hrMemoryDescr\" variable instead.  Default: /^(?!/run|/sys/.*|/dev|.*@docker.*|.*[M|m]emory)/",
             "error": null,
@@ -7462,7 +7618,10 @@ data:
           {
             "allValue": null,
             "current": {},
-            "datasource": "prometheus",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus"
+            },
             "definition": "label_values(flashCacheSSDDev{job=~'$JobName',instance=~'$Device'},flashCacheSSDDev)",
             "description": null,
             "error": null,
@@ -7489,7 +7648,10 @@ data:
           {
             "allValue": null,
             "current": {},
-            "datasource": "prometheus",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus"
+            },
             "definition": "label_values(hrStorageDescr{job=~'$JobName',instance=~'$Device'},hrStorageDescr)",
             "description": "Regex controls file hrStorageDescr devices to show here.   Default: /.*[M|m]emory.*/",
             "error": null,
@@ -7516,7 +7678,10 @@ data:
           {
             "allValue": null,
             "current": {},
-            "datasource": "prometheus",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus"
+            },
             "definition": "label_values(diskSMARTInfoDevName{job=~'$JobName',instance=~'$Device'},diskSMARTInfoDevName)",
             "description": null,
             "error": null,
@@ -7543,7 +7708,10 @@ data:
           {
             "allValue": null,
             "current": {},
-            "datasource": "prometheus",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus"
+            },
             "definition": "label_values(serviceName{job=~'$JobName',instance=~'$Device'},serviceName)",
             "description": "Regex controls which services to hide.  Default: /^(?!TELNET|FTP|AFP|OTHER)/",
             "error": null,
