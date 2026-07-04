@@ -33,7 +33,7 @@ spec:
               mountPath: /dockerfile
       containers:
         - name: kaniko
-          image: gcr.io/kaniko-project/executor:v1.23.2
+          image: gcr.io/kaniko-project/executor:v1.24.0
           args:
             - --context=dir:///workspace/ds4
             - --dockerfile=Dockerfile
