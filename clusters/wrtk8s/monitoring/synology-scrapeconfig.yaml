@@ -12,7 +12,7 @@ spec:
   params:
     # Dashboard 14284 needs Synology-private MIBs + UCD-SNMP-MIB (ssCpuUser,
     # hrStorageDescr) + IF-MIB (ifName, ifInOctets) all in one scrape.
-    module: [synology, if_mib, ucd_system_stats, ucd_memory]
+    module: [synology, if_mib, ucd_system_stats, ucd_memory, hr_mib]
     auth: [synology_v3]
   staticConfigs:
     - targets:

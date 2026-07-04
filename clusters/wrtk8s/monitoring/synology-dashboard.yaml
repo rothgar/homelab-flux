@@ -7352,7 +7352,7 @@ data:
               "type": "prometheus",
               "uid": "prometheus"
             },
-            "definition": "label_values(ifName{job=~'$JobName',instance=~'$Device'},ifName)",
+            "definition": "label_values(ifAdminStatus{job=~'$JobName',instance=~'$Device'},ifName)",
             "description": "Regex controls interfaces to show.  Default: ^eth.*|^bond.*|^docker[0-9]",
             "error": null,
             "hide": 0,
@@ -7362,7 +7362,7 @@ data:
             "name": "Interface",
             "options": [],
             "query": {
-              "query": "label_values(ifName{job=~'$JobName',instance=~'$Device'},ifName)",
+              "query": "label_values(ifAdminStatus{job=~'$JobName',instance=~'$Device'},ifName)",
               "refId": "StandardVariableQuery"
             },
             "refresh": 2,
@@ -7382,7 +7382,7 @@ data:
               "type": "prometheus",
               "uid": "prometheus"
             },
-            "definition": "label_values(ifName{job=~'$JobName',instance=~'$Device'},ifName)",
+            "definition": "label_values(ifAdminStatus{job=~'$JobName',instance=~'$Device'},ifName)",
             "description": "Physical Network Interfaces",
             "error": null,
             "hide": 0,
@@ -7392,7 +7392,7 @@ data:
             "name": "InterfacePhysical",
             "options": [],
             "query": {
-              "query": "label_values(ifName{job=~'$JobName',instance=~'$Device'},ifName)",
+              "query": "label_values(ifAdminStatus{job=~'$JobName',instance=~'$Device'},ifName)",
               "refId": "StandardVariableQuery"
             },
             "refresh": 2,
@@ -7412,7 +7412,7 @@ data:
               "type": "prometheus",
               "uid": "prometheus"
             },
-            "definition": "label_values(ifType_info{job=~'$JobName',instance=~'$Device'},ifName)",
+            "definition": "label_values(ifAdminStatus{job=~'$JobName',instance=~'$Device'},ifName)",
             "description": "Bonds an VLans",
             "error": null,
             "hide": 0,
@@ -7422,7 +7422,7 @@ data:
             "name": "InterfaceVirtual",
             "options": [],
             "query": {
-              "query": "label_values(ifType_info{job=~'$JobName',instance=~'$Device'},ifName)",
+              "query": "label_values(ifAdminStatus{job=~'$JobName',instance=~'$Device'},ifName)",
               "refId": "StandardVariableQuery"
             },
             "refresh": 2,
