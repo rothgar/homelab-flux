@@ -15,7 +15,7 @@ spec:
     spec:
       initContainers:
         - name: fix-permissions
-          image: busybox:1.37
+          image: busybox:1.38
           command: ["sh", "-c", "chown -R 911:1001 /Config /Downloads && chmod -R u+rw /Config"]
           securityContext:
             runAsUser: 0
