@@ -1,0 +1,86 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: synology-snmp-auths
+  namespace: monitoring
+data:
+  # Overlay merged on top of snmp_exporter's built-in snmp.yml. Adds a v3
+  # auth block used by scrapeconfig's `auth=synology_v3` param.
+  auths.yml: |
+    auths:
+      synology_v3:
+        version: 3
+        security_level: authNoPriv
+        username: ${SNMP_USERNAME}
+        password: ${SNMP_PASSWORD}
+        auth_protocol: SHA
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: snmp-exporter
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: snmp-exporter
+  template:
+    metadata:
+      labels:
+        app: snmp-exporter
+    spec:
+      containers:
+        - name: snmp-exporter
+          image: prom/snmp-exporter:v0.30.0
+          args:
+            - --config.file=/etc/snmp_exporter/snmp.yml,/etc/snmp_exporter/auths.yml
+            - --config.expand-environment-variables
+          env:
+            - name: SNMP_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: synology-snmp
+                  key: username
+            - name: SNMP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: synology-snmp
+                  key: password
+          ports:
+            - containerPort: 9116
+              name: http
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 9116
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 128Mi
+          volumeMounts:
+            - name: auths
+              mountPath: /etc/snmp_exporter/auths.yml
+              subPath: auths.yml
+              readOnly: true
+      volumes:
+        - name: auths
+          configMap:
+            name: synology-snmp-auths
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: snmp-exporter
+  namespace: monitoring
+  labels:
+    app: snmp-exporter
+spec:
+  selector:
+    app: snmp-exporter
+  ports:
+    - port: 9116
+      targetPort: 9116
+      name: http

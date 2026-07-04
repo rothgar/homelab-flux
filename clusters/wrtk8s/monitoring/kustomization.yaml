@@ -10,3 +10,6 @@ resources:
   - poditlater-egress.yaml
   - poditlater-scrapeconfig.yaml
   - poditlater-dashboard.yaml
+  - synology-external-secret.yaml
+  - synology-snmp-exporter.yaml
+  - synology-scrapeconfig.yaml
