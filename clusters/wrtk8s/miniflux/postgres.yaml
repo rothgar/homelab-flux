@@ -24,3 +24,52 @@ spec:
       cpu: 100m
     limits:
       memory: 512Mi
+---
+# Target 17 cluster. CNPG doesn't support in-place major upgrades; instead this
+# provisions a new cluster that bootstraps by logically importing the miniflux
+# database from the running 16 cluster. When ready:
+#   1. Wait for `kubectl -n miniflux get cluster miniflux-db-17` to show Ready
+#   2. Swap `miniflux-db-rw` → `miniflux-db-17-rw` in miniflux.yaml DATABASE_URL
+#   3. After verification, delete this file's old miniflux-db Cluster block
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: miniflux-db-17
+  namespace: miniflux
+spec:
+  instances: 1
+  imageName: ghcr.io/cloudnative-pg/postgresql:17
+
+  bootstrap:
+    initdb:
+      database: miniflux
+      owner: miniflux
+      secret:
+        name: miniflux-db-credentials
+      import:
+        type: microservice
+        databases:
+          - miniflux
+        source:
+          externalCluster: miniflux-db-old
+
+  externalClusters:
+    - name: miniflux-db-old
+      connectionParameters:
+        host: miniflux-db-rw.miniflux.svc.cluster.local
+        user: miniflux
+        dbname: miniflux
+      password:
+        name: miniflux-db-credentials
+        key: password
+
+  storage:
+    size: 5Gi
+    storageClass: nfs-synology
+
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+    limits:
+      memory: 512Mi
