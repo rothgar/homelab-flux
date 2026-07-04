@@ -13,3 +13,4 @@ resources:
   - synology-external-secret.yaml
   - synology-snmp-exporter.yaml
   - synology-scrapeconfig.yaml
+  - synology-dashboard.yaml

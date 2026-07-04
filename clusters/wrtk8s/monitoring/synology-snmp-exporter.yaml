@@ -53,7 +53,7 @@ spec:
               name: http
           readinessProbe:
             httpGet:
-              path: /health
+              path: /metrics
               port: 9116
           resources:
             requests:
