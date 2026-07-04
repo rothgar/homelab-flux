@@ -212,6 +212,91 @@ data:
               "legendFormat": "{{job}}"
             }
           ]
+        },
+        {
+          "title": "Total Cache Storage",
+          "type": "stat",
+          "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "bytes",
+              "thresholds": {
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "orange", "value": 200000000000 },
+                  { "color": "red", "value": 250000000000 }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "textMode": "auto",
+            "colorMode": "value"
+          },
+          "targets": [
+            {
+              "expr": "sum(kubelet_volume_stats_used_bytes{namespace=\"registry\"})",
+              "legendFormat": "used"
+            }
+          ]
+        },
+        {
+          "title": "Cache % Used per PVC",
+          "type": "bargauge",
+          "gridPos": { "h": 4, "w": 12, "x": 12, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "percentunit",
+              "min": 0,
+              "max": 1,
+              "thresholds": {
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "orange", "value": 0.8 },
+                  { "color": "red", "value": 0.9 }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "orientation": "horizontal",
+            "displayMode": "gradient",
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }
+          },
+          "targets": [
+            {
+              "expr": "kubelet_volume_stats_used_bytes{namespace=\"registry\"} / kubelet_volume_stats_capacity_bytes{namespace=\"registry\"}",
+              "legendFormat": "{{persistentvolumeclaim}}"
+            }
+          ]
+        },
+        {
+          "title": "Cache Storage by PVC",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 24, "x": 0, "y": 36 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "stacking": { "mode": "none" }
+              },
+              "unit": "bytes"
+            },
+            "overrides": []
+          },
+          "targets": [
+            {
+              "expr": "kubelet_volume_stats_used_bytes{namespace=\"registry\"}",
+              "legendFormat": "{{persistentvolumeclaim}}"
+            }
+          ]
         }
       ],
       "schemaVersion": 39,
