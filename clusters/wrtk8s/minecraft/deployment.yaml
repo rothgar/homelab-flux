@@ -44,7 +44,7 @@ spec:
             limits:
               memory: 2Gi
         - name: playit
-          image: ghcr.io/playit-cloud/playit-agent:0.17
+          image: ghcr.io/playit-cloud/playit-agent:1.0
           env:
             - name: SECRET_KEY
               valueFrom:
