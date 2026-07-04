@@ -19,7 +19,7 @@ spec:
         # NFS exports mount 777 with root_squash, so files Mealie writes can end
         # up owned by another uid and fail subsequent reads. Mealie runs as 911.
         - name: fix-data-perms
-          image: busybox:1.36
+          image: busybox:1.38
           command:
             - sh
             - -c

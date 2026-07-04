@@ -23,7 +23,7 @@ spec:
         # NFS mounts /config mode 777. Bambu Studio's bundled libs refuse to
         # use a world-writable HOME and exit silently — tighten perms first.
         - name: fix-config-perms
-          image: busybox:1.36
+          image: busybox:1.38
           command:
             - sh
             - -c
@@ -37,7 +37,7 @@ spec:
         # (svc-de actually writes /de-pid). Pre-touching /dev/shm/audio.lock
         # short-circuits the whole wait branch in svc-selkies/run.
         - name: skip-selkies-audio-wait
-          image: busybox:1.36
+          image: busybox:1.38
           command:
             - sh
             - -c
