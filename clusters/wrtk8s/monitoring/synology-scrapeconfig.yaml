@@ -10,7 +10,9 @@ spec:
   scrapeInterval: 60s
   scrapeTimeout: 30s
   params:
-    module: [synology]
+    # Dashboard 14284 needs Synology-private MIBs + UCD-SNMP-MIB (ssCpuUser,
+    # hrStorageDescr) + IF-MIB (ifName, ifInOctets) all in one scrape.
+    module: [synology, if_mib, ucd_system_stats, ucd_memory]
     auth: [synology_v3]
   staticConfigs:
     - targets:
