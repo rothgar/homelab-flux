@@ -5,7 +5,7 @@ metadata:
   namespace: ds4-system
 data:
   Dockerfile: |
-    FROM nvcr.io/nvidia/cuda:12.9.2-devel-ubuntu24.04 AS builder
+    FROM nvcr.io/nvidia/cuda:13.3.0-devel-ubuntu24.04 AS builder
     RUN apt-get update && apt-get install -y --no-install-recommends \
           build-essential ca-certificates git curl \
         && rm -rf /var/lib/apt/lists/*
@@ -17,7 +17,7 @@ data:
     RUN make -B ds4 ds4-server ds4-bench ds4-eval ds4-agent \
         NVCC_ARCH_FLAGS="-gencode arch=compute_120,code=sm_120 -gencode arch=compute_120,code=compute_120"
 
-    FROM nvcr.io/nvidia/cuda:12.9.2-runtime-ubuntu24.04
+    FROM nvcr.io/nvidia/cuda:13.3.0-runtime-ubuntu24.04
     RUN apt-get update && apt-get install -y --no-install-recommends \
           ca-certificates curl \
         && rm -rf /var/lib/apt/lists/*
