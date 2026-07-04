@@ -34,7 +34,8 @@ spec:
         - name: snmp-exporter
           image: prom/snmp-exporter:v0.30.0
           args:
-            - --config.file=/etc/snmp_exporter/snmp.yml,/etc/snmp_exporter/auths.yml
+            - --config.file=/etc/snmp_exporter/snmp.yml
+            - --config.file=/etc/snmp_exporter/auths.yml
             - --config.expand-environment-variables
           env:
             - name: SNMP_USERNAME
