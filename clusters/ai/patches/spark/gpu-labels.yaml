@@ -1,3 +1,0 @@
-machine:
-  nodeLabels:
-    nvidia.com/gpu: "true"
