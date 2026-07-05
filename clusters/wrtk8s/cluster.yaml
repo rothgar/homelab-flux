@@ -36,8 +36,10 @@ systemExtensions:
   - siderolabs/amd-ucode
   - siderolabs/intel-ice-firmware
   - siderolabs/intel-ucode
-  - siderolabs/nvidia-container-toolkit-production
-  - siderolabs/nonfree-kmod-nvidia-production
+  # z has a Pascal GPU (sm_61) — driver 595 in the production branch dropped
+  # support, so stay on -lts (still ships driver 580 which supports Pascal).
+  - siderolabs/nvidia-container-toolkit-lts
+  - siderolabs/nonfree-kmod-nvidia-lts
 name: 0564bde4-47b8-c3bd-79e6-63e7a2badf27
 kernelArgs:
   - talos.dashboard.disabled=1
