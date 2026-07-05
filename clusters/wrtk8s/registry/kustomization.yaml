@@ -6,6 +6,7 @@ resources:
   - cache-pvc.yaml
   - certificate.yaml
   - deployment.yaml
+  - tailscale-service.yaml
   - docker-cache.yaml
   - k8s-cache.yaml
   - gcr-cache.yaml

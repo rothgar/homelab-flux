@@ -1,0 +1,25 @@
+# Second Service exposing the same registry pods on the tailnet. The primary
+# `registry` LoadBalancer stays as-is for cr.jgarr.net; this one gets picked up
+# by tailscale-operator's expose annotation and gets its own tailnet device.
+#
+# Note: registry serves TLS with a Let's Encrypt cert for cr.jgarr.net. Docker
+# clients hitting cr.gerbil-dragon.ts.net will see a hostname mismatch, so add
+#   {"insecure-registries": ["cr.gerbil-dragon.ts.net"]}
+# to daemon.json on any client that pulls from this endpoint. LE can't issue a
+# SAN for the .ts.net domain since Tailscale controls its DNS.
+apiVersion: v1
+kind: Service
+metadata:
+  name: registry-tailscale
+  namespace: registry
+  annotations:
+    tailscale.com/expose: "true"
+    tailscale.com/hostname: cr
+spec:
+  type: ClusterIP
+  selector:
+    app: registry
+  ports:
+    - port: 443
+      targetPort: 5000
+      name: https
