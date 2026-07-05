@@ -1,25 +1,110 @@
-# Second Service exposing the same registry pods on the tailnet. The primary
-# `registry` LoadBalancer stays as-is for cr.jgarr.net; this one gets picked up
-# by tailscale-operator's expose annotation and gets its own tailnet device.
+# Tailnet exposure for cr.gerbil-dragon.ts.net with a valid Tailscale MagicDNS
+# cert (no client-side insecure-registries config needed).
 #
-# Note: registry serves TLS with a Let's Encrypt cert for cr.jgarr.net. Docker
-# clients hitting cr.gerbil-dragon.ts.net will see a hostname mismatch, so add
-#   {"insecure-registries": ["cr.gerbil-dragon.ts.net"]}
-# to daemon.json on any client that pulls from this endpoint. LE can't issue a
-# SAN for the .ts.net domain since Tailscale controls its DNS.
+# Chain: client → https://cr.gerbil-dragon.ts.net (tailscale MagicDNS cert)
+#        → tailscale operator ingress (HTTP to backend)
+#        → registry-tailscale-proxy (nginx, HTTP → HTTPS re-encrypt)
+#        → registry Service:443 (existing TLS cert for cr.jgarr.net)
+#
+# The nginx step exists because registry:2 only serves HTTPS but tailscale
+# ingress only forwards HTTP. Backend cert verification is off since the cert
+# is for cr.jgarr.net and we're routing internally by service name.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: registry-tailscale-proxy
+  namespace: registry
+data:
+  nginx.conf: |
+    events {}
+    http {
+      client_max_body_size 0;
+      proxy_request_buffering off;
+      proxy_http_version 1.1;
+      server {
+        listen 80;
+        location / {
+          proxy_pass https://registry.registry.svc.cluster.local:443;
+          proxy_ssl_verify off;
+          proxy_ssl_server_name on;
+          proxy_ssl_name cr.jgarr.net;
+          proxy_set_header Host cr.jgarr.net;
+          proxy_set_header X-Forwarded-Proto https;
+          proxy_set_header X-Real-IP $remote_addr;
+        }
+      }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: registry-tailscale-proxy
+  namespace: registry
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: registry-tailscale-proxy
+  template:
+    metadata:
+      labels:
+        app: registry-tailscale-proxy
+      annotations:
+        reloader.stakater.com/auto: "true"
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.27-alpine
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+              readOnly: true
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 64Mi
+      volumes:
+        - name: config
+          configMap:
+            name: registry-tailscale-proxy
+---
 apiVersion: v1
 kind: Service
 metadata:
-  name: registry-tailscale
+  name: registry-tailscale-proxy
   namespace: registry
-  annotations:
-    tailscale.com/expose: "true"
-    tailscale.com/hostname: cr
 spec:
   type: ClusterIP
   selector:
-    app: registry
+    app: registry-tailscale-proxy
   ports:
-    - port: 443
-      targetPort: 5000
-      name: https
+    - port: 80
+      targetPort: 80
+      name: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: registry-tailscale
+  namespace: registry
+spec:
+  ingressClassName: tailscale
+  rules:
+    - host: cr
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: registry-tailscale-proxy
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - cr
