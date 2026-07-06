@@ -4,7 +4,7 @@ metadata:
   name: vllm
   namespace: vllm-system
 spec:
-  replicas: 0
+  replicas: 1
   strategy:
     type: Recreate
   selector:

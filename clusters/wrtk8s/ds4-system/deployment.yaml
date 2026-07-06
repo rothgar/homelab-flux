@@ -4,7 +4,7 @@ metadata:
   name: ds4
   namespace: ds4-system
 spec:
-  replicas: 1
+  replicas: 0
   strategy:
     type: Recreate
   selector:
