@@ -15,54 +15,43 @@ spec:
       labels:
         app: youtarr-db
     spec:
-      # linuxserver.io image supports PUID/PGID so we can run mysqld as uid
-      # 1000 (Synology's NFS accepts this uid; the mariadb.org image's fixed
-      # uid 999 is denied). Same pattern as bambustudio/mealie.
-      initContainers:
-        - name: fix-perms
-          image: busybox:1.38
-          command:
-            - sh
-            - -c
-            - chown -R 1000:1000 /config
-          securityContext:
-            runAsUser: 0
-          volumeMounts:
-            - name: data
-              mountPath: /config
+      # MariaDB supports running as an arbitrary user. Setting runAsUser=1000
+      # avoids the image's default uid 999 which Synology's NFS rejects.
+      # fsGroup=1000 tells kubelet to chown the PVC mount to gid 1000 so the
+      # non-root mysqld can write to it.
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
       containers:
         - name: mariadb
-          image: lscr.io/linuxserver/mariadb:latest
+          image: mariadb:11.4
           env:
-            - name: PUID
-              value: "1000"
-            - name: PGID
-              value: "1000"
-            - name: TZ
-              value: America/Los_Angeles
-            - name: MYSQL_ROOT_PASSWORD
+            - name: MARIADB_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: youtarr-db-credentials
                   key: root-password
-            - name: MYSQL_USER
+            - name: MARIADB_USER
               valueFrom:
                 secretKeyRef:
                   name: youtarr-db-credentials
                   key: username
-            - name: MYSQL_PASSWORD
+            - name: MARIADB_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: youtarr-db-credentials
                   key: password
-            - name: MYSQL_DATABASE
+            - name: MARIADB_DATABASE
               value: youtarr
+            - name: TZ
+              value: America/Los_Angeles
           ports:
             - containerPort: 3306
               name: mysql
           readinessProbe:
-            tcpSocket:
-              port: 3306
+            exec:
+              command: ["healthcheck.sh", "--connect", "--innodb_initialized"]
             initialDelaySeconds: 30
             periodSeconds: 10
           resources:
@@ -73,7 +62,7 @@ spec:
               memory: 1Gi
           volumeMounts:
             - name: data
-              mountPath: /config
+              mountPath: /var/lib/mysql
       volumes:
         - name: data
           persistentVolumeClaim:
