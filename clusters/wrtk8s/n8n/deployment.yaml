@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: n8n
+  namespace: n8n
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: n8n
+  template:
+    metadata:
+      labels:
+        app: n8n
+    spec:
+      # n8n's default `node` user is uid 1000 — Synology-NFS-friendly. fsGroup
+      # makes kubelet chown the /home/node/.n8n mount to gid 1000 automatically.
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+        - name: n8n
+          image: docker.n8n.io/n8nio/n8n:1.108.0
+          env:
+            - name: N8N_HOST
+              value: n8n.gerbil-dragon.ts.net
+            - name: N8N_PORT
+              value: "5678"
+            - name: N8N_PROTOCOL
+              value: https
+            - name: WEBHOOK_URL
+              value: https://n8n.gerbil-dragon.ts.net/
+            - name: N8N_EDITOR_BASE_URL
+              value: https://n8n.gerbil-dragon.ts.net/
+            - name: N8N_TRUSTED_PROXIES
+              value: 10.0.0.0/8
+            - name: TZ
+              value: America/Los_Angeles
+            - name: GENERIC_TIMEZONE
+              value: America/Los_Angeles
+            - name: N8N_ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: n8n-encryption-key
+                  key: encryption-key
+            # Silence the "enforce_settings_file_permissions" warning on NFS
+            # (which can't set 0600 via chmod against Synology's default ACL).
+            - name: N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS
+              value: "false"
+          ports:
+            - containerPort: 5678
+              name: http
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 5678
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 5678
+            periodSeconds: 30
+            failureThreshold: 5
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              memory: 1Gi
+          volumeMounts:
+            - name: data
+              mountPath: /home/node/.n8n
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: n8n-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: n8n
+  namespace: n8n
+spec:
+  type: ClusterIP
+  selector:
+    app: n8n
+  ports:
+    - port: 80
+      targetPort: 5678
+      name: http

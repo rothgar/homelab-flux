@@ -24,6 +24,7 @@ resources:
   - agent-sandbox
   - mistral-system
   - miniflux
+  - n8n
   - tenstorrent-system
   - monitoring
   - mqtt
