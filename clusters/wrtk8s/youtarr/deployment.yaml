@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: youtarr
+  namespace: youtarr
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: youtarr
+  template:
+    metadata:
+      labels:
+        app: youtarr
+    spec:
+      containers:
+        - name: youtarr
+          image: dialmaster/youtarr:latest
+          env:
+            - name: TZ
+              value: America/Los_Angeles
+            - name: DB_HOST
+              value: youtarr-db.youtarr.svc.cluster.local
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_NAME
+              value: youtarr
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: youtarr-db-credentials
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: youtarr-db-credentials
+                  key: password
+            - name: YOUTUBE_OUTPUT_DIR
+              value: /usr/src/app/data
+            - name: AUTH_ENABLED
+              value: "false"
+            - name: TRUST_PROXY
+              value: "true"
+          ports:
+            - containerPort: 3011
+              name: http
+          readinessProbe:
+            tcpSocket:
+              port: 3011
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 3011
+            periodSeconds: 30
+          resources:
+            requests:
+              cpu: 50m
+              memory: 256Mi
+            limits:
+              memory: 1Gi
+          volumeMounts:
+            - name: downloads
+              mountPath: /usr/src/app/data
+            - name: config
+              mountPath: /app/config
+              subPath: config
+            - name: config
+              mountPath: /app/jobs
+              subPath: jobs
+            - name: config
+              mountPath: /app/server/images
+              subPath: images
+      volumes:
+        - name: downloads
+          persistentVolumeClaim:
+            claimName: youtarr-downloads
+        - name: config
+          persistentVolumeClaim:
+            claimName: youtarr-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: youtarr
+  namespace: youtarr
+spec:
+  type: ClusterIP
+  selector:
+    app: youtarr
+  ports:
+    - port: 80
+      targetPort: 3011
+      name: http

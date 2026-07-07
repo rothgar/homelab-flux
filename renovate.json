@@ -17,6 +17,11 @@
       "matchUpdateTypes": ["major"],
       "enabled": false,
       "description": "Skip Postgres major bumps — they require data migration, not a tag bump."
+    },
+    {
+      "matchDepNames": ["nvcr.io/nvidia/vllm"],
+      "allowedVersions": "<=26.04-py3",
+      "description": "Pin nvcr.io/nvidia/vllm — 26.06 segfaults in cuStreamCreateWithPriority on GB10 with driver 595."
     }
   ]
 }

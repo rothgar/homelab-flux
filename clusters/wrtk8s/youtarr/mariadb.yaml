@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: youtarr-db
+  namespace: youtarr
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: youtarr-db
+  template:
+    metadata:
+      labels:
+        app: youtarr-db
+    spec:
+      # Upstream docker-compose pins mariadb:10.3 for schema-migration reasons.
+      initContainers:
+        # NFS-synology PVCs mount 777 with a root subdir. mariadb refuses to
+        # start unless /var/lib/mysql is owned by uid 999 (the mysql user).
+        - name: fix-perms
+          image: busybox:1.38
+          command:
+            - sh
+            - -c
+            - chown -R 999:999 /var/lib/mysql
+          securityContext:
+            runAsUser: 0
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/mysql
+      containers:
+        - name: mariadb
+          image: mariadb:10.3
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: youtarr-db-credentials
+                  key: root-password
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: youtarr-db-credentials
+                  key: username
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: youtarr-db-credentials
+                  key: password
+            - name: MYSQL_DATABASE
+              value: youtarr
+          ports:
+            - containerPort: 3306
+              name: mysql
+          readinessProbe:
+            exec:
+              command: ["healthcheck.sh", "--connect", "--innodb_initialized"]
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 50m
+              memory: 256Mi
+            limits:
+              memory: 1Gi
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: youtarr-db
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: youtarr-db
+  namespace: youtarr
+spec:
+  type: ClusterIP
+  selector:
+    app: youtarr-db
+  ports:
+    - port: 3306
+      targetPort: 3306
+      name: mysql

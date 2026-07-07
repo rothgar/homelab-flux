@@ -45,6 +45,7 @@ resources:
   - vllm-system
   - volsync
   - whisper-webui
+  - youtarr
   - arm
   - bambustudio
   - gitea
