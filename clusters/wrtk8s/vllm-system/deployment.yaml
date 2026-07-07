@@ -32,7 +32,10 @@ spec:
                       - spark
       containers:
         - name: vllm
-          image: nvcr.io/nvidia/vllm:26.06-py3
+          # v26.06-py3 segfaults in cuStreamCreateWithPriority on GB10 with
+          # driver 595. Pinning back to the last known-good tag until upstream
+          # ships a fix.
+          image: nvcr.io/nvidia/vllm:26.04-py3
           command:
             - vllm
             - serve
