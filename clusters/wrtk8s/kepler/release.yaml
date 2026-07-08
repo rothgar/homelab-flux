@@ -23,6 +23,14 @@ spec:
       create: false
       name: kepler
 
+    image:
+      # Chart 0.11.4 pins appVersion to v0.11.4 but upstream never published
+      # that image tag — only `latest` and `v0.11.4-N-g<sha>` git-sha tags
+      # exist on quay. Track `latest` with Always pull until they cut real
+      # release image tags.
+      tag: latest
+      pullPolicy: Always
+
     # ServiceMonitor discovered by the existing kube-prometheus-stack Prometheus
     # (matches serviceMonitorSelector: release=kube-prometheus-stack).
     serviceMonitor:
@@ -34,7 +42,11 @@ spec:
 
     daemonset:
       hostPID: true
-      # Schedule on every node including the control-plane (mini).
+      # Kepler's `latest` image is amd64-only (no manifest list, no arm64
+      # build). Skip arm nodes (spark, pi4-*, pi5-*) until upstream ships arm64.
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      # Schedule on every amd64 node including the control-plane (mini).
       tolerations:
         - key: node-role.kubernetes.io/control-plane
           operator: Exists
@@ -56,16 +68,14 @@ spec:
       log:
         level: info
         format: text
-      # Kepler falls through this ordered list; arm64 (spark) will skip rapl
-      # and land on hwmon, x86 nodes will use rapl if MSR access works.
       cpu:
         meters: [rapl, hwmon]
       exporter:
         prometheus:
           enabled: true
-      # Enable pod-level metrics via kubelet informer.
+      # kube.enabled MUST stay false in the config file — the chart's daemonset
+      # already passes `--kube.enable --kube.node-name=$(NODE_NAME)` on the
+      # command line. Setting it true here fails config validation because the
+      # file has no nodeName (which only the CLI provides via downward API).
       kube:
-        enabled: true
-        podInformer:
-          mode: kubelet
-          pollInterval: 15s
+        enabled: false
