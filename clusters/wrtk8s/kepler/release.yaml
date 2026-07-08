@@ -39,6 +39,17 @@ spec:
       path: /metrics
       labels:
         release: kube-prometheus-stack
+      # Replace the default IP:port `instance` label with the pod's node
+      # hostname so the Grafana dashboard's Node picker shows "mini" / "iota"
+      # instead of "10.244.x.x:28282". Mirrors the node-exporter pattern in
+      # monitoring/release.yaml.
+      relabelings:
+        - sourceLabels: [__meta_kubernetes_pod_node_name]
+          targetLabel: instance
+          action: replace
+        - sourceLabels: [__meta_kubernetes_pod_node_name]
+          targetLabel: nodename
+          action: replace
 
     daemonset:
       hostPID: true
