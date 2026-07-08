@@ -35,7 +35,7 @@ spec:
     # (matches serviceMonitorSelector: release=kube-prometheus-stack).
     serviceMonitor:
       enabled: true
-      interval: 30s
+      interval: 60s
       path: /metrics
       labels:
         release: kube-prometheus-stack
@@ -70,6 +70,10 @@ spec:
         format: text
       cpu:
         meters: [rapl, hwmon]
+      # Reduce Kepler's own CPU / attributed-power overhead: default polling
+      # cadence is 5s and the monitor loop takes 200-500ms each iteration.
+      monitor:
+        interval: 30s
       exporter:
         prometheus:
           enabled: true
