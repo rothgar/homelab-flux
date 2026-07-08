@@ -14,6 +14,7 @@ resources:
   - headlamp
   - home-assistant
   - immich
+  - kepler
   - kubelet-csr-approver
   - kvmm
   - local-path-provisioner

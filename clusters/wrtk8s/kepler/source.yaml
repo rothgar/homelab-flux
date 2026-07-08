@@ -1,0 +1,9 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: kepler
+  namespace: kepler
+spec:
+  interval: 1h
+  type: oci
+  url: oci://quay.io/sustainable_computing_io/charts
