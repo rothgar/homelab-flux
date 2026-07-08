@@ -17,80 +17,21 @@ spec:
         name: kepler
         namespace: kepler
   values:
-    namespace:
-      # Namespace is managed by Flux via namespace.yaml so Kepler's chart must
-      # not try to create/own it.
-      create: false
-      name: kepler
-
     image:
-      # Chart 0.11.4 pins appVersion to v0.11.4 but upstream never published
-      # that image tag — only `latest` and `v0.11.4-N-g<sha>` git-sha tags
-      # exist on quay. Track `latest` with Always pull until they cut real
-      # release image tags.
+      # Chart 0.11.4 pins appVersion=v0.11.4 but upstream never published that
+      # image tag — only `latest` and `v0.11.4-N-g<sha>` git-sha tags exist on
+      # quay. Track `latest` with Always pull until they cut release tags.
       tag: latest
       pullPolicy: Always
 
-    # ServiceMonitor discovered by the existing kube-prometheus-stack Prometheus
-    # (matches serviceMonitorSelector: release=kube-prometheus-stack).
-    serviceMonitor:
-      enabled: true
-      interval: 60s
-      path: /metrics
-      labels:
-        release: kube-prometheus-stack
-      # Replace the default IP:port `instance` label with the pod's node
-      # hostname so the Grafana dashboard's Node picker shows "mini" / "iota"
-      # instead of "10.244.x.x:28282". Mirrors the node-exporter pattern in
-      # monitoring/release.yaml.
-      relabelings:
-        - sourceLabels: [__meta_kubernetes_pod_node_name]
-          targetLabel: instance
-          action: replace
-        - sourceLabels: [__meta_kubernetes_pod_node_name]
-          targetLabel: nodename
-          action: replace
-
     daemonset:
-      hostPID: true
-      # Kepler's `latest` image is amd64-only (no manifest list, no arm64
-      # build). Skip arm nodes (spark, pi4-*, pi5-*) until upstream ships arm64.
+      # Upstream `latest` is amd64-only (no manifest list, no arm64 build).
+      # Restrict to amd64 nodes until arm64 images ship.
       nodeSelector:
         kubernetes.io/arch: amd64
-      # Schedule on every amd64 node including the control-plane (mini).
-      tolerations:
-        - key: node-role.kubernetes.io/control-plane
-          operator: Exists
-          effect: NoSchedule
-        - key: node-role.kubernetes.io/master
-          operator: Exists
-          effect: NoSchedule
-      securityContext:
-        privileged: true
-        runAsNonRoot: false
-      resources:
-        requests:
-          cpu: 50m
-          memory: 128Mi
-        limits:
-          memory: 400Mi
 
     config:
-      log:
-        level: info
-        format: text
-      cpu:
-        meters: [rapl, hwmon]
-      # Reduce Kepler's own CPU / attributed-power overhead: default polling
-      # cadence is 5s and the monitor loop takes 200-500ms each iteration.
+      # Chart default is 5s, which pinned Kepler's own attributed power at ~2x
+      # any other namespace on otherwise-idle nodes.
       monitor:
         interval: 30s
-      exporter:
-        prometheus:
-          enabled: true
-      # kube.enabled MUST stay false in the config file — the chart's daemonset
-      # already passes `--kube.enable --kube.node-name=$(NODE_NAME)` on the
-      # command line. Setting it true here fails config validation because the
-      # file has no nodeName (which only the CLI provides via downward API).
-      kube:
-        enabled: false

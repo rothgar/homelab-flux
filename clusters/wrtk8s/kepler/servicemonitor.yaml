@@ -1,0 +1,27 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: kepler
+  namespace: kepler
+  labels:
+    release: kube-prometheus-stack
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kepler
+      app.kubernetes.io/instance: kepler
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 60s
+      # Replace the default IP:port `instance` label with the pod's node
+      # hostname so the Grafana dashboard's Node picker shows "mini" / "iota"
+      # instead of "10.244.x.x:28282". The chart's built-in ServiceMonitor
+      # template doesn't accept relabelings, so we manage it here.
+      relabelings:
+        - sourceLabels: [__meta_kubernetes_pod_node_name]
+          targetLabel: instance
+          action: replace
+        - sourceLabels: [__meta_kubernetes_pod_node_name]
+          targetLabel: nodename
+          action: replace
