@@ -1,0 +1,42 @@
+# Front the immich-ml Deployment with the KEDA HTTP add-on so it scales to
+# zero after idle (freeing the nvidia.com/gpu slot on mini) and wakes on the
+# first request from immich-server.
+#
+# Traffic path:
+#   immich-server  →  ExternalName Service (immich-ml-scaled)
+#                  →  KEDA HTTP interceptor (keda ns, port 8080)
+#                  →  matches HTTPScaledObject by Host header
+#                  →  buffers request, scales Deployment 0→1 if needed
+#                  →  forwards to immich-machine-learning:3003
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: immich-ml-scaled
+  namespace: immich
+spec:
+  type: ExternalName
+  externalName: keda-add-ons-http-interceptor-proxy.keda.svc.cluster.local
+---
+apiVersion: http.keda.sh/v1alpha1
+kind: HTTPScaledObject
+metadata:
+  name: immich-machine-learning
+  namespace: immich
+spec:
+  # The Host header immich-server sends is derived from the URL. axios uses
+  # `host:port` when a non-default port is present.
+  hosts:
+    - immich-ml-scaled:8080
+    - immich-ml-scaled
+  scaleTargetRef:
+    name: immich-machine-learning
+    kind: Deployment
+    apiVersion: apps/v1
+    service: immich-machine-learning
+    port: 3003
+  replicas:
+    min: 0
+    max: 1
+  # Seconds of no matching HTTP traffic before scaling back to 0.
+  scaledownPeriod: 300

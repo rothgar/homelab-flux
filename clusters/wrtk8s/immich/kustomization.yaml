@@ -10,3 +10,4 @@ resources:
   - httproute.yaml
   - tailscale-ingress.yaml
   - external-secret.yaml
+  - ml-scaler.yaml

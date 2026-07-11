@@ -29,6 +29,9 @@ spec:
                 tag: v2.5.6
               env:
                 DB_URL: "postgresql://immich:immich@immich-postgres:5432/immich"
+                # Route ML calls through KEDA HTTP interceptor so the ML
+                # Deployment can scale to zero. See ml-scaler.yaml.
+                IMMICH_MACHINE_LEARNING_URL: "http://immich-ml-scaled:8080"
       persistence:
         pictures:
           enabled: true
