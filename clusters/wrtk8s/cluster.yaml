@@ -3,7 +3,7 @@ name: wrtk8s
 kubernetes:
   version: v1.35.6
 talos:
-  version: v1.13.5
+  version: v1.13.6
 features:
   enableWorkloadProxy: false
 patches:
