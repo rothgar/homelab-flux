@@ -73,6 +73,10 @@ metadata:
   namespace: monitoring
   labels:
     app: shelly-json-exporter
+  annotations:
+    # json_exporter reads its config once at startup, so pick up ConfigMap
+    # edits via a controlled restart from stakater/reloader.
+    configmap.reloader.stakater.com/reload: shelly-json-exporter
 spec:
   replicas: 1
   selector:
