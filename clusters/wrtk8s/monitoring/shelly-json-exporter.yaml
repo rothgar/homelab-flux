@@ -13,47 +13,58 @@ data:
           - name: shelly_power_watts
             path: '{ .["switch:0"].apower }'
             help: Active power in watts.
-            type: gauge
+            type: value
+            valuetype: gauge
           - name: shelly_voltage_volts
             path: '{ .["switch:0"].voltage }'
             help: Line voltage.
-            type: gauge
+            type: value
+            valuetype: gauge
           - name: shelly_current_amps
             path: '{ .["switch:0"].current }'
             help: Instantaneous current draw.
-            type: gauge
+            type: value
+            valuetype: gauge
           - name: shelly_frequency_hertz
             path: '{ .["switch:0"].freq }'
             help: AC frequency.
-            type: gauge
+            type: value
+            valuetype: gauge
           - name: shelly_energy_watthours_total
             path: '{ .["switch:0"].aenergy.total }'
             help: Cumulative delivered energy in watt-hours (counter).
-            type: counter
+            type: value
+            valuetype: counter
           - name: shelly_returned_energy_watthours_total
             path: '{ .["switch:0"].ret_aenergy.total }'
             help: Cumulative returned energy in watt-hours (counter).
-            type: counter
+            type: value
+            valuetype: counter
           - name: shelly_temperature_celsius
             path: '{ .["switch:0"].temperature.tC }'
             help: Internal device temperature.
-            type: gauge
+            type: value
+            valuetype: gauge
           - name: shelly_switch_output
             path: '{ .["switch:0"].output }'
             help: Relay state (1 = on, 0 = off).
-            type: gauge
+            type: value
+            valuetype: gauge
           - name: shelly_wifi_rssi
             path: '{ .wifi.rssi }'
             help: WiFi signal strength.
-            type: gauge
+            type: value
+            valuetype: gauge
           - name: shelly_uptime_seconds
             path: '{ .sys.uptime }'
             help: Seconds since last boot.
-            type: counter
+            type: value
+            valuetype: counter
           - name: shelly_cloud_connected
             path: '{ .cloud.connected }'
             help: 1 = connected to Shelly cloud, 0 = not connected.
-            type: gauge
+            type: value
+            valuetype: gauge
 ---
 apiVersion: apps/v1
 kind: Deployment
