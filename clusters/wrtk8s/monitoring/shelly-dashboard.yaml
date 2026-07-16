@@ -1,0 +1,114 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: shelly-grafana-dashboard
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+data:
+  shelly.json: |
+    {
+      "annotations": { "list": [] },
+      "editable": true,
+      "graphTooltip": 1,
+      "title": "Shelly Plugs",
+      "uid": "shelly-plugs",
+      "schemaVersion": 39,
+      "timezone": "",
+      "time": { "from": "now-6h", "to": "now" },
+      "refresh": "30s",
+      "templating": {
+        "list": [
+          {
+            "type": "query",
+            "name": "device",
+            "label": "Device",
+            "datasource": { "type": "prometheus", "uid": "${datasource}" },
+            "query": "label_values(shelly_power_watts, device)",
+            "multi": true,
+            "includeAll": true,
+            "current": { "text": "All", "value": "$__all" }
+          },
+          {
+            "type": "datasource",
+            "name": "datasource",
+            "query": "prometheus",
+            "current": { "text": "Prometheus", "value": "Prometheus" }
+          }
+        ]
+      },
+      "panels": [
+        {
+          "id": 1, "type": "stat", "title": "Power Now",
+          "gridPos": { "h": 5, "w": 6, "x": 0, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": { "defaults": { "unit": "watt", "decimals": 1, "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 500 }, { "color": "red", "value": 1200 }] } } },
+          "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "colorMode": "background", "graphMode": "area" },
+          "targets": [{ "expr": "sum by (device) (shelly_power_watts{device=~\"$device\"})", "legendFormat": "{{device}}" }]
+        },
+        {
+          "id": 2, "type": "stat", "title": "Voltage",
+          "gridPos": { "h": 5, "w": 4, "x": 6, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": { "defaults": { "unit": "volt", "decimals": 1 } },
+          "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "value", "graphMode": "area" },
+          "targets": [{ "expr": "avg by (device) (shelly_voltage_volts{device=~\"$device\"})", "legendFormat": "{{device}}" }]
+        },
+        {
+          "id": 3, "type": "stat", "title": "Current",
+          "gridPos": { "h": 5, "w": 4, "x": 10, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": { "defaults": { "unit": "amp", "decimals": 3 } },
+          "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "value", "graphMode": "area" },
+          "targets": [{ "expr": "sum by (device) (shelly_current_amps{device=~\"$device\"})", "legendFormat": "{{device}}" }]
+        },
+        {
+          "id": 4, "type": "stat", "title": "Energy (kWh)",
+          "gridPos": { "h": 5, "w": 5, "x": 14, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "description": "Cumulative delivered energy from device counters.",
+          "fieldConfig": { "defaults": { "unit": "kwatth", "decimals": 3 } },
+          "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "value", "graphMode": "area" },
+          "targets": [{ "expr": "sum by (device) (shelly_energy_watthours_total{device=~\"$device\"}) / 1000", "legendFormat": "{{device}}" }]
+        },
+        {
+          "id": 5, "type": "stat", "title": "Temperature",
+          "gridPos": { "h": 5, "w": 5, "x": 19, "y": 0 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": { "defaults": { "unit": "celsius", "decimals": 1, "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 60 }, { "color": "red", "value": 80 }] } } },
+          "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none" },
+          "targets": [{ "expr": "max by (device) (shelly_temperature_celsius{device=~\"$device\"})", "legendFormat": "{{device}}" }]
+        },
+        {
+          "id": 6, "type": "timeseries", "title": "Power Over Time",
+          "gridPos": { "h": 9, "w": 16, "x": 0, "y": 5 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": { "defaults": { "unit": "watt", "custom": { "drawStyle": "line", "fillOpacity": 20, "gradientMode": "opacity", "lineWidth": 1 } } },
+          "options": { "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max", "lastNotNull"] } },
+          "targets": [{ "expr": "shelly_power_watts{device=~\"$device\"}", "legendFormat": "{{device}}" }]
+        },
+        {
+          "id": 7, "type": "timeseries", "title": "Temperature",
+          "gridPos": { "h": 9, "w": 8, "x": 16, "y": 5 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": { "defaults": { "unit": "celsius", "custom": { "drawStyle": "line", "fillOpacity": 10, "lineWidth": 1 } } },
+          "options": { "legend": { "displayMode": "list", "placement": "bottom" } },
+          "targets": [{ "expr": "shelly_temperature_celsius{device=~\"$device\"}", "legendFormat": "{{device}}" }]
+        },
+        {
+          "id": 8, "type": "timeseries", "title": "Energy Consumed (rate, W)",
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 14 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "description": "Derived from the aenergy counter; useful to compare against instantaneous power for consistency.",
+          "fieldConfig": { "defaults": { "unit": "watt", "custom": { "drawStyle": "line", "fillOpacity": 10, "lineWidth": 1 } } },
+          "targets": [{ "expr": "rate(shelly_energy_watthours_total{device=~\"$device\"}[5m]) * 3600", "legendFormat": "{{device}}" }]
+        },
+        {
+          "id": 9, "type": "timeseries", "title": "WiFi RSSI",
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 14 },
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "fieldConfig": { "defaults": { "unit": "dBm", "custom": { "drawStyle": "line", "fillOpacity": 10, "lineWidth": 1 } } },
+          "targets": [{ "expr": "shelly_wifi_rssi{device=~\"$device\"}", "legendFormat": "{{device}}" }]
+        }
+      ]
+    }

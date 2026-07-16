@@ -1,0 +1,31 @@
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: ScrapeConfig
+metadata:
+  name: shelly
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  metricsPath: /probe
+  scrapeInterval: 30s
+  params:
+    module: [shelly]
+  # Add another `- targets:` block per additional Shelly plug and Prometheus
+  # will pick it up on the next config reload.
+  staticConfigs:
+    - targets:
+        - 10.1.2.2
+      labels:
+        device: shelly-benchy
+        model: S4PL-00116US
+  relabelings:
+    # Ship the raw target IP as the value of ?target= on the exporter probe URL
+    # and rewrite the actual scrape address to the exporter service. This is
+    # the same pattern used by synology-scrapeconfig.yaml.
+    - sourceLabels: [__address__]
+      targetLabel: __param_target
+      replacement: http://${1}/rpc/Shelly.GetStatus
+    - sourceLabels: [__param_target]
+      targetLabel: instance
+    - targetLabel: __address__
+      replacement: shelly-json-exporter.monitoring.svc.cluster.local:7979

@@ -14,3 +14,6 @@ resources:
   - synology-snmp-exporter.yaml
   - synology-scrapeconfig.yaml
   - synology-dashboard.yaml
+  - shelly-json-exporter.yaml
+  - shelly-scrapeconfig.yaml
+  - shelly-dashboard.yaml
