@@ -10,4 +10,9 @@ resources:
   - httproute.yaml
   - tailscale-ingress.yaml
   - external-secret.yaml
-  - ml-scaler.yaml
+  # NOTE: ml-scaler.yaml contains an HTTPScaledObject that depends on the KEDA
+  # HTTP add-on CRD. Re-enable this line AFTER Flux has installed the keda
+  # namespace's HelmReleases (check with `kubectl get crds | grep http.keda.sh`).
+  # Leaving it uncommented before that CRD exists blocks the entire root
+  # Kustomization on dry-run failure.
+  # - ml-scaler.yaml
