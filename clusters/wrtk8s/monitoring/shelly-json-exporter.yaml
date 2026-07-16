@@ -7,62 +7,48 @@ data:
   config.yml: |
     modules:
       shelly:
-        # Scrape /rpc/Shelly.GetStatus which returns metering + system info
-        # in one JSON blob. Keys like `switch:0` need bracket notation.
+        # Scrape /rpc/Switch.GetStatus?id=0 which returns metering fields at
+        # the top level (json_exporter's kubectl-style jsonpath doesn't handle
+        # colon-in-key names like `switch:0` cleanly).
         metrics:
           - name: shelly_power_watts
-            path: '{ .["switch:0"].apower }'
+            path: '{ .apower }'
             help: Active power in watts.
             type: value
             valuetype: gauge
           - name: shelly_voltage_volts
-            path: '{ .["switch:0"].voltage }'
+            path: '{ .voltage }'
             help: Line voltage.
             type: value
             valuetype: gauge
           - name: shelly_current_amps
-            path: '{ .["switch:0"].current }'
+            path: '{ .current }'
             help: Instantaneous current draw.
             type: value
             valuetype: gauge
           - name: shelly_frequency_hertz
-            path: '{ .["switch:0"].freq }'
+            path: '{ .freq }'
             help: AC frequency.
             type: value
             valuetype: gauge
           - name: shelly_energy_watthours_total
-            path: '{ .["switch:0"].aenergy.total }'
+            path: '{ .aenergy.total }'
             help: Cumulative delivered energy in watt-hours (counter).
             type: value
             valuetype: counter
           - name: shelly_returned_energy_watthours_total
-            path: '{ .["switch:0"].ret_aenergy.total }'
+            path: '{ .ret_aenergy.total }'
             help: Cumulative returned energy in watt-hours (counter).
             type: value
             valuetype: counter
           - name: shelly_temperature_celsius
-            path: '{ .["switch:0"].temperature.tC }'
+            path: '{ .temperature.tC }'
             help: Internal device temperature.
             type: value
             valuetype: gauge
           - name: shelly_switch_output
-            path: '{ .["switch:0"].output }'
+            path: '{ .output }'
             help: Relay state (1 = on, 0 = off).
-            type: value
-            valuetype: gauge
-          - name: shelly_wifi_rssi
-            path: '{ .wifi.rssi }'
-            help: WiFi signal strength.
-            type: value
-            valuetype: gauge
-          - name: shelly_uptime_seconds
-            path: '{ .sys.uptime }'
-            help: Seconds since last boot.
-            type: value
-            valuetype: counter
-          - name: shelly_cloud_connected
-            path: '{ .cloud.connected }'
-            help: 1 = connected to Shelly cloud, 0 = not connected.
             type: value
             valuetype: gauge
 ---

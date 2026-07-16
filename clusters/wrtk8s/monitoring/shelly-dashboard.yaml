@@ -97,18 +97,11 @@ data:
         },
         {
           "id": 8, "type": "timeseries", "title": "Energy Consumed (rate, W)",
-          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 14 },
+          "gridPos": { "h": 8, "w": 24, "x": 0, "y": 14 },
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
           "description": "Derived from the aenergy counter; useful to compare against instantaneous power for consistency.",
           "fieldConfig": { "defaults": { "unit": "watt", "custom": { "drawStyle": "line", "fillOpacity": 10, "lineWidth": 1 } } },
           "targets": [{ "expr": "rate(shelly_energy_watthours_total{device=~\"$device\"}[5m]) * 3600", "legendFormat": "{{device}}" }]
-        },
-        {
-          "id": 9, "type": "timeseries", "title": "WiFi RSSI",
-          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 14 },
-          "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "fieldConfig": { "defaults": { "unit": "dBm", "custom": { "drawStyle": "line", "fillOpacity": 10, "lineWidth": 1 } } },
-          "targets": [{ "expr": "shelly_wifi_rssi{device=~\"$device\"}", "legendFormat": "{{device}}" }]
         }
       ]
     }

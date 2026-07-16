@@ -24,7 +24,7 @@ spec:
     # the same pattern used by synology-scrapeconfig.yaml.
     - sourceLabels: [__address__]
       targetLabel: __param_target
-      replacement: http://${1}/rpc/Shelly.GetStatus
+      replacement: http://${1}/rpc/Switch.GetStatus?id=0
     - sourceLabels: [__param_target]
       targetLabel: instance
     - targetLabel: __address__
