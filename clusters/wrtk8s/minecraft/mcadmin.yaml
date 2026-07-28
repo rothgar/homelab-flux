@@ -22,11 +22,15 @@ spec:
       containers:
         - name: rwa
           image: itzg/rcon-web-admin:latest
+          env:
+            # Tell the browser JS to hit the public hostname over TLS on the
+            # same 443 port — Traefik terminates TLS and proxies to the
+            # backend, upgrading WebSocket transparently.
+            - name: RWA_WEB_WS_PORT
+              value: "443"
           ports:
             - containerPort: 4326
               name: http
-            - containerPort: 4327
-              name: ws
           resources:
             requests:
               cpu: 50m
@@ -46,16 +50,37 @@ kind: Service
 metadata:
   name: mcadmin
   namespace: minecraft
-  annotations:
-    external-dns.alpha.kubernetes.io/hostname: mcadmin.jgarr.net
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: mcadmin
   ports:
-    - port: 80
-      targetPort: 4326
+    - port: 4326
+      targetPort: http
       name: http
-    - port: 4327
-      targetPort: 4327
-      name: ws
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mcadmin
+  namespace: minecraft
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    external-dns.alpha.kubernetes.io/hostname: mcadmin.jgarr.net
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - mcadmin.jgarr.net
+      secretName: mcadmin-tls
+  rules:
+    - host: mcadmin.jgarr.net
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: mcadmin
+                port:
+                  number: 4326
