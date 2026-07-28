@@ -15,6 +15,11 @@ spec:
       labels:
         app: mcadmin
     spec:
+      # itzg/rcon:0.14.1-1 has no arm64 build, and the DB path is version-
+      # scoped so we can't switch to :multiarch without also editing the
+      # mount path. Pin to amd64 nodes.
+      nodeSelector:
+        kubernetes.io/arch: amd64
       containers:
         - name: rwa
           # Pinned to 0.14.1-1 because the DB mount path below is version-

@@ -6,7 +6,10 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: nfs-synology
+  # itzg/rcon runs as root; Synology NFS's root_squash rejects root writes.
+  # Use local-path since the admin panel config isn't critical to keep across
+  # node moves — worst case is reconfiguring the RCON connection in the UI.
+  storageClassName: local-path
   resources:
     requests:
       storage: 1Gi
