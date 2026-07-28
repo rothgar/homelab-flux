@@ -10,3 +10,7 @@ resources:
   - java-pvc.yaml
   - java-deployment.yaml
   - java-service.yaml
+  - java-rcon-service.yaml
+  - rcon-external-secret.yaml
+  - mcadmin-pvc.yaml
+  - mcadmin.yaml

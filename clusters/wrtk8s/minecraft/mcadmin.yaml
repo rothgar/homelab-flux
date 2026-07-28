@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mcadmin
+  namespace: minecraft
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: mcadmin
+  template:
+    metadata:
+      labels:
+        app: mcadmin
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+        - name: rwa
+          image: itzg/rcon-web-admin:latest
+          ports:
+            - containerPort: 4326
+              name: http
+            - containerPort: 4327
+              name: ws
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              memory: 256Mi
+          volumeMounts:
+            - name: data
+              mountPath: /rwa/db
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: mcadmin-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mcadmin
+  namespace: minecraft
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: mcadmin.jgarr.net
+spec:
+  type: LoadBalancer
+  selector:
+    app: mcadmin
+  ports:
+    - port: 80
+      targetPort: 4326
+      name: http
+    - port: 4327
+      targetPort: 4327
+      name: ws

@@ -29,6 +29,10 @@ spec:
           image: itzg/minecraft-server:latest
           ports:
             - containerPort: 25565
+              name: game
+              protocol: TCP
+            - containerPort: 25575
+              name: rcon
               protocol: TCP
           env:
             - name: EULA
@@ -49,6 +53,17 @@ spec:
               value: "10"
             - name: ONLINE_MODE
               value: "TRUE"
+            - name: OPS
+              value: tuff_bricks
+            - name: ENABLE_RCON
+              value: "true"
+            - name: RCON_PORT
+              value: "25575"
+            - name: RCON_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rcon-secret
+                  key: password
           volumeMounts:
             - name: data
               mountPath: /data

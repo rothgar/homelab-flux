@@ -1,0 +1,15 @@
+# Internal-only service so rcon-web-admin can reach RCON on the java pod.
+# NOT part of the LoadBalancer service — RCON must not be exposed externally.
+apiVersion: v1
+kind: Service
+metadata:
+  name: java-rcon
+  namespace: minecraft
+spec:
+  type: ClusterIP
+  selector:
+    app: java
+  ports:
+    - port: 25575
+      targetPort: rcon
+      protocol: TCP
