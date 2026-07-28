@@ -15,10 +15,6 @@ spec:
       labels:
         app: mcadmin
     spec:
-      securityContext:
-        runAsUser: 1000
-        runAsGroup: 1000
-        fsGroup: 1000
       containers:
         - name: rwa
           # Pinned to 0.14.1-1 because the DB mount path below is version-
