@@ -1,0 +1,36 @@
+# Standalone playit-agent that serves tunnels for every game server in this
+# namespace. Tunnels are configured in playit.gg's web UI; each one forwards
+# to a k8s Service DNS name (e.g. bedrock.minecraft.svc.cluster.local:19132,
+# java.minecraft.svc.cluster.local:25565).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: playit
+  namespace: minecraft
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: playit
+  template:
+    metadata:
+      labels:
+        app: playit
+    spec:
+      containers:
+        - name: playit
+          image: ghcr.io/playit-cloud/playit-agent:1.0
+          env:
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: playit-secret
+                  key: SECRET_KEY
+          resources:
+            requests:
+              memory: 64Mi
+              cpu: 50m
+            limits:
+              memory: 128Mi

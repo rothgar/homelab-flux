@@ -1,49 +1,57 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: bedrock
+  name: java
   namespace: minecraft
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
-      app: bedrock
+      app: java
   template:
     metadata:
       labels:
-        app: bedrock
+        app: java
     spec:
       nodeSelector:
         kubernetes.io/arch: amd64
       containers:
-        - name: bedrock
-          image: itzg/minecraft-bedrock-server:latest
+        - name: java
+          image: itzg/minecraft-server:latest
           ports:
-            - containerPort: 19132
-              protocol: UDP
+            - containerPort: 25565
+              protocol: TCP
           env:
             - name: EULA
               value: "TRUE"
-            - name: SERVER_NAME
+            - name: TYPE
+              value: VANILLA
+            - name: VERSION
+              value: LATEST
+            - name: MEMORY
+              value: 2G
+            - name: MOTD
               value: "wrtk8s"
-            - name: GAMEMODE
+            - name: MODE
               value: creative
             - name: DIFFICULTY
               value: normal
-            - name: ALLOW_CHEATS
-              value: "true"
             - name: MAX_PLAYERS
               value: "10"
+            - name: ONLINE_MODE
+              value: "TRUE"
           volumeMounts:
             - name: data
               mountPath: /data
           resources:
             requests:
-              memory: 512Mi
+              memory: 1Gi
               cpu: 500m
             limits:
-              memory: 2Gi
+              memory: 4Gi
       volumes:
         - name: data
           persistentVolumeClaim:
-            claimName: bedrock-data
+            claimName: java-data
