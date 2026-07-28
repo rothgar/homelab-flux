@@ -21,7 +21,7 @@ spec:
         fsGroup: 1000
       containers:
         - name: rwa
-          image: itzg/rcon-web-admin:latest
+          image: itzg/rcon:latest
           env:
             # Tell the browser JS to hit the public hostname over TLS on the
             # same 443 port — Traefik terminates TLS and proxies to the
