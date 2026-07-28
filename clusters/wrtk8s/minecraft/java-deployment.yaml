@@ -17,6 +17,13 @@ spec:
     spec:
       nodeSelector:
         kubernetes.io/arch: amd64
+      # itzg/minecraft-server switches to uid=1000 internally, so the mount
+      # needs to be owned by that gid before the container starts. Same
+      # pattern that fixed the Synology-NFS permission on youtarr-db.
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
       containers:
         - name: java
           image: itzg/minecraft-server:latest
