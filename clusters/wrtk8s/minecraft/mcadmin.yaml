@@ -21,17 +21,12 @@ spec:
       nodeSelector:
         kubernetes.io/arch: amd64
       containers:
+        # Pinned to 0.14.1-1 because the DB mount path below is version-
+        # scoped (`/opt/rcon-web-admin-0.14.1/db`). Bump the tag and the path
+        # together via Renovate.
         - name: rwa
-          # Pinned to 0.14.1-1 because the DB mount path below is version-
-          # scoped (`/opt/rcon-web-admin-0.14.1/db`). Bump the tag and the path
-          # together via Renovate.
           image: itzg/rcon:0.14.1-1
           env:
-            # Tell the browser JS to hit the public hostname over TLS on the
-            # same 443 port — Traefik terminates TLS and proxies to the
-            # backend, upgrading WebSocket transparently.
-            - name: RWA_WEB_WS_PORT
-              value: "443"
             - name: RWA_USERNAME
               value: admin
             # Reuse the RCON password for the panel login too. Panel access is
@@ -42,9 +37,17 @@ spec:
                 secretKeyRef:
                   name: rcon-secret
                   key: password
+            # rcon-web-admin's HTTP server (4326) and WebSocket server (4327)
+            # are on separate ports. Point the browser JS at the /socket path
+            # on the same hostname — the Ingress below routes /socket to
+            # backend port 4327 while / goes to 4326.
+            - name: RWA_WEBSOCKET_URL_SSL
+              value: wss://mcadmin.jgarr.net/socket
           ports:
             - containerPort: 4326
               name: http
+            - containerPort: 4327
+              name: ws
           resources:
             requests:
               cpu: 50m
@@ -72,6 +75,9 @@ spec:
     - port: 4326
       targetPort: http
       name: http
+    - port: 4327
+      targetPort: ws
+      name: ws
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -91,6 +97,13 @@ spec:
     - host: mcadmin.jgarr.net
       http:
         paths:
+          - path: /socket
+            pathType: Prefix
+            backend:
+              service:
+                name: mcadmin
+                port:
+                  number: 4327
           - path: /
             pathType: Prefix
             backend:
