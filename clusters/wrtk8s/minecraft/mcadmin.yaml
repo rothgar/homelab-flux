@@ -32,6 +32,16 @@ spec:
             # backend, upgrading WebSocket transparently.
             - name: RWA_WEB_WS_PORT
               value: "443"
+            - name: RWA_USERNAME
+              value: admin
+            # Reuse the RCON password for the panel login too. Panel access is
+            # already Ingress-gated with TLS; dual-purposing keeps 1Password
+            # simpler.
+            - name: RWA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rcon-secret
+                  key: password
           ports:
             - containerPort: 4326
               name: http
