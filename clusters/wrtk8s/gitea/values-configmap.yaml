@@ -17,8 +17,13 @@ data:
       ssh:
         type: LoadBalancer
         port: 22
+        # Pin to the traefik LB IP so git.jgarr.net can resolve to a single
+        # address that serves both HTTPS and SSH. Metallb permits the sharing
+        # via the allow-shared-ip annotation matched on the traefik service.
+        loadBalancerIP: 10.1.1.152
         annotations:
           external-dns.alpha.kubernetes.io/hostname: git.jgarr.net
+          metallb.universe.tf/allow-shared-ip: gitea-web-ssh
 
     persistence:
       enabled: true

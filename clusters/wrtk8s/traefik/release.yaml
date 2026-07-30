@@ -15,6 +15,11 @@ spec:
   values:
     service:
       type: LoadBalancer
+      # Allow gitea-ssh (and any other same-keyed LB in the cluster) to share
+      # this metallb IP so git.jgarr.net can host both HTTPS (80/443) and SSH
+      # (22) on one A record.
+      annotations:
+        metallb.universe.tf/allow-shared-ip: gitea-web-ssh
     ingressClass:
       enabled: true
       isDefaultClass: true
