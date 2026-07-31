@@ -5,7 +5,6 @@ resources:
   - cert-manager
   - controld-exporter
   - descheduler
-  - ds4-system
   - external-dns
   - external-secrets
   - flannel
@@ -47,7 +46,6 @@ resources:
   - talos-remote-config
   - traefik
   - vllm-system
-  - volsync
   - whisper-webui
   - youtarr
   - arm
