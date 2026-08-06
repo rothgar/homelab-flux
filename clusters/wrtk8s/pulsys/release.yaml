@@ -13,6 +13,12 @@ spec:
         name: pulsys
         namespace: pulsys
   values:
+    image:
+      # Chart's appVersion is 0.1.0 but no such tag was published to GHCR
+      # (goreleaser publishes {{ .Version }} without the leading `v`, and
+      # the first release cut was 0.1.1). Pin to the GitRepository tag.
+      tag: "0.1.4"
+
     proxy:
       # HF clients don't require TLS; MetalLB LB below exposes :80 → :8080.
       publicBaseURL: http://hf.jgarr.net
