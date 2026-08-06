@@ -1,0 +1,13 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: pulsys
+  namespace: pulsys
+spec:
+  interval: 1h
+  url: https://github.com/pulsys-io/pulsys
+  ref:
+    tag: v0.1.4
+  ignore: |
+    /*
+    !/deploy/charts/pulsys

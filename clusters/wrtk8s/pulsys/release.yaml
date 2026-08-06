@@ -1,0 +1,46 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: pulsys
+  namespace: pulsys
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: deploy/charts/pulsys
+      sourceRef:
+        kind: GitRepository
+        name: pulsys
+        namespace: pulsys
+  values:
+    proxy:
+      # HF clients don't require TLS; MetalLB LB below exposes :80 → :8080.
+      publicBaseURL: http://hf.jgarr.net
+      logLevel: info
+
+    admin:
+      enabled: true
+      tenant: default
+      imports:
+        worker: true
+        hfTokenSecret: pulsys-hf-token
+
+    postgres:
+      existingSecret: pulsys-pg-app
+      existingSecretKey: uri
+
+    persistence:
+      enabled: true
+      existingClaim: pulsys-cache
+
+    service:
+      type: ClusterIP
+      port: 8080
+      adminPort: 6060
+
+    resources:
+      requests:
+        cpu: 250m
+        memory: 256Mi
+      limits:
+        memory: 2Gi

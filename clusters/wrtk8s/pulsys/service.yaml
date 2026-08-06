@@ -1,0 +1,21 @@
+# Public data-plane exposure via MetalLB. Kept separate from the chart's
+# ClusterIP Service so the admin port (6060) stays internal — the chart
+# combines data + admin ports on one Service, and exposing that as LB
+# would publish /admin/api/v1 and /metrics.
+apiVersion: v1
+kind: Service
+metadata:
+  name: pulsys-lb
+  namespace: pulsys
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: hf.jgarr.net
+spec:
+  type: LoadBalancer
+  selector:
+    app.kubernetes.io/name: pulsys
+    app.kubernetes.io/instance: pulsys
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+      protocol: TCP
