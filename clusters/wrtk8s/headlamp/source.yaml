@@ -5,4 +5,4 @@ metadata:
   namespace: headlamp
 spec:
   interval: 1h0m0s
-  url: https://headlamp-k8s.github.io/headlamp/
+  url: https://kubernetes-sigs.github.io/headlamp/

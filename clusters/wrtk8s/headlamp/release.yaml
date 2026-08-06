@@ -45,9 +45,9 @@ spec:
         volumeMounts:
           - name: plugins
             mountPath: /plugins
-    extraVolumes:
+    volumes:
       - name: plugins
         emptyDir: {}
-    extraVolumeMounts:
+    volumeMounts:
       - name: plugins
         mountPath: /headlamp/plugins
