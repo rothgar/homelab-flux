@@ -14,10 +14,12 @@ spec:
         namespace: pulsys
   values:
     image:
-      # Upstream published public images from v0.1.5 onward (see
-      # pulsys-io/pulsys#33). Empty tag = chart's appVersion.
+      # Pinned to chart v0.1.4. That chart's appVersion is 0.1.0 (no
+      # matching upstream image), so tag is set explicitly to 0.1.4.
+      # Upstream chart v0.1.5+ has a duplicate-label bug (pulsys-io/pulsys#46)
+      # that flux's helm-controller rejects — revisit the bump once that's out.
       repository: ghcr.io/pulsys-io/pulsys
-      tag: ""
+      tag: "0.1.4"
 
     proxy:
       # HF clients don't require TLS; MetalLB LB below exposes :80 → :8080.
