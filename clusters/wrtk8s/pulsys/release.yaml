@@ -14,11 +14,10 @@ spec:
         namespace: pulsys
   values:
     image:
-      # Upstream ghcr.io/pulsys-io/pulsys is private, so we mirror the
-      # source-built image (deploy/docker/Dockerfile at tag v0.1.4) to the
-      # local unauth registry. Rebuild + repush when bumping the version.
-      repository: cr.jgarr.net/pulsys-io/pulsys
-      tag: "0.1.4"
+      # Upstream published public images from v0.1.5 onward (see
+      # pulsys-io/pulsys#33). Empty tag = chart's appVersion.
+      repository: ghcr.io/pulsys-io/pulsys
+      tag: ""
 
     proxy:
       # HF clients don't require TLS; MetalLB LB below exposes :80 → :8080.
