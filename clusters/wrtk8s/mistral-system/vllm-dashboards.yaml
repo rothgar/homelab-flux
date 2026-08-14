@@ -2605,7 +2605,7 @@ data:
           {
             "current": {
               "text": "Prometheus",
-              "value": "4184fc20-68a7-483a-8d9b-7caa59c680dd"
+              "value": "prometheus"
             },
             "label": "datasource",
             "name": "DS_PROMETHEUS",
