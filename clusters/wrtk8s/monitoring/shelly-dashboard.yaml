@@ -33,7 +33,7 @@ data:
             "type": "datasource",
             "name": "datasource",
             "query": "prometheus",
-            "current": { "text": "Prometheus", "value": "Prometheus" }
+            "current": { "text": "Prometheus", "value": "prometheus" }
           }
         ]
       },
