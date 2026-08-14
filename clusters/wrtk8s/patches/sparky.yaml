@@ -1,0 +1,24 @@
+apiVersion: v1alpha1
+kind: HostnameConfig
+auto: "off"
+hostname: sparky
+---
+apiVersion: v1alpha1
+kind: VolumeConfig
+name: EPHEMERAL
+provisioning:
+  diskSelector:
+    match: disk.transport == "nvme"
+  maxSize: 100GiB
+---
+# ~2-3.5 TiB partition carried over from sparky's dgx layout, used for HF
+# weight cache. Preserved by talosctl reset unless --user-disks-wipe is set.
+apiVersion: v1alpha1
+kind: UserVolumeConfig
+name: models
+volumeType: partition
+provisioning:
+  diskSelector:
+    match: disk.transport == "nvme"
+  maxSize: 3500GiB
+  minSize: 2000GiB

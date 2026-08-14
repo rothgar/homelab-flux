@@ -24,7 +24,7 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: vllm-server
+  name: qwen36-27b
   namespace: vllm-system
   annotations:
     external-dns.alpha.kubernetes.io/hostname: ai.jgarr.net
@@ -41,5 +41,5 @@ spec:
             type: PathPrefix
             value: /
       backendRefs:
-        - name: vllm-server
+        - name: qwen36-27b
           port: 8000

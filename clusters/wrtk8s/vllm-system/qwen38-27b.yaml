@@ -1,0 +1,137 @@
+# Qwen 3.8 27B FP8 pinned to sparky. Mirrors the qwen 3.6 spec, but uses
+# sparky's dedicated `models` UserVolume (2-3.5 TiB partition) instead of
+# spark's longhorn path so both boxes can serve their own model without
+# sharing disk. Tailnet exposure via the Tailscale operator's Service
+# annotations (same pattern as qwen 3.6).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qwen38-27b
+  namespace: vllm-system
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: qwen38-27b
+  template:
+    metadata:
+      labels:
+        app: qwen38-27b
+    spec:
+      terminationGracePeriodSeconds: 15
+      runtimeClassName: nvidia
+      tolerations:
+        - key: nvidia.com/gpu
+          operator: Exists
+          effect: NoSchedule
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - sparky
+      containers:
+        - name: vllm
+          # Same nvcr build spark uses — v26.06-py3 segfaults on GB10 with
+          # driver 595, so pin to 26.04.
+          image: nvcr.io/nvidia/vllm:26.04-py3
+          command:
+            - vllm
+            - serve
+            - Qwen/Qwen3.8-27B-FP8
+            - --download-dir
+            - /models
+            - --host
+            - "0.0.0.0"
+            - --port
+            - "8000"
+            - --served-model-name
+            - qwen3.8-27b
+            - --gpu-memory-utilization
+            - "0.85"
+            - --max-model-len
+            - "65536"
+            - --enable-auto-tool-choice
+            - --tool-call-parser
+            - qwen3_xml
+            - --enable-prefix-caching
+            - --kv-cache-dtype
+            - fp8
+            - --max-num-seqs
+            - "1"
+            - --default-chat-template-kwargs
+            - '{"enable_thinking": false}'
+          env:
+            - name: HF_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: hf-token
+                  key: token
+            - name: HF_HOME
+              value: /models/huggingface
+          ports:
+            - containerPort: 8000
+              name: http
+          startupProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 360
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+            limits:
+              nvidia.com/gpu: 1
+          volumeMounts:
+            - name: models
+              mountPath: /models
+            - name: models
+              mountPath: /root/.cache
+              subPath: cache
+            - name: shm
+              mountPath: /dev/shm
+      volumes:
+        - name: models
+          hostPath:
+            path: /var/mnt/models
+            type: DirectoryOrCreate
+        - name: shm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 16Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: qwen38-27b
+  namespace: vllm-system
+  annotations:
+    tailscale.com/expose: "true"
+    tailscale.com/hostname: "qwen3.8-27b"
+spec:
+  selector:
+    app: qwen38-27b
+  ports:
+    - port: 8000
+      targetPort: http
+  type: LoadBalancer

@@ -3,7 +3,7 @@ name: wrtk8s
 kubernetes:
   version: v1.35.6
 talos:
-  version: v1.13.6
+  version: v1.13.8
 features:
   enableWorkloadProxy: false
 patches:
@@ -25,6 +25,7 @@ kind: Workers
 machines:
   - 0564bde4-47b8-c3bd-79e6-63e7a2badf27
   - 4c5615cc-1dd2-11b2-8000-4cbb47001716
+  - d68614b6-bfde-11d3-8000-4cbb472dcf87  # sparky (GB10, moved from dgx)
   - 03000200-0400-0500-0006-000700080009
   - 30303031-3030-3030-6230-316439626200
   - 30303031-3030-3030-3838-313163373500
@@ -78,6 +79,27 @@ kernelArgs:
   - arm64.nobti
 patches:
   - file: patches/spark.yaml
+  - file: patches/gb10-nvidia.yaml
+  - file: patches/gpu-labels.yaml
+  - file: patches/kubelet.yaml
+---
+# sparky (GB10, migrated from dgx 2026-08-13). Direct CX-7 cable to spark
+# for NCCL/RDMA — matches spark's kernelArgs + extensions and adds
+# kexec_load_disabled=1 (DGX Spark kexec is broken: secondary CPUs come
+# down via PSCI, new kernel never lands — so Talos falls back to firmware
+# reboot).
+kind: Machine
+systemExtensions:
+  - siderolabs/nvidia-container-toolkit-production
+  - siderolabs/nonfree-kmod-nvidia-production
+name: d68614b6-bfde-11d3-8000-4cbb472dcf87
+kernelArgs:
+  - talos.dashboard.disabled=1
+  - nfs.nfs4_disable_idmapping=1
+  - arm64.nobti
+  - kexec_load_disabled=1
+patches:
+  - file: patches/sparky.yaml
   - file: patches/gb10-nvidia.yaml
   - file: patches/gpu-labels.yaml
   - file: patches/kubelet.yaml
