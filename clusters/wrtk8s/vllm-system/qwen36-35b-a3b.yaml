@@ -68,6 +68,11 @@ spec:
             - --enable-prefix-caching
             - --kv-cache-dtype
             - fp8
+            # vLLM auto-picks attention block_size=2096 for this arch to
+            # align with Mamba pages; default max-num-batched-tokens=2048
+            # trips an assertion. 8192 also gives concurrency headroom.
+            - --max-num-batched-tokens
+            - "8192"
             - --max-num-seqs
             - "4"
             - --default-chat-template-kwargs

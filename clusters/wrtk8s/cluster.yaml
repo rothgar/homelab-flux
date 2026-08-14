@@ -23,32 +23,12 @@ patches:
 ---
 kind: Workers
 machines:
-  - 0564bde4-47b8-c3bd-79e6-63e7a2badf27
   - 4c5615cc-1dd2-11b2-8000-4cbb47001716
   - d68614b6-bfde-11d3-8000-4cbb472dcf87  # sparky (GB10, moved from dgx)
   - 03000200-0400-0500-0006-000700080009
   - 30303031-3030-3030-6230-316439626200
   - 30303031-3030-3030-3838-313163373500
   - 62663165-6138-3361-6134-656562386600
-  - 38373431-6563-3733-3564-386565373200
----
-kind: Machine
-systemExtensions:
-  - siderolabs/amd-ucode
-  - siderolabs/intel-ice-firmware
-  - siderolabs/intel-ucode
-  # z has a Pascal GPU (sm_61) — driver 595 in the production branch dropped
-  # support, so stay on -lts (still ships driver 580 which supports Pascal).
-name: 0564bde4-47b8-c3bd-79e6-63e7a2badf27
-kernelArgs:
-  - talos.dashboard.disabled=1
-  - nfs.nfs4_disable_idmapping=1
-patches:
-  - file: patches/z.yaml
-  - file: patches/coretemp.yaml
-  - file: patches/nvidia.yaml
-  - file: patches/gpu-labels.yaml
-  - file: patches/kubelet.yaml
 ---
 kind: Machine
 systemExtensions:
@@ -143,15 +123,5 @@ kernelArgs:
   - nfs.nfs4_disable_idmapping=1
 patches:
   - file: patches/pi5-1.yaml
-  - file: patches/pi-labels.yaml
-  - file: patches/kubelet.yaml
----
-kind: Machine
-name: 38373431-6563-3733-3564-386565373200
-kernelArgs:
-  - talos.dashboard.disabled=1
-  - nfs.nfs4_disable_idmapping=1
-patches:
-  - file: patches/pi5-2.yaml
   - file: patches/pi-labels.yaml
   - file: patches/kubelet.yaml
