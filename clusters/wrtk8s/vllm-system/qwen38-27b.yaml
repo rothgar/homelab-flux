@@ -65,7 +65,7 @@ spec:
             - --kv-cache-dtype
             - fp8
             - --max-num-seqs
-            - "1"
+            - "4"
             - --default-chat-template-kwargs
             - '{"enable_thinking": true}'
           env:
