@@ -52,10 +52,12 @@ spec:
           env:
             - name: OLLAMA_BASE_URL
               value: ""
+            # `;`-separated list of OpenAI-compatible backends. open-webui
+            # merges the /v1/models responses from each into one picker.
             - name: OPENAI_API_BASE_URLS
-              value: "http://ds4.ds4-system.svc.cluster.local:8000/v1"
+              value: "http://qwen36-27b:8000/v1;http://qwen38-27b:8000/v1"
             - name: OPENAI_API_KEYS
-              value: "local"
+              value: "local;local"
             - name: WEBUI_AUTH
               value: "false"
             - name: HTTP_PROXY
