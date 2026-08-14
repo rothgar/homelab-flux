@@ -59,13 +59,15 @@ spec:
             - --enable-auto-tool-choice
             - --tool-call-parser
             - qwen3_xml
+            - --reasoning-parser
+            - qwen3
             - --enable-prefix-caching
             - --kv-cache-dtype
             - fp8
             - --max-num-seqs
             - "1"
             - --default-chat-template-kwargs
-            - '{"enable_thinking": false}'
+            - '{"enable_thinking": true}'
           env:
             - name: HF_TOKEN
               valueFrom:
