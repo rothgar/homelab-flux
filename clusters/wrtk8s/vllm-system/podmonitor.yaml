@@ -10,7 +10,7 @@ spec:
     matchExpressions:
       - key: app
         operator: In
-        values: [qwen36-27b, qwen38-27b]
+        values: [qwen36-27b, qwen36-35b-a3b, qwen38-27b]
   podMetricsEndpoints:
     - port: http
       interval: 30s

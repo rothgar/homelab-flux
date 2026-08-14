@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - qwen36-27b.yaml
+  - qwen36-35b-a3b.yaml
   - qwen38-27b.yaml
   - podmonitor.yaml
   - open-webui.yaml
