@@ -4,10 +4,9 @@ metadata:
   name: qwen36-27b
   namespace: vllm-system
 spec:
-  # Scaled to 0 while spark hosts the qwen 3.6 35B A3B MoE variant instead.
-  # Bump back to 1 to bring 3.6-27b back — model weights stay cached under
-  # /var/mnt/longhorn/vllm so a restart is fast (< 60 s).
-  replicas: 0
+  # Moved to sparky (spark hosts qwen 3.6 35B A3B MoE and qwen 3.8-27b is
+  # scaled to 0 to free sparky's GPU).
+  replicas: 1
   strategy:
     type: Recreate
   selector:
@@ -32,7 +31,7 @@ spec:
                   - key: kubernetes.io/hostname
                     operator: In
                     values:
-                      - spark
+                      - sparky
       containers:
         - name: vllm
           # v26.06-py3 segfaults in cuStreamCreateWithPriority on GB10 with
@@ -114,7 +113,8 @@ spec:
       volumes:
         - name: models
           hostPath:
-            path: /var/mnt/longhorn/vllm
+            # Sparky's dedicated `models` UserVolume — 2-3.5 TiB partition.
+            path: /var/mnt/models
             type: DirectoryOrCreate
         - name: shm
           emptyDir:
