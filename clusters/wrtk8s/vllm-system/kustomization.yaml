@@ -4,6 +4,7 @@ resources:
   - namespace.yaml
   - qwen36-27b.yaml
   - qwen38-27b.yaml
+  - podmonitor.yaml
   - open-webui.yaml
   - httproute.yaml
   - tailscale-ingress.yaml

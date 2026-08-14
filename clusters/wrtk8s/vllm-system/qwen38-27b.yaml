@@ -127,7 +127,8 @@ metadata:
   namespace: vllm-system
   annotations:
     tailscale.com/expose: "true"
-    tailscale.com/hostname: "qwen3.8-27b"
+    # Tailscale hostnames must be valid DNS labels — no dots allowed.
+    tailscale.com/hostname: "qwen38-27b"
 spec:
   selector:
     app: qwen38-27b

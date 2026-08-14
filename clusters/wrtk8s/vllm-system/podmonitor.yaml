@@ -1,0 +1,20 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: qwen-vllm
+  namespace: vllm-system
+  labels:
+    release: kube-prometheus-stack
+spec:
+  selector:
+    matchExpressions:
+      - key: app
+        operator: In
+        values: [qwen36-27b, qwen38-27b]
+  podMetricsEndpoints:
+    - port: http
+      interval: 30s
+      path: /metrics
+      relabelings:
+        - sourceLabels: [__meta_kubernetes_pod_node_name]
+          targetLabel: node
