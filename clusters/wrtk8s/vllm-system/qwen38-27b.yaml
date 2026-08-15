@@ -9,9 +9,7 @@ metadata:
   name: qwen38-27b
   namespace: vllm-system
 spec:
-  # Scaled to 0 while sparky hosts qwen 3.6-27b instead. Weights stay cached
-  # under /var/mnt/models on sparky so bumping back to 1 is a fast restart.
-  replicas: 0
+  replicas: 1
   strategy:
     type: Recreate
   selector:

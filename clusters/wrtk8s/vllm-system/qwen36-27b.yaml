@@ -4,9 +4,10 @@ metadata:
   name: qwen36-27b
   namespace: vllm-system
 spec:
-  # Moved to sparky (spark hosts qwen 3.6 35B A3B MoE and qwen 3.8-27b is
-  # scaled to 0 to free sparky's GPU).
-  replicas: 1
+  # Scaled to 0 while sparky hosts qwen 3.8-27b (and spark keeps the 3.6
+  # 35B A3B MoE). Bump back to 1 to bring 3.6-27b back on sparky — weights
+  # stay cached under /var/mnt/models on sparky so a restart is fast.
+  replicas: 0
   strategy:
     type: Recreate
   selector:
