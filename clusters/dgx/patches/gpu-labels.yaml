@@ -1,0 +1,9 @@
+# Talos v1.14+ strict mode rejects setting `.machine.nodeLabels` in v1alpha1
+# when Omni also emits a NodeLabelsConfig typed document (Omni 1.10.4 does).
+# Use the typed doc so both merge cleanly.
+---
+apiVersion: v1alpha1
+kind: NodeLabelsConfig
+labels:
+  nvidia.com/gpu: "true"
+  nvidia.com/gpu.present: "true"

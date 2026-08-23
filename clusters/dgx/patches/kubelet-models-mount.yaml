@@ -1,0 +1,18 @@
+# Talos v1.14+ strict mode rejects setting `.machine.kubelet` in v1alpha1
+# when Omni also emits a KubeletConfig typed document (Omni 1.10.4 does).
+# Use the typed doc so extraMounts merges cleanly with Omni's auto config.
+#
+# UserVolumeConfig `models` mounts at /var/mnt/models on the host. kubelet
+# runs in its own mount namespace on Talos; this extraMount bind-shares the
+# host mount so hostPath pods can see the partition.
+---
+apiVersion: v1alpha1
+kind: KubeletConfig
+extraMounts:
+  - destination: /var/mnt/models
+    options:
+      - bind
+      - rshared
+      - rw
+    source: /var/mnt/models
+    type: bind
