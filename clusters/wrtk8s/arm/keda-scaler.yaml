@@ -1,0 +1,36 @@
+# Front arm with the KEDA HTTP interceptor so the pod scales to zero when
+# no disc is being ripped. Both Ingresses (arm.jgarr.net via Traefik and
+# `arm` via Tailscale operator) route through here.
+apiVersion: v1
+kind: Service
+metadata:
+  name: arm-scaled
+  namespace: arm
+spec:
+  type: ExternalName
+  externalName: keda-add-ons-http-interceptor-proxy.keda.svc.cluster.local
+---
+apiVersion: http.keda.sh/v1alpha1
+kind: HTTPScaledObject
+metadata:
+  name: arm
+  namespace: arm
+spec:
+  # Match both the LAN hostname (via Traefik) and the tailnet FQDN (via
+  # Tailscale operator). The interceptor routes by Host header regardless
+  # of upstream ingress.
+  hosts:
+    - arm.jgarr.net
+    - arm.gerbil-dragon.ts.net
+    - arm-scaled
+    - arm-scaled:8080
+  scaleTargetRef:
+    name: arm
+    kind: Deployment
+    apiVersion: apps/v1
+    service: arm
+    port: 8080
+  replicas:
+    min: 0
+    max: 1
+  scaledownPeriod: 300

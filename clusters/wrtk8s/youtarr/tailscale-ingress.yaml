@@ -6,7 +6,7 @@ metadata:
 spec:
   ingressClassName: tailscale
   rules:
-    - host: yt
+    - host: youtarr
       http:
         paths:
           - path: /
@@ -18,4 +18,4 @@ spec:
                   number: 80
   tls:
     - hosts:
-        - yt
+        - youtarr

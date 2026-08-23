@@ -19,8 +19,10 @@ spec:
           - path: /
             pathType: Prefix
             backend:
+              # Route through KEDA HTTP interceptor so the pod can scale
+              # to zero when nothing's being ripped. See keda-scaler.yaml.
               service:
-                name: arm
+                name: arm-scaled
                 port:
                   number: 8080
 ---
@@ -38,8 +40,10 @@ spec:
           - path: /
             pathType: Prefix
             backend:
+              # Route through KEDA HTTP interceptor so the pod can scale
+              # to zero when nothing's being ripped. See keda-scaler.yaml.
               service:
-                name: arm
+                name: arm-scaled
                 port:
                   number: 8080
   tls:

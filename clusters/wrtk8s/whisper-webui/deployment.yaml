@@ -67,10 +67,12 @@ spec:
           - path: /
             pathType: Prefix
             backend:
+              # Route through KEDA HTTP interceptor so the Deployment can
+              # scale to zero and wake on demand. See keda-scaler.yaml.
               service:
-                name: whisper-webui
+                name: whisper-webui-scaled
                 port:
-                  number: 80
+                  number: 8080
   tls:
     - hosts:
         - whisper

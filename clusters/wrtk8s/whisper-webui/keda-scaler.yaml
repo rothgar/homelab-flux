@@ -1,0 +1,41 @@
+# Front whisper-webui with the KEDA HTTP interceptor so the GPU-consuming
+# Deployment scales to zero when idle and wakes on the first request.
+#
+# Traffic path:
+#   client → Tailscale Ingress (whisper.gerbil-dragon.ts.net)
+#          → backend: whisper-webui-scaled (ExternalName)
+#          → keda-add-ons-http-interceptor-proxy.keda:8080
+#          → matches HTTPScaledObject by Host header
+#          → buffers request, scales Deployment 0→1 if needed
+#          → forwards to whisper-webui:80 (containerPort 7860)
+apiVersion: v1
+kind: Service
+metadata:
+  name: whisper-webui-scaled
+  namespace: default
+spec:
+  type: ExternalName
+  externalName: keda-add-ons-http-interceptor-proxy.keda.svc.cluster.local
+---
+apiVersion: http.keda.sh/v1alpha1
+kind: HTTPScaledObject
+metadata:
+  name: whisper-webui
+  namespace: default
+spec:
+  # Host header the interceptor matches against. Tailscale operator
+  # preserves the client's original Host, which is the FQDN below.
+  hosts:
+    - whisper.gerbil-dragon.ts.net
+    - whisper-webui-scaled
+    - whisper-webui-scaled:8080
+  scaleTargetRef:
+    name: whisper-webui
+    kind: Deployment
+    apiVersion: apps/v1
+    service: whisper-webui
+    port: 80
+  replicas:
+    min: 0
+    max: 1
+  scaledownPeriod: 300

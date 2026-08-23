@@ -5,3 +5,4 @@ resources:
   - tts.yaml
   - tailscale-ingress.yaml
   - external-secret.yaml
+  - keda-scaler.yaml

@@ -12,10 +12,12 @@ spec:
           - path: /
             pathType: Prefix
             backend:
+              # Route through KEDA HTTP interceptor so the GPU pod can
+              # scale to zero. See keda-scaler.yaml.
               service:
-                name: tts
+                name: tts-scaled
                 port:
-                  number: 8000
+                  number: 8080
   tls:
     - hosts:
         - tts

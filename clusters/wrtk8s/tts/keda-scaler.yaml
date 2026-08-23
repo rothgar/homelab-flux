@@ -1,0 +1,32 @@
+# Front tts with the KEDA HTTP interceptor so the GPU pod scales to zero
+# when idle and wakes on demand. See whisper-webui/keda-scaler.yaml for
+# the same pattern.
+apiVersion: v1
+kind: Service
+metadata:
+  name: tts-scaled
+  namespace: tts
+spec:
+  type: ExternalName
+  externalName: keda-add-ons-http-interceptor-proxy.keda.svc.cluster.local
+---
+apiVersion: http.keda.sh/v1alpha1
+kind: HTTPScaledObject
+metadata:
+  name: tts
+  namespace: tts
+spec:
+  hosts:
+    - tts.gerbil-dragon.ts.net
+    - tts-scaled
+    - tts-scaled:8080
+  scaleTargetRef:
+    name: tts
+    kind: Deployment
+    apiVersion: apps/v1
+    service: tts
+    port: 8000
+  replicas:
+    min: 0
+    max: 1
+  scaledownPeriod: 300
