@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: headlamp-tailscale
+  namespace: headlamp
+spec:
+  ingressClassName: tailscale
+  rules:
+    - host: headlamp
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: headlamp
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - headlamp

@@ -5,3 +5,4 @@ resources:
   - source.yaml
   - release.yaml
   - httproute.yaml
+  - tailscale-ingress.yaml
