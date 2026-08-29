@@ -15,6 +15,16 @@ spec:
       labels:
         app: paperless-ngx
     spec:
+      # Synology NFS export passes non-root UIDs through unchanged, and the
+      # Synology side doesn't recognize uid 1000 (paperless). The container
+      # ran fine for 74d until a `:latest` re-pull that changed how s6-overlay
+      # sets up privileges. Force the whole pod to run as nobody (uid 65534)
+      # so writes hit the root_squash → nobody code path that Synology allows
+      # on the 777 export.
+      securityContext:
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
       containers:
         - name: paperless-ngx
           image: ghcr.io/paperless-ngx/paperless-ngx:latest

@@ -13,6 +13,10 @@ spec:
       labels:
         app: controld-exporter
     spec:
+      # ghcr.io/rothgar/controld-exporter:latest is amd64-only; on ARM nodes
+      # (pi5-1, pi4-*, spark, sparky) the pod hits `exec format error`.
+      nodeSelector:
+        kubernetes.io/arch: amd64
       containers:
         - name: controld-exporter
           image: ghcr.io/rothgar/controld-exporter:latest
