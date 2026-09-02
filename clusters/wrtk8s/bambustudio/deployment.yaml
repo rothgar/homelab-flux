@@ -67,6 +67,14 @@ spec:
             # Bambu's wxWidgets init — viewport stays on software Mesa.
             - name: SELKIES_ENCODER
               value: nvh264enc
+            # Cap framerate + bitrate to keep the WebSocket video path from
+            # backpressuring over tailnet. Defaults (60 fps, no bitrate cap)
+            # were producing ~15-30 Mbps at 1940x1182 which overwhelmed the
+            # browser side and drove reconnect loops.
+            - name: SELKIES_FRAMERATE
+              value: "30"
+            - name: SELKIES_VIDEO_BITRATE
+              value: "8000"
           ports:
             - containerPort: 3000
               name: http
