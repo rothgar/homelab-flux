@@ -1,0 +1,127 @@
+# Dedicated control-plane on a Framework (amd64) — the 3 DGX Spark workers
+# talk to it over the LAN. Rationale for splitting off the CP:
+#
+#   1. Recovery from a bad network patch (see the CX-7 hazard notes in memory)
+#      is way faster with an untouched CP still holding etcd — you can push a
+#      revert through Omni instead of USB-rescuing all three at once.
+#   2. Sparks are pure workers now, so a mlx5 hiccup on jumbo-frame changes
+#      no longer wobbles apiserver/etcd. Matches nicolerenee's topology.
+#
+# Trade-off: single-node CP has no etcd HA. If framework dies we lose the CP
+# entirely and rebuild from Omni; sparks stay installed and re-join once the
+# CP comes back. That's a manual reset, not a data-loss event — the models
+# UserVolume on each spark is preserved across `talosctl reset` unless
+# --user-disks-wipe is passed.
+kind: Cluster
+name: dgx
+kubernetes:
+  version: v1.36.4
+  # Every entry is `mode: full` = continuous reconcile; `kubectl edit` is
+  # overwritten within the next sync tick. Order matters only on first-time
+  # apply: namespaces first, then anything that lives inside them.
+  manifests:
+    - name: namespaces
+      mode: full
+      file: manifests/namespaces.yaml
+    - name: nvidia-runtimeclass
+      mode: full
+      file: manifests/nvidia-runtimeclass.yaml
+    - name: dra-driver-nvidia-gpu
+      mode: full
+      file: manifests/dra-driver-nvidia-gpu.yaml
+    - name: dranet
+      mode: full
+      file: manifests/dranet.yaml
+    - name: lws
+      mode: full
+      file: manifests/lws.yaml
+    - name: resourceclaimtemplates
+      mode: full
+      file: manifests/resourceclaimtemplates.yaml
+    - name: huggingface-secret
+      mode: full
+      file: manifests/huggingface-secret.yaml
+    # Only one of the LWS models is enabled at a time — both use tp=2 across
+    # 2 sparks and would clash on the GPUs. minimax-m27-nvfp4.yaml is kept in
+    # the repo for reference; comment out deepseek + uncomment minimax to
+    # swap models.
+    # Rewritten to use eugr/spark-vllm-b12x — the "B12X" (Blackwell 12x)
+    # kernel path is the intended DSV4 fast path. Qwen scaled to 0 to free
+    # its GPU for deepseek's tp=2 across 2 sparks.
+    - name: deepseek-v4-flash
+      mode: full
+      file: manifests/deepseek-v4-flash.yaml
+    - name: qwen36-35b-nvfp4
+      mode: full
+      file: manifests/qwen36-35b-nvfp4.yaml
+    # - name: minimax-m27-nvfp4
+    #   mode: full
+    #   file: manifests/minimax-m27-nvfp4.yaml
+    # Prometheus + Grafana + dcgm-exporter + node-exporter, pinned to
+    # framework CP. Dashboard ships as a separate manifest so the Grafana
+    # Deployment can reference the ConfigMap by name — both must apply in
+    # the same sync tick, which mode: full guarantees.
+    - name: monitoring
+      mode: full
+      file: manifests/monitoring.yaml
+    - name: monitoring-dashboard
+      mode: full
+      file: manifests/monitoring-dashboard.yaml
+talos:
+  version: v1.14.0-rc.1
+features:
+  enableWorkloadProxy: false
+patches:
+  - file: patches/network.yaml
+  - file: patches/coredns.yaml
+---
+kind: ControlPlane
+machines:
+  - 99f5a5c4-dd40-f011-bf91-240346800388  # framework (amd64, dedicated CP)
+# No cp-scheduling patch: framework runs only CP components. Workloads land
+# on the sparks via the Workers machineset below.
+---
+kind: Workers
+machines:
+  - d3b2fe5c-bfde-11d3-8000-4cbb472de35b  # ultron (arm64, GB10)
+  - d38b452e-bfde-11d3-8000-4cbb472dce04  # jarvis (arm64, GB10)
+---
+kind: Machine
+name: 99f5a5c4-dd40-f011-bf91-240346800388  # framework
+systemExtensions:
+  - siderolabs/amd-ucode
+patches:
+  - file: patches/framework.yaml
+---
+kind: Machine
+name: d3b2fe5c-bfde-11d3-8000-4cbb472de35b  # ultron
+systemExtensions:
+  - siderolabs/nonfree-kmod-nvidia-production
+  - siderolabs/nvidia-container-toolkit-production
+kernelArgs:
+  - talos.dashboard.disabled=1
+  - arm64.nobti
+  # DGX Spark kexec is broken (secondary CPUs come down via PSCI, new kernel
+  # never lands). Disable kexec so Talos falls back to firmware reboot.
+  - kexec_load_disabled=1
+patches:
+  - file: patches/ultron.yaml
+  - file: patches/watchdog.yaml
+  - file: patches/gb10-nvidia.yaml
+  - file: patches/gpu-labels.yaml
+---
+kind: Machine
+name: d38b452e-bfde-11d3-8000-4cbb472dce04  # jarvis
+systemExtensions:
+  - siderolabs/nonfree-kmod-nvidia-production
+  - siderolabs/nvidia-container-toolkit-production
+# jarvis has a monitor attached — Talos dashboard is left enabled here
+# (framework/ultron still boot with `talos.dashboard.disabled=1`).
+kernelArgs:
+  - arm64.nobti
+  - kexec_load_disabled=1
+patches:
+  - file: patches/jarvis.yaml
+  - file: patches/watchdog.yaml
+  - file: patches/gb10-nvidia.yaml
+  - file: patches/gpu-labels.yaml
