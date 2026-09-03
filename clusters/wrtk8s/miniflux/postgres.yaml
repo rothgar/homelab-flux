@@ -5,6 +5,10 @@ metadata:
   namespace: miniflux
 spec:
   instances: 1
+  # Single-instance homelab DB — the auto-generated PDB (minAvailable=1) blocks
+  # node drains during Talos upgrades. Disable it so drain proceeds; the ~30s
+  # postgres restart on a new node is acceptable downtime.
+  enablePDB: false
   imageName: ghcr.io/cloudnative-pg/postgresql:16
 
   bootstrap:
@@ -38,6 +42,10 @@ metadata:
   namespace: miniflux
 spec:
   instances: 1
+  # Single-instance homelab DB — the auto-generated PDB (minAvailable=1) blocks
+  # node drains during Talos upgrades. Disable it so drain proceeds; the ~30s
+  # postgres restart on a new node is acceptable downtime.
+  enablePDB: false
   imageName: ghcr.io/cloudnative-pg/postgresql:17
 
   bootstrap:

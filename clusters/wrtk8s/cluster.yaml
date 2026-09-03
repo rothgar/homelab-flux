@@ -58,6 +58,11 @@ kernelArgs:
   - talos.dashboard.disabled=1
   - nfs.nfs4_disable_idmapping=1
   - arm64.nobti
+  # DGX Spark kexec is broken (secondary CPUs come down via PSCI, new kernel
+  # never lands). Same fix sparky already has — Talos then falls back to a
+  # firmware reboot which works. Missing this here is why spark hung after the
+  # Talos upgrade drain 2026-09-03.
+  - kexec_load_disabled=1
 patches:
   - file: patches/spark.yaml
   - file: patches/gb10-nvidia.yaml
