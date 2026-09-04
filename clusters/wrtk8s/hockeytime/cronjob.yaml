@@ -1,0 +1,37 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: hockeytime
+  namespace: hockeytime
+spec:
+  # 9:00 AND 15:00 local time in America/Los_Angeles. K8s CronJob's
+  # timeZone field (GA in 1.27+) interprets the crontab in that zone,
+  # so no manual UTC offset needed.
+  schedule: "0 9,15 * * *"
+  timeZone: America/Los_Angeles
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          restartPolicy: Never
+          # Image is amd64-only (built locally with docker, not buildx),
+          # so pin to amd64 nodes.
+          nodeSelector:
+            kubernetes.io/arch: amd64
+          containers:
+            - name: hockeytime
+              image: cr.jgarr.net/hockeytime:latest
+              imagePullPolicy: Always
+              env:
+                - name: NTFY_TOPIC
+                  value: hockeytime-LaP1WYgM
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+                limits:
+                  memory: 128Mi

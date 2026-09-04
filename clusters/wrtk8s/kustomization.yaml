@@ -11,6 +11,7 @@ resources:
   - flux-system
   - frigate
   - headlamp
+  - hockeytime
   - home-assistant
   - immich
   - keda
