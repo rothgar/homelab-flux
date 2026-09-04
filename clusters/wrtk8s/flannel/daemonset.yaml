@@ -41,7 +41,7 @@ spec:
             - name: cni-plugin
               mountPath: /opt/cni/bin
         - name: install-cni
-          image: ghcr.io/flannel-io/flannel:v0.28.5
+          image: ghcr.io/flannel-io/flannel:v0.28.9
           command: ["cp"]
           args: ["-f", "/etc/kube-flannel/cni-conf.json", "/etc/cni/net.d/10-flannel.conflist"]
           volumeMounts:
@@ -51,7 +51,7 @@ spec:
               mountPath: /etc/kube-flannel/
       containers:
         - name: kube-flannel
-          image: ghcr.io/flannel-io/flannel:v0.28.5
+          image: ghcr.io/flannel-io/flannel:v0.28.9
           command: ["/opt/bin/flanneld"]
           args: ["--ip-masq", "--kube-subnet-mgr"]
           env:
