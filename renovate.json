@@ -20,8 +20,8 @@
     },
     {
       "matchDepNames": ["nvcr.io/nvidia/vllm"],
-      "allowedVersions": "<=26.04-py3",
-      "description": "Pin nvcr.io/nvidia/vllm — 26.06 segfaults in cuStreamCreateWithPriority on GB10 with driver 595."
+      "allowedVersions": "/^(2[0-5]\\.\\d+|26\\.0[0-4])-py\\d+$/",
+      "description": "Pin nvcr.io/nvidia/vllm — 26.06 segfaults in cuStreamCreateWithPriority on GB10 with driver 595. Docker versioning can't parse the -py3 suffix, so allowedVersions is a regex allowing 20.xx-py* through 26.04-py*."
     }
   ]
 }
