@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: audiomass-tailscale
+  namespace: audiomass
+spec:
+  ingressClassName: tailscale
+  rules:
+    - host: audiomass
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: audiomass
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - audiomass

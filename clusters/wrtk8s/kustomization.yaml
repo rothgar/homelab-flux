@@ -48,6 +48,7 @@ resources:
   - whisper-webui
   - youtarr
   - arm
+  - audiomass
   - bambustudio
   - gitea
   - pdfcraft

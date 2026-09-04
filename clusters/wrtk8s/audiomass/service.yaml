@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: audiomass
+  namespace: audiomass
+spec:
+  selector:
+    app: audiomass
+  ports:
+    - port: 80
+      targetPort: http
+      name: http

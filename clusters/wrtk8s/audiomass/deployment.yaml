@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: audiomass
+  namespace: audiomass
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: audiomass
+  template:
+    metadata:
+      labels:
+        app: audiomass
+    spec:
+      containers:
+        # AudioMass is a pure client-side JS app; the image is just nginx
+        # with `src/` baked in from the rothgar/AudioMass fork. The GHA in
+        # that repo builds and pushes ghcr.io/rothgar/audiomass:latest on
+        # every push to production; this reference uses cr.jgarr.net until
+        # ghcr auth is wired up.
+        - name: audiomass
+          image: cr.jgarr.net/audiomass:latest
+          ports:
+            - containerPort: 80
+              name: http
+          readinessProbe:
+            httpGet:
+              path: /index.html
+              port: http
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 20m
+              memory: 32Mi
+            limits:
+              memory: 128Mi
