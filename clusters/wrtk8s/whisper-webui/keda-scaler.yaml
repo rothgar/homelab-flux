@@ -38,4 +38,9 @@ spec:
   replicas:
     min: 0
     max: 1
-  scaledownPeriod: 300
+  # 30 min of idle before KEDA scales whisper back to 0. In the current
+  # tailnet routing (tailscale proxy dials whisper-webui direct, bypassing
+  # the KEDA interceptor) KEDA never sees in-flight requests, so scale-down
+  # was firing mid-transcription and killing the pod. 30 min covers most
+  # audio files comfortably.
+  scaledownPeriod: 1800
