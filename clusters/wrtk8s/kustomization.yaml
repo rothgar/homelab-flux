@@ -22,7 +22,6 @@ resources:
   - metallb
   - metrics-server
   - minecraft
-  - agent-sandbox
   - mistral-system
   - miniflux
   - n8n
