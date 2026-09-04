@@ -14,6 +14,20 @@ spec:
         app: whisper-webui
     spec:
       runtimeClassName: nvidia
+      # CUDA 13 dropped Pascal (sm_61) support — the container's runtime
+      # segfaults on init if scheduled on z (Quadro P1000, compute 6.1).
+      # Use the NFD-populated `nvidia.com/gpu.compute.major` label to steer
+      # scheduling toward Turing (7.x) or newer without hardcoding a node.
+      # Not a hard "CUDA13-capable" flag — NFD doesn't ship one — but
+      # `major > 6` is a good rule-of-thumb for CUDA 13-era compatibility.
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: nvidia.com/gpu.compute.major
+                    operator: Gt
+                    values: ["6"]
       containers:
         - name: whisper-webui
           image: ghcr.io/rothgar/whisper-webui:v0.0.0-d2bdcf7
