@@ -16,11 +16,10 @@ spec:
       containers:
         # AudioMass is a pure client-side JS app; the image is just nginx
         # with `src/` baked in from the rothgar/AudioMass fork. The GHA in
-        # that repo builds and pushes ghcr.io/rothgar/audiomass:latest on
-        # every push to production; this reference uses cr.jgarr.net until
-        # ghcr auth is wired up.
+        # that repo builds a multi-arch (amd64 + arm64) image on every
+        # push to production. Image is public — no imagePullSecret needed.
         - name: audiomass
-          image: cr.jgarr.net/audiomass:latest
+          image: ghcr.io/rothgar/audiomass:latest
           ports:
             - containerPort: 80
               name: http
