@@ -19,7 +19,7 @@ spec:
       # Upstream chart v0.1.5+ has a duplicate-label bug (pulsys-io/pulsys#46)
       # that flux's helm-controller rejects — revisit the bump once that's out.
       repository: ghcr.io/pulsys-io/pulsys
-      tag: "0.1.4"
+      tag: "0.1.5"
 
     proxy:
       # HF clients don't require TLS; MetalLB LB below exposes :80 → :8080.
