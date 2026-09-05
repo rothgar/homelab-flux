@@ -23,6 +23,7 @@ resources:
   - metallb
   - metrics-server
   - minecraft
+  - mini-crawler
   - mistral-system
   - miniflux
   - n8n

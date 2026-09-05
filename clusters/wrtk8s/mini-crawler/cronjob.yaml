@@ -1,0 +1,42 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: mini-crawler
+  namespace: mini-crawler
+spec:
+  # Twice-daily like hockeytime — 9:00 and 15:00 America/Los_Angeles. If
+  # Mini listings on Craigslist/OfferUp end up churning faster than that
+  # (and interesting listings sell in hours), bump the frequency here.
+  schedule: "0 9,15 * * *"
+  timeZone: America/Los_Angeles
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          restartPolicy: Never
+          # Image built locally with plain `docker build` (not buildx), so
+          # it's amd64-only for now. Pin to amd64 nodes.
+          nodeSelector:
+            kubernetes.io/arch: amd64
+          containers:
+            - name: mini-crawler
+              image: cr.jgarr.net/mini-crawler:latest
+              imagePullPolicy: Always
+              env:
+                - name: NTFY_TOPIC
+                  value: minime-81nzcmb
+              # --urls keeps the log terse (URLs only, no table); --state-backend
+              # defaults to `auto`, which uses the ntfy topic history for dedup
+              # since NTFY_TOPIC is set — no PVC required.
+              args:
+                - --urls
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 128Mi
+                limits:
+                  memory: 256Mi
