@@ -24,7 +24,6 @@ spec:
                 port:
                   number: 3000
 ---
-apiVersion: networking.k8s.io/v1
 # tailscale-operator's ingress-reconciler can't route to a headless Service
 # (ClusterIP: None) — it uses .spec.clusterIP as the dial address and marks
 # empty as "no valid backends". The helm-installed `gitea-http` is headless,
