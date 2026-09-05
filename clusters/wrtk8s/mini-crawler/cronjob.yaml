@@ -18,10 +18,6 @@ spec:
       template:
         spec:
           restartPolicy: Never
-          # Image built locally with plain `docker build` (not buildx), so
-          # it's amd64-only for now. Pin to amd64 nodes.
-          nodeSelector:
-            kubernetes.io/arch: amd64
           containers:
             - name: mini-crawler
               image: cr.jgarr.net/mini-crawler:latest
