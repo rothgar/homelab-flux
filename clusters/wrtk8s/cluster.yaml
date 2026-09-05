@@ -118,6 +118,10 @@ kind: Machine
 systemExtensions:
   - siderolabs/intel-ucode
   - siderolabs/intel-ice-firmware
+  # Google Coral Edge TPU (M.2 A+E card, PCI ID 1ac1:089a). Provides the
+  # `gasket` + `apex` kernel modules; /dev/apex_0 appears after reboot.
+  # Pair with the google.com/edgetpu device plugin to schedule pods.
+  - siderolabs/gasket-driver
 name: 03000200-0400-0500-0006-000700080009
 kernelArgs:
   - talos.dashboard.disabled=1
