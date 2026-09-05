@@ -68,6 +68,7 @@ patches:
   - file: patches/gb10-nvidia.yaml
   - file: patches/gpu-labels.yaml
   - file: patches/kubelet.yaml
+  - file: patches/watchdog.yaml
 ---
 # sparky (GB10, migrated from dgx 2026-08-13). Direct CX-7 cable to spark
 # for NCCL/RDMA — matches spark's kernelArgs + extensions and adds
@@ -89,6 +90,7 @@ patches:
   - file: patches/gb10-nvidia.yaml
   - file: patches/gpu-labels.yaml
   - file: patches/kubelet.yaml
+  - file: patches/watchdog.yaml
 ---
 kind: Machine
 systemExtensions:

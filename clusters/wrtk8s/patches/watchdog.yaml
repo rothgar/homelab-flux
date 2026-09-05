@@ -1,0 +1,12 @@
+# Arm the SBSA generic watchdog (initialized with 10s hardware timeout on
+# these boxes) so a kernel hang forces a hardware reset instead of leaving
+# the node dark. Talos pets /dev/watchdog0 while healthy; if petting stops
+# for `timeout`, the watchdog fires and resets the box.
+#
+# spark 2026-09-03 wedged in an rcu_sched CPU stall (CPUs 0 and 11 stopped
+# responding to NMI) and stayed dark for ~2 days until manually power-cycled.
+# Watchdog would have hardware-reset it inside 2 minutes.
+apiVersion: v1alpha1
+kind: WatchdogTimerConfig
+device: /dev/watchdog0
+timeout: 2m0s
