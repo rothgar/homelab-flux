@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: onedev-values
+  namespace: git
+data:
+  values.yaml: |
+    replicaCount: 1
+
+    image:
+      name: 1dev/server
+      tag: "16.5.11"
+
+    # OneDev's SSH is exposed on its own LoadBalancer Service sharing the same
+    # VIP as the Traefik Ingress for git.jgarr.net, so a single address serves
+    # both HTTPS and SSH. Metallb permits the sharing via the allow-shared-ip
+    # annotation matched on the traefik service. The group key is intentionally
+    # kept as `gitea-web-ssh` (unchanged from the gitea install it replaces) so
+    # all LB services for git.jgarr.net continue to share one VIP.
+    ssh:
+      enabled: true
+      separateService:
+        enabled: true
+        type: LoadBalancer
+        loadBalancerIP: 10.1.1.152
+        annotations:
+          metallb.universe.tf/allow-shared-ip: gitea-web-ssh
+
+    service:
+      type: ClusterIP
+      ports:
+        http: "80"
+
+    # We write our own Ingress and set the public URL via initSettings below,
+    # so the chart's built-in ingress (and its default onedev.example.com host)
+    # must stay disabled.
+    ingress:
+      enabled: false
+
+    onedev:
+      initSettings:
+        # Left empty on purpose: set the admin user/password/email via the UI
+        # on first login. The chart stores an empty password in its own Secret
+        # (it has no existingSecret support), so nothing sensitive is committed.
+        user: ""
+        password: ""
+        email: ""
+        serverUrl: "https://git.jgarr.net"
+        sshRootUrl: "ssh://git.jgarr.net:22"
+
+    persistence:
+      enabled: true
+      size: 50Gi
+      storageClassName: nfs-synology
+      accessModes: "ReadWriteOnce"
+
+    database:
+      external: false
+
+    serviceAccount:
+      create: true

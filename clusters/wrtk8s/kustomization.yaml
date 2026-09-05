@@ -52,7 +52,7 @@ resources:
   - arm
   - audiomass
   - bambustudio
-  - gitea
+  - git
   - pdfcraft
   - plex
   - pulsys

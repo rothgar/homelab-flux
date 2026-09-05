@@ -1,0 +1,50 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: onedev
+  namespace: git
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    external-dns.alpha.kubernetes.io/hostname: git.jgarr.net
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - git.jgarr.net
+      secretName: git-tls
+  rules:
+    - host: git.jgarr.net
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: onedev
+                port:
+                  number: 80
+---
+# The OneDev HTTP Service (`onedev`) is a regular ClusterIP Service (not
+# headless), so tailscale-operator can route to it directly and no ClusterIP
+# shim is required (unlike gitea, whose chart produced a headless service).
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: onedev-tailscale
+  namespace: git
+spec:
+  ingressClassName: tailscale
+  rules:
+    - host: git
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: onedev
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - git

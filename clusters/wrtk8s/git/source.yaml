@@ -1,8 +1,8 @@
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
 metadata:
-  name: gitea-charts
-  namespace: gitea
+  name: onedev-charts
+  namespace: git
 spec:
   interval: 1h
-  url: https://dl.gitea.com/charts/
+  url: https://code.onedev.io/onedev/~helm

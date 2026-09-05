@@ -1,18 +1,19 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: gitea
-  namespace: gitea
+  name: onedev
+  namespace: git
 spec:
   interval: 5m
   chart:
     spec:
-      chart: gitea
+      chart: onedev
+      version: "16.5.11"
       sourceRef:
         kind: HelmRepository
-        name: gitea-charts
-        namespace: gitea
+        name: onedev-charts
+        namespace: git
   valuesFrom:
     - kind: ConfigMap
-      name: gitea-values
+      name: onedev-values
       valuesKey: values.yaml
