@@ -18,10 +18,6 @@ spec:
       template:
         spec:
           restartPolicy: Never
-          # Image is amd64-only (built locally with docker, not buildx),
-          # so pin to amd64 nodes.
-          nodeSelector:
-            kubernetes.io/arch: amd64
           containers:
             - name: hockeytime
               image: cr.jgarr.net/hockeytime:latest
