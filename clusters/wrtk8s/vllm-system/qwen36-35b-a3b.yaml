@@ -14,7 +14,10 @@ metadata:
   name: qwen36-35b-a3b
   namespace: vllm-system
 spec:
-  replicas: 1
+  # Scaled to 0 while qwen38-27b-nvfp4 holds spark's GPU for the
+  # NVFP4-vs-FP8 benchmark. Bump back to 1 (and scale nvfp4 to 0) to
+  # restore.
+  replicas: 0
   strategy:
     type: Recreate
   selector:
