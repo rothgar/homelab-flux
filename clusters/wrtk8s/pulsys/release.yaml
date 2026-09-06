@@ -21,6 +21,14 @@ spec:
       repository: ghcr.io/pulsys-io/pulsys
       tag: "0.1.5"
 
+    console:
+      # The chart defaults console.image.tag to Chart.AppVersion (still 0.1.4
+      # even on the b21522f2 commit) — but ghcr.io/pulsys-io/pulsys-console
+      # only started shipping at 0.1.5, so the default resolves to a
+      # non-existent tag. Pin it explicitly.
+      image:
+        tag: "0.1.5"
+
     proxy:
       # HF clients don't require TLS; MetalLB LB below exposes :80 → :8080.
       publicBaseURL: http://hf.jgarr.net
