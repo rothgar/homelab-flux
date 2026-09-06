@@ -5,7 +5,6 @@ resources:
   - qwen36-27b.yaml
   - qwen36-35b-a3b.yaml
   - qwen38-27b.yaml
-  - qwen38-27b-nvfp4.yaml
   - podmonitor.yaml
   - open-webui.yaml
   - httproute.yaml
