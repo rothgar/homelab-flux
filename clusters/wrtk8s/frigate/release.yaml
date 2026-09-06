@@ -33,8 +33,11 @@ spec:
                   values:
                     - "true"
     resources:
+      requests:
+        memory: 1Gi
       limits:
         google.com/edgetpu: 1
+        memory: 3Gi
     extraVolumes:
       - name: dri
         hostPath:
