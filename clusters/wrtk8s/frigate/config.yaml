@@ -24,8 +24,6 @@ stringData:
           num_threads: 3
       model:
         path: /edgetpu_model.tflite
-        input_tensor: nhwc
-        input_dtype: uint8
         labelmap_path: /labelmap/coco-80.txt
       objects:
         track:
