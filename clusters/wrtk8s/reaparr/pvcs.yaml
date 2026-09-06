@@ -1,6 +1,32 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  name: reaparr-config-nfs
+  namespace: reaparr
+spec:
+  storageClassName: nfs-synology
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: reaparr-downloads-nfs
+  namespace: reaparr
+spec:
+  storageClassName: nfs-synology
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 50Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
   name: reaparr-config
   namespace: reaparr
 spec:
