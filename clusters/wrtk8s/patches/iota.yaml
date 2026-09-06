@@ -2,7 +2,3 @@ apiVersion: v1alpha1
 kind: HostnameConfig
 auto: "off"
 hostname: iota
----
-machine:
-  nodeLabels:
-    google.com/edgetpu: "true"
