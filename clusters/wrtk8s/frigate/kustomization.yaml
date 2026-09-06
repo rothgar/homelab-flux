@@ -6,4 +6,5 @@ resources:
   - config.yaml
   - pvc-nfs.yaml
   - release.yaml
+  - tailscale-ingress.yaml
   - external-secret.yaml

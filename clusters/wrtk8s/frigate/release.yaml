@@ -50,9 +50,6 @@ spec:
     service:
       type: LoadBalancer
       port: 80
-      annotations:
-        tailscale.com/expose: "true"
-        tailscale.com/hostname: "frigate"
   valuesFrom:
     - kind: Secret
       name: frigate-config
