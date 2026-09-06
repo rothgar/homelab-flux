@@ -18,7 +18,10 @@ spec:
 
   storage:
     size: 5Gi
-    storageClass: nfs-synology
+    # iSCSI (block) instead of NFS — postgres's fsync + small-random-write
+    # patterns are notoriously unfriendly to NFS's client-cache/RPC model,
+    # and CNPG's docs specifically recommend block storage for prod.
+    storageClass: synology-iscsi
 
   resources:
     requests:
