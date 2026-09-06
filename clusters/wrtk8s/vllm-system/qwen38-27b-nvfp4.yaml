@@ -1,0 +1,147 @@
+# Qwen 3.8-27B in NVIDIA NVFP4 (from unsloth) pinned to spark, running in
+# parallel with the FP8 variant on sparky (qwen38-27b.yaml) for a
+# same-model different-quantization tokens/sec comparison on GB10.
+#
+# NVFP4 uses Blackwell's native FP4 tensor cores — the point of the whole
+# exercise. On non-Blackwell GPUs this would emulate slowly, but sparks
+# are exactly the target hardware.
+#
+# Weights live in spark's longhorn hostPath (same shape as qwen36-35b-a3b).
+# When you want to run qwen36-35b-a3b back on spark, `kubectl -n vllm-system
+# scale deployment qwen38-27b-nvfp4 --replicas=0` first.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qwen38-27b-nvfp4
+  namespace: vllm-system
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: qwen38-27b-nvfp4
+  template:
+    metadata:
+      labels:
+        app: qwen38-27b-nvfp4
+    spec:
+      terminationGracePeriodSeconds: 15
+      runtimeClassName: nvidia
+      tolerations:
+        - key: nvidia.com/gpu
+          operator: Exists
+          effect: NoSchedule
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - spark
+      containers:
+        - name: vllm
+          # 26.06-py3 segfaults on GB10 with driver 595 — pin to 26.04
+          # (same as the FP8 sibling).
+          image: nvcr.io/nvidia/vllm:26.04-py3
+          command:
+            - vllm
+            - serve
+            - unsloth/Qwen3.8-27B-NVFP4
+            - --download-dir
+            - /models
+            - --host
+            - "0.0.0.0"
+            - --port
+            - "8000"
+            - --served-model-name
+            - qwen3.8-27b-nvfp4
+            - --gpu-memory-utilization
+            - "0.85"
+            - --max-model-len
+            - "65536"
+            - --enable-auto-tool-choice
+            - --tool-call-parser
+            - qwen3_xml
+            - --reasoning-parser
+            - qwen3
+            - --enable-prefix-caching
+            - --kv-cache-dtype
+            - fp8
+            - --max-num-seqs
+            - "4"
+            - --default-chat-template-kwargs
+            - '{"enable_thinking": true}'
+          env:
+            - name: HF_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: hf-token
+                  key: token
+            - name: HF_HOME
+              value: /models/huggingface
+          ports:
+            - containerPort: 8000
+              name: http
+          startupProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 360
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+            limits:
+              nvidia.com/gpu: 1
+          volumeMounts:
+            - name: models
+              mountPath: /models
+            - name: models
+              mountPath: /root/.cache
+              subPath: cache
+            - name: shm
+              mountPath: /dev/shm
+      volumes:
+        - name: models
+          hostPath:
+            path: /var/mnt/longhorn/vllm
+            type: DirectoryOrCreate
+        - name: shm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 16Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: qwen38-27b-nvfp4
+  namespace: vllm-system
+  annotations:
+    tailscale.com/expose: "true"
+    # Dot-free tailnet hostname, distinct from qwen38-27b (FP8) so both can
+    # register their own tailnet device for parallel serving / benchmarking.
+    tailscale.com/hostname: "qwen38-27b-nvfp4"
+spec:
+  selector:
+    app: qwen38-27b-nvfp4
+  ports:
+    - port: 8000
+      targetPort: http
+  type: LoadBalancer
