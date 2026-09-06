@@ -3,7 +3,6 @@ kind: HostnameConfig
 auto: "off"
 hostname: iota
 ---
-apiVersion: v1alpha1
-kind: NodeLabelConfig
-labels:
-  google.com/edgetpu: "true"
+machine:
+  nodeLabels:
+    google.com/edgetpu: "true"
