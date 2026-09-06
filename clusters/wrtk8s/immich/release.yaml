@@ -57,6 +57,7 @@ spec:
             runtimeClassName: nvidia
             nodeSelector:
               nvidia.com/gpu: "true"
+              kubernetes.io/arch: amd64
       persistence:
         cache:
           enabled: true
