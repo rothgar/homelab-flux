@@ -20,27 +20,29 @@ spec:
       targetPort: 8080
       protocol: TCP
 ---
-# Tailscale-only exposure for the admin console. The helm chart owns
-# svc/pulsys-console (ClusterIP); annotating it directly would get
-# overwritten on reconcile, so this is a parallel Service selecting the
-# same pod. Ends up as https://pulsys.<tailnet>.ts.net/ — a secure
-# context, which the console's PKCE flow needs (crypto.subtle isn't
-# available on plain http://<lan-ip>).
-apiVersion: v1
-kind: Service
+# Tailscale-only exposure for the admin console. Using an Ingress
+# (ingressClassName: tailscale) rather than a Service-annotation so the
+# tailscale operator does actual TLS termination — https://pulsys.<tailnet>.ts.net/
+# is a secure origin, which the console's PKCE flow needs (crypto.subtle
+# is undefined on plain http:// non-localhost).
+apiVersion: networking.k8s.io/v1
+kind: Ingress
 metadata:
   name: pulsys-console-tailscale
   namespace: pulsys
-  annotations:
-    tailscale.com/expose: "true"
-    tailscale.com/hostname: "pulsys"
 spec:
-  type: ClusterIP
-  selector:
-    app.kubernetes.io/name: pulsys-console
-    app.kubernetes.io/instance: pulsys
-  ports:
-    - name: http
-      port: 80
-      targetPort: 80
-      protocol: TCP
+  ingressClassName: tailscale
+  rules:
+    - host: pulsys
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: pulsys-console
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - pulsys
