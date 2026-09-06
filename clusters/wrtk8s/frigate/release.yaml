@@ -35,6 +35,13 @@ spec:
     resources:
       limits:
         google.com/edgetpu: 1
+    extraVolumes:
+      - name: dri
+        hostPath:
+          path: /dev/dri
+    extraVolumeMounts:
+      - name: dri
+        mountPath: /dev/dri
     service:
       type: LoadBalancer
       port: 80
