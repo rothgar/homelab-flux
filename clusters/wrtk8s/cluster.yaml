@@ -102,12 +102,16 @@ systemExtensions:
   # Pair with the google.com/edgetpu device plugin to schedule pods.
   - siderolabs/gasket-driver
   - siderolabs/iscsi-tools
+  # Intel iGPU (PCI 8086:461c) — provides i915 kernel module + firmware so
+  # /dev/dri is available for frigate VAAPI hardware decoding.
+  - siderolabs/i915
 name: 03000200-0400-0500-0006-000700080009
 kernelArgs:
   - talos.dashboard.disabled=1
   - nfs.nfs4_disable_idmapping=1
 patches:
   - file: patches/iota.yaml
+  - file: patches/iota-gpu.yaml
   - file: patches/kubelet.yaml
 ---
 kind: Machine
