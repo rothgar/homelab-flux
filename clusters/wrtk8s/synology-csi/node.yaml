@@ -99,6 +99,7 @@ spec:
             - /etc/synology/client-info.yml
             - --log-level=info
             - --chroot-dir=/host
+            - --iscsiadm-path=/usr/local/sbin/iscsiadm
           env:
             - name: CSI_ENDPOINT
               value: unix://csi/csi.sock
