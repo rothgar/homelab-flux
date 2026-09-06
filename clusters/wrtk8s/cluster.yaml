@@ -23,7 +23,6 @@ patches:
 ---
 kind: Workers
 machines:
-  - 0564bde4-47b8-c3bd-79e6-63e7a2badf27  # z (Intel + Pascal GPU, re-added 2026-08-28)
   - 4c5615cc-1dd2-11b2-8000-4cbb47001716
   - d68614b6-bfde-11d3-8000-4cbb472dcf87  # sparky (GB10, moved from dgx)
   - 03000200-0400-0500-0006-000700080009
@@ -93,28 +92,6 @@ patches:
   - file: patches/gpu-labels.yaml
   - file: patches/kubelet.yaml
   - file: patches/watchdog.yaml
----
-kind: Machine
-systemExtensions:
-  - siderolabs/nvidia-container-toolkit-lts
-  - siderolabs/nonfree-kmod-nvidia-lts
-  - siderolabs/intel-ice-firmware
-  - siderolabs/intel-ucode
-# z has a Pascal GPU (sm_61) — driver 595 in the production branch dropped
-# support, so stay on -lts (still ships driver 580 which supports Pascal).
-# Re-added 2026-08-28 after the same physical box reconnected to Omni;
-# local-path data on the NVMe should still be intact if EPHEMERAL wasn't
-# wiped, which will restore frigate/immich-postgres/reaparr PVCs.
-name: 0564bde4-47b8-c3bd-79e6-63e7a2badf27
-kernelArgs:
-  - talos.dashboard.disabled=1
-  - nfs.nfs4_disable_idmapping=1
-patches:
-  - file: patches/z.yaml
-  - file: patches/coretemp.yaml
-  - file: patches/nvidia.yaml
-  - file: patches/gpu-labels.yaml
-  - file: patches/kubelet.yaml
 ---
 kind: Machine
 systemExtensions:
