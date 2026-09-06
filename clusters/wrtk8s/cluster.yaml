@@ -51,6 +51,7 @@ patches:
 ---
 kind: Machine
 systemExtensions:
+  - siderolabs/iscsi-tools
   - siderolabs/nvidia-container-toolkit-production
   - siderolabs/nonfree-kmod-nvidia-production
 name: 4c5615cc-1dd2-11b2-8000-4cbb47001716
