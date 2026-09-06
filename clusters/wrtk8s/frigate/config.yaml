@@ -19,16 +19,13 @@ stringData:
       auth:
         enabled: false
       detectors:
-        onnx:
-          type: onnx
-          device: cuda
+        coral:
+          type: edgetpu
+          num_threads: 3
       model:
-        model_type: yolo-generic
-        width: 320
-        height: 320
-        input_tensor: nchw
-        input_dtype: float
-        path: /config/model_cache/yolov9-t-320.onnx
+        path: /edgetpu.tflite
+        input_tensor: nhwc
+        input_dtype: uint8
         labelmap_path: /labelmap/coco-80.txt
       objects:
         track:
@@ -62,7 +59,7 @@ stringData:
       cameras:
         front_door:
           ffmpeg:
-            hwaccel_args: preset-nvidia
+            hwaccel_args: preset-vaapi
             inputs:
               - path: rtsp://127.0.0.1:8554/front_door
                 input_args: preset-rtsp-restream
@@ -74,7 +71,7 @@ stringData:
                   - detect
         rear_door:
           ffmpeg:
-            hwaccel_args: preset-nvidia
+            hwaccel_args: preset-vaapi
             inputs:
               - path: rtsp://127.0.0.1:8554/rear_door
                 input_args: preset-rtsp-restream
@@ -86,7 +83,7 @@ stringData:
                   - detect
         backyard:
           ffmpeg:
-            hwaccel_args: preset-nvidia
+            hwaccel_args: preset-vaapi
             inputs:
               - path: rtsp://127.0.0.1:8554/backyard
                 input_args: preset-rtsp-restream
