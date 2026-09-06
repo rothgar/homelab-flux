@@ -37,6 +37,8 @@ spec:
       labels:
         app: immich-postgres
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: mini
       containers:
         - name: postgres
           image: tensorchord/pgvecto-rs:pg16-v0.2.1
@@ -51,7 +53,7 @@ spec:
       volumes:
         - name: data
           persistentVolumeClaim:
-            claimName: immich-postgres
+            claimName: immich-postgres-iscsi
 ---
 apiVersion: v1
 kind: Service
