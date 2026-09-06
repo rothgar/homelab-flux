@@ -46,7 +46,7 @@ spec:
       serviceAccountName: open-webui-ts
       containers:
         - name: open-webui
-          image: ghcr.io/open-webui/open-webui:v0.10.2
+          image: ghcr.io/open-webui/open-webui:v0.11.3
           ports:
             - containerPort: 8080
           env:
