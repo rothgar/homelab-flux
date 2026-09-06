@@ -4,5 +4,6 @@ resources:
   - namespace.yaml
   - source.yaml
   - config.yaml
+  - pvc-nfs.yaml
   - release.yaml
   - external-secret.yaml

@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: frigate-config-nfs
+  namespace: frigate
+spec:
+  storageClassName: nfs-synology
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: frigate-media-nfs
+  namespace: frigate
+spec:
+  storageClassName: nfs-synology
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 20Gi
