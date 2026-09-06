@@ -14,12 +14,12 @@ spec:
         namespace: pulsys
   values:
     image:
-      # Pinned to chart v0.1.4. That chart's appVersion is 0.1.0 (no
-      # matching upstream image), so tag is set explicitly to 0.1.4.
-      # Upstream chart v0.1.5+ has a duplicate-label bug (pulsys-io/pulsys#46)
-      # that flux's helm-controller rejects — revisit the bump once that's out.
+      # Chart is pinned to the merge commit for PR #47 (see source.yaml).
+      # Image tag is set explicitly since the chart's appVersion doesn't
+      # move in lockstep with releases. 0.1.5 adds the admin console + a
+      # dev Keycloak so PATs can be minted via UI instead of psql INSERTs.
       repository: ghcr.io/pulsys-io/pulsys
-      tag: "0.1.4"
+      tag: "0.1.5"
 
     proxy:
       # HF clients don't require TLS; MetalLB LB below exposes :80 → :8080.
