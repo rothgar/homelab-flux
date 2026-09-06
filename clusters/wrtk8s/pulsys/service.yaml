@@ -19,30 +19,3 @@ spec:
       port: 80
       targetPort: 8080
       protocol: TCP
----
-# Tailscale-only exposure for the admin console. Using an Ingress
-# (ingressClassName: tailscale) rather than a Service-annotation so the
-# tailscale operator does actual TLS termination — https://pulsys.<tailnet>.ts.net/
-# is a secure origin, which the console's PKCE flow needs (crypto.subtle
-# is undefined on plain http:// non-localhost).
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: pulsys-console-tailscale
-  namespace: pulsys
-spec:
-  ingressClassName: tailscale
-  rules:
-    - host: pulsys
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: pulsys-console
-                port:
-                  number: 80
-  tls:
-    - hosts:
-        - pulsys

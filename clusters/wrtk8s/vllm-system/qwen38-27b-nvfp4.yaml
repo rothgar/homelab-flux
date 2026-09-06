@@ -1,22 +1,30 @@
+# Qwen 3.8-27B in NVIDIA NVFP4 (from unsloth) pinned to spark, running in
+# parallel with the FP8 variant on sparky (qwen38-27b.yaml) for a
+# same-model different-quantization tokens/sec comparison on GB10.
+#
+# NVFP4 uses Blackwell's native FP4 tensor cores — the point of the whole
+# exercise. On non-Blackwell GPUs this would emulate slowly, but sparks
+# are exactly the target hardware.
+#
+# Weights live in spark's longhorn hostPath (same shape as qwen36-35b-a3b).
+# When you want to run qwen36-35b-a3b back on spark, `kubectl -n vllm-system
+# scale deployment qwen38-27b-nvfp4 --replicas=0` first.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: qwen36-27b
+  name: qwen38-27b-nvfp4
   namespace: vllm-system
 spec:
-  # Scaled to 0 while sparky hosts qwen 3.8-27b (and spark keeps the 3.6
-  # 35B A3B MoE). Bump back to 1 to bring 3.6-27b back on sparky — weights
-  # stay cached under /var/mnt/models on sparky so a restart is fast.
-  replicas: 0
+  replicas: 1
   strategy:
     type: Recreate
   selector:
     matchLabels:
-      app: qwen36-27b
+      app: qwen38-27b-nvfp4
   template:
     metadata:
       labels:
-        app: qwen36-27b
+        app: qwen38-27b-nvfp4
     spec:
       terminationGracePeriodSeconds: 15
       runtimeClassName: nvidia
@@ -32,17 +40,16 @@ spec:
                   - key: kubernetes.io/hostname
                     operator: In
                     values:
-                      - sparky
+                      - spark
       containers:
         - name: vllm
-          # v26.06-py3 segfaults in cuStreamCreateWithPriority on GB10 with
-          # driver 595. Pinning back to the last known-good tag until upstream
-          # ships a fix.
+          # 26.06-py3 segfaults on GB10 with driver 595 — pin to 26.04
+          # (same as the FP8 sibling).
           image: nvcr.io/nvidia/vllm:26.04-py3
           command:
             - vllm
             - serve
-            - Qwen/Qwen3.6-27B-FP8
+            - unsloth/Qwen3.8-27B-NVFP4
             - --download-dir
             - /models
             - --host
@@ -50,7 +57,7 @@ spec:
             - --port
             - "8000"
             - --served-model-name
-            - qwen3.6-27b
+            - qwen3.8-27b-nvfp4
             - --gpu-memory-utilization
             - "0.85"
             - --max-model-len
@@ -87,7 +94,7 @@ spec:
             initialDelaySeconds: 30
             periodSeconds: 10
             timeoutSeconds: 5
-            failureThreshold: 180
+            failureThreshold: 360
           livenessProbe:
             httpGet:
               path: /health
@@ -116,8 +123,7 @@ spec:
       volumes:
         - name: models
           hostPath:
-            # Sparky's dedicated `models` UserVolume — 2-3.5 TiB partition.
-            path: /var/mnt/models
+            path: /var/mnt/longhorn/vllm
             type: DirectoryOrCreate
         - name: shm
           emptyDir:
@@ -127,15 +133,16 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: qwen36-27b
+  name: qwen38-27b-nvfp4
   namespace: vllm-system
   annotations:
     tailscale.com/expose: "true"
-    # Tailscale hostnames must be valid DNS labels — no dots allowed.
-    tailscale.com/hostname: "qwen36-27b"
+    # Dot-free tailnet hostname, distinct from qwen38-27b (FP8) so both can
+    # register their own tailnet device for parallel serving / benchmarking.
+    tailscale.com/hostname: "qwen38-27b-nvfp4"
 spec:
   selector:
-    app: qwen36-27b
+    app: qwen38-27b-nvfp4
   ports:
     - port: 8000
       targetPort: http

@@ -85,6 +85,8 @@ spec:
                   key: token
             - name: HF_HOME
               value: /models/huggingface
+            - name: HF_ENDPOINT
+              value: http://hf.jgarr.net
           ports:
             - containerPort: 8000
               name: http
