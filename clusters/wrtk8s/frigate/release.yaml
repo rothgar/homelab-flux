@@ -18,21 +18,11 @@ spec:
       tag: 0.17.0
     persistence:
       config:
-        enabled: false
+        enabled: true
+        existingClaim: frigate-config-nfs
       media:
-        enabled: false
-    extraVolumes:
-      - name: config
-        persistentVolumeClaim:
-          claimName: frigate-config-nfs
-      - name: media
-        persistentVolumeClaim:
-          claimName: frigate-media-nfs
-    extraVolumeMounts:
-      - name: config
-        mountPath: /config
-      - name: media
-        mountPath: /media
+        enabled: true
+        existingClaim: frigate-media-nfs
     affinity:
       nodeAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
