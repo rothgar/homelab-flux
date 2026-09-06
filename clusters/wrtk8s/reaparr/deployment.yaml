@@ -48,10 +48,10 @@ spec:
       volumes:
         - name: config
           persistentVolumeClaim:
-            claimName: reaparr-config
+            claimName: reaparr-config-nfs
         - name: downloads
           persistentVolumeClaim:
-            claimName: reaparr-downloads
+            claimName: reaparr-downloads-nfs
         - name: movies
           persistentVolumeClaim:
             claimName: movies
