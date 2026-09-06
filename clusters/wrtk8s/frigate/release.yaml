@@ -42,6 +42,8 @@ spec:
     extraVolumeMounts:
       - name: dri
         mountPath: /dev/dri
+    securityContext:
+      privileged: true
     service:
       type: LoadBalancer
       port: 80
