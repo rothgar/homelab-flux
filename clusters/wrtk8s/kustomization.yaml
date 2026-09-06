@@ -14,6 +14,8 @@ resources:
   - hockeytime
   - home-assistant
   - immich
+  - iscsi-csi
+  - edgetpu-system
   - keda
   - kepler
   - kubelet-csr-approver

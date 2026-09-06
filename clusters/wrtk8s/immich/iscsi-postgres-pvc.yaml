@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: immich-postgres-iscsi
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  csi:
+    driver: iscsi.csi.k8s.io
+    volumeHandle: synology-wrtk8s-20-lun1
+    volumeAttributes:
+      targetPortal: 10.1.1.4:3260
+      iqn: iqn.2000-01.com.synology:d.Target-1.3608e51f461
+      lun: "1"
+      iscsiInterface: default
+      discoveryCHAPAuth: "false"
+      sessionCHAPAuth: "false"
+      fsType: ext4
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: immich-postgres-iscsi
+  namespace: immich
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  storageClassName: ""
+  volumeName: immich-postgres-iscsi
+  resources:
+    requests:
+      storage: 20Gi

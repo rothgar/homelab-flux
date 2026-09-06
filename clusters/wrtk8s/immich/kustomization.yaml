@@ -6,6 +6,7 @@ resources:
   - library-pvc.yaml
   - pictures-pvc.yaml
   - postgres.yaml
+  - iscsi-postgres-pvc.yaml
   - release.yaml
   - httproute.yaml
   - tailscale-ingress.yaml
