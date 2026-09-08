@@ -23,8 +23,11 @@ spec:
               image: cr.jgarr.net/mini-crawler:latest
               imagePullPolicy: Always
               env:
+                # Full URL, not just the topic slug — the crawler passes this
+                # to httpx as-is and rejects it as "missing 'http://' or
+                # 'https://' protocol" otherwise.
                 - name: NTFY_TOPIC
-                  value: minime-81nzcmb
+                  value: https://ntfy.sh/minime-81nzcmb
               # --urls keeps the log terse (URLs only, no table); --state-backend
               # defaults to `auto`, which uses the ntfy topic history for dedup
               # since NTFY_TOPIC is set — no PVC required.
