@@ -4,10 +4,16 @@ metadata:
   name: hockeytime
   namespace: hockeytime
 spec:
-  # 9:00 AND 15:00 local time in America/Los_Angeles. K8s CronJob's
+  # 00:00, 09:00 AND 15:00 local time in America/Los_Angeles. K8s CronJob's
   # timeZone field (GA in 1.27+) interprets the crontab in that zone,
   # so no manual UTC offset needed.
-  schedule: "0 9,15 * * *"
+  #
+  # The 00:00 run exists so no gap between runs exceeds ntfy.sh's 12-hour
+  # message cache. Without it the 15:00 -> 09:00 next-day gap (18h) lets
+  # the previous run's messages expire, so the 09:00 run can't recover the
+  # dedup IDs from topic history and re-fires every alert. Gaps are now
+  # 9h / 6h / 9h, all within the cache window.
+  schedule: "0 0,9,15 * * *"
   timeZone: America/Los_Angeles
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
