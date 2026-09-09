@@ -34,7 +34,9 @@ metadata:
   name: open-webui
   namespace: vllm-system
 spec:
-  replicas: 1
+  # Scaled to 0 while a container in the pod is crashlooping; bump back
+  # to 1 once the underlying failure is diagnosed.
+  replicas: 0
   selector:
     matchLabels:
       app: open-webui

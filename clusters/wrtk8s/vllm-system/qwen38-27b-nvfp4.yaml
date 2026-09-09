@@ -15,7 +15,9 @@ metadata:
   name: qwen38-27b-nvfp4
   namespace: vllm-system
 spec:
-  replicas: 1
+  # Scaled to 0 while the vLLM engine core init keeps failing on this
+  # model. Bump back to 1 once the loader + quant combo is settled.
+  replicas: 0
   strategy:
     type: Recreate
   selector:
