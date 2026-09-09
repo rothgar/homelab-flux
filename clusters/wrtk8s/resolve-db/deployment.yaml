@@ -44,4 +44,4 @@ spec:
       volumes:
         - name: data
           persistentVolumeClaim:
-            claimName: resolve-db-data
+            claimName: resolve-db-data-iscsi

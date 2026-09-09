@@ -1,12 +1,16 @@
+# Migrated 2026-09-09 from nfs-synology to synology-iscsi. Postgres's fsync +
+# small-random-write pattern is unfriendly to NFS's client-cache/RPC model;
+# same rationale as the pulsys-pg move. Data was copied via a one-off Job
+# before the PVC swap.
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: resolve-db-data
+  name: resolve-db-data-iscsi
   namespace: resolve-db
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: nfs-synology
+  storageClassName: synology-iscsi
   resources:
     requests:
       storage: 50Gi
