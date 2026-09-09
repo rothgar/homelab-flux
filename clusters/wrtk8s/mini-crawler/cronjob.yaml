@@ -4,10 +4,11 @@ metadata:
   name: mini-crawler
   namespace: mini-crawler
 spec:
-  # Twice-daily like hockeytime — 9:00 and 15:00 America/Los_Angeles. If
-  # Mini listings on Craigslist/OfferUp end up churning faster than that
-  # (and interesting listings sell in hours), bump the frequency here.
-  schedule: "0 9,15 * * *"
+  # 00:00, 09:00, 15:00 America/Los_Angeles. The midnight run is a
+  # keep-alive so the ntfy topic history (used by --state-backend=auto
+  # for dedup) stays populated across the >12h gap that ntfy.sh retains
+  # messages — same reason hockeytime picked this cadence.
+  schedule: "0 0,9,15 * * *"
   timeZone: America/Los_Angeles
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
