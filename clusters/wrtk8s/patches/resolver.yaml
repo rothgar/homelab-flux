@@ -1,0 +1,10 @@
+# Clear DHCP-provided search domains cluster-wide. Without this, the LAN
+# DHCP server hands out `jgarr.net` → kubelet inherits it into every pod's
+# resolv.conf → any short external hostname (github.com etc.) hits the
+# `*.jgarr.net` wildcard as `<name>.jgarr.net` first and gets 47.149.56.32
+# (public IP hairpin, unreachable). Empty list explicitly clears; leaving
+# unset would inherit from DHCP.
+apiVersion: v1alpha1
+kind: ResolverConfig
+searchDomains:
+  domains: []

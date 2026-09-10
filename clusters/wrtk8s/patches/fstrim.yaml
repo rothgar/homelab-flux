@@ -1,0 +1,14 @@
+# Talos 1.14 periodic filesystem trim. Weekly matches the default that
+# `talosctl gen config` emits for fresh 1.14+ clusters (upgrades don't
+# gain this automatically, so it has to be added explicitly).
+#
+# Talos hashes node ID + volume ID to build a stable per-volume offset
+# within the interval, so trims spread across the cluster instead of
+# hitting every SSD at midnight. Nothing to schedule manually.
+#
+# For LUKS-encrypted volumes trim only fires if the volume also has
+# `allowDiscards: true` — none of the wrtk8s volumes are encrypted at
+# the moment, so no extra work needed.
+apiVersion: v1alpha1
+kind: FilesystemTrimConfig
+interval: 168h0m0s
