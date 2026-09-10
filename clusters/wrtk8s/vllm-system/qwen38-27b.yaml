@@ -9,7 +9,9 @@ metadata:
   name: qwen38-27b
   namespace: vllm-system
 spec:
-  replicas: 1
+  # Scaled to 0 alongside the rest of vllm-system. Bump back to 1 when a
+  # model is needed on sparky.
+  replicas: 0
   strategy:
     type: Recreate
   selector:
