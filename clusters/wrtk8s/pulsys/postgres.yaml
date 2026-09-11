@@ -29,3 +29,11 @@ spec:
       cpu: 100m
     limits:
       memory: 512Mi
+
+  # Pin off the Pi4/Pi5 workers — postgres+iSCSI health checks time out on
+  # them and CNPG kills the pod (500 on /startupz, exit 0 clean shutdown,
+  # CrashLoopBackOff). amd64 covers mini, iota, and any future beefier
+  # workers.
+  affinity:
+    nodeSelector:
+      kubernetes.io/arch: amd64
