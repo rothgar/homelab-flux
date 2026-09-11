@@ -28,12 +28,6 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     external-dns.alpha.kubernetes.io/hostname: cr.jgarr.net
-    traefik.ingress.kubernetes.io/service.serversscheme: https
-    # Registry pods serve a letsencrypt cert with cr.jgarr.net SANs,
-    # but Traefik dials them by pod IP (no SNI, no IP SAN match), so
-    # skip cert verify on the CNI-internal hop. See registry-insecure
-    # ServersTransport below.
-    traefik.ingress.kubernetes.io/service.serverstransport: registry-registry-insecure@kubernetescrd
 spec:
   ingressClassName: traefik
   tls:
@@ -60,12 +54,6 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     external-dns.alpha.kubernetes.io/hostname: docker.cr.jgarr.net
-    traefik.ingress.kubernetes.io/service.serversscheme: https
-    # Registry pods serve a letsencrypt cert with cr.jgarr.net SANs,
-    # but Traefik dials them by pod IP (no SNI, no IP SAN match), so
-    # skip cert verify on the CNI-internal hop. See registry-insecure
-    # ServersTransport below.
-    traefik.ingress.kubernetes.io/service.serverstransport: registry-registry-insecure@kubernetescrd
 spec:
   ingressClassName: traefik
   tls:
@@ -92,12 +80,6 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     external-dns.alpha.kubernetes.io/hostname: gcr.cr.jgarr.net
-    traefik.ingress.kubernetes.io/service.serversscheme: https
-    # Registry pods serve a letsencrypt cert with cr.jgarr.net SANs,
-    # but Traefik dials them by pod IP (no SNI, no IP SAN match), so
-    # skip cert verify on the CNI-internal hop. See registry-insecure
-    # ServersTransport below.
-    traefik.ingress.kubernetes.io/service.serverstransport: registry-registry-insecure@kubernetescrd
 spec:
   ingressClassName: traefik
   tls:
@@ -124,12 +106,6 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     external-dns.alpha.kubernetes.io/hostname: ghcr.cr.jgarr.net
-    traefik.ingress.kubernetes.io/service.serversscheme: https
-    # Registry pods serve a letsencrypt cert with cr.jgarr.net SANs,
-    # but Traefik dials them by pod IP (no SNI, no IP SAN match), so
-    # skip cert verify on the CNI-internal hop. See registry-insecure
-    # ServersTransport below.
-    traefik.ingress.kubernetes.io/service.serverstransport: registry-registry-insecure@kubernetescrd
 spec:
   ingressClassName: traefik
   tls:
@@ -156,12 +132,6 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     external-dns.alpha.kubernetes.io/hostname: k8s.cr.jgarr.net
-    traefik.ingress.kubernetes.io/service.serversscheme: https
-    # Registry pods serve a letsencrypt cert with cr.jgarr.net SANs,
-    # but Traefik dials them by pod IP (no SNI, no IP SAN match), so
-    # skip cert verify on the CNI-internal hop. See registry-insecure
-    # ServersTransport below.
-    traefik.ingress.kubernetes.io/service.serverstransport: registry-registry-insecure@kubernetescrd
 spec:
   ingressClassName: traefik
   tls:

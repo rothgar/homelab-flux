@@ -54,6 +54,8 @@ metadata:
   namespace: registry
   annotations:
     external-dns.alpha.kubernetes.io/hostname: gcr.cr.jgarr.net
+    traefik.ingress.kubernetes.io/service.serversscheme: https
+    traefik.ingress.kubernetes.io/service.serverstransport: registry-registry-insecure@kubernetescrd
 spec:
   type: LoadBalancer
   selector:
