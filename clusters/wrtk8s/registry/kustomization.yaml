@@ -13,3 +13,4 @@ resources:
   - ghcr-cache.yaml
   - servicemonitor.yaml
   - dashboard.yaml
+  - ingress.yaml

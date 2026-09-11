@@ -1,0 +1,147 @@
+# Traefik Ingresses in front of each registry-namespace LoadBalancer
+# Service. external-dns's --source=service silently drops LB Services
+# with hostname annotations on this cluster (v0.21.0 + K8s 1.36 +
+# `ipMode: VIP` combination); Ingresses under --source=ingress are the
+# only reliable way to get Cloudflare A records published for these
+# hostnames. Nodes still use the direct MetalLB IPs via
+# `patches/mirrors.yaml` StaticHostConfig for image-pull fast path; this
+# is just for external `dig` + non-mirrored clients.
+#
+# Backend scheme is HTTPS because the registry pods serve their own
+# letsencrypt-issued cert on :5000. SNI Host header matches the cert
+# SANs (`cr.jgarr.net`, `*.cr.jgarr.net`), so Traefik trusts the chain.
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: registry
+  namespace: registry
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    external-dns.alpha.kubernetes.io/hostname: cr.jgarr.net
+    traefik.ingress.kubernetes.io/service.serversscheme: https
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - cr.jgarr.net
+      secretName: cr-jgarr-net-tls
+  rules:
+    - host: cr.jgarr.net
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: registry
+                port:
+                  number: 443
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: docker-cache
+  namespace: registry
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    external-dns.alpha.kubernetes.io/hostname: docker.cr.jgarr.net
+    traefik.ingress.kubernetes.io/service.serversscheme: https
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - docker.cr.jgarr.net
+      secretName: docker-cr-jgarr-net-tls
+  rules:
+    - host: docker.cr.jgarr.net
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: docker-cache
+                port:
+                  number: 443
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: gcr-cache
+  namespace: registry
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    external-dns.alpha.kubernetes.io/hostname: gcr.cr.jgarr.net
+    traefik.ingress.kubernetes.io/service.serversscheme: https
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - gcr.cr.jgarr.net
+      secretName: gcr-cr-jgarr-net-tls
+  rules:
+    - host: gcr.cr.jgarr.net
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: gcr-cache
+                port:
+                  number: 443
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ghcr-cache
+  namespace: registry
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    external-dns.alpha.kubernetes.io/hostname: ghcr.cr.jgarr.net
+    traefik.ingress.kubernetes.io/service.serversscheme: https
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - ghcr.cr.jgarr.net
+      secretName: ghcr-cr-jgarr-net-tls
+  rules:
+    - host: ghcr.cr.jgarr.net
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ghcr-cache
+                port:
+                  number: 443
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: k8s-cache
+  namespace: registry
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    external-dns.alpha.kubernetes.io/hostname: k8s.cr.jgarr.net
+    traefik.ingress.kubernetes.io/service.serversscheme: https
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - k8s.cr.jgarr.net
+      secretName: k8s-cr-jgarr-net-tls
+  rules:
+    - host: k8s.cr.jgarr.net
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: k8s-cache
+                port:
+                  number: 443
