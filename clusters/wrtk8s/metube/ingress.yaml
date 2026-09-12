@@ -1,0 +1,30 @@
+# Public exposure at youtube.jgarr.net via Traefik + letsencrypt.
+# MeTube has NO built-in auth — anyone who resolves this hostname can
+# queue downloads to your disk/bandwidth. Fine for now behind Cloudflare
+# but consider adding Traefik basic-auth middleware if you notice
+# unwanted traffic.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: metube
+  namespace: metube
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    external-dns.alpha.kubernetes.io/hostname: youtube.jgarr.net
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - youtube.jgarr.net
+      secretName: metube-tls
+  rules:
+    - host: youtube.jgarr.net
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: metube
+                port:
+                  number: 80

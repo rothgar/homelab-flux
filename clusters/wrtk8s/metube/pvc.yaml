@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: metube-downloads
+  namespace: metube
+spec:
+  # NFS on Synology — matches the pattern for other large-media apps
+  # (youtarr, plex). ReadWriteOnce is fine since MeTube is a single pod.
+  storageClassName: nfs-synology
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Gi

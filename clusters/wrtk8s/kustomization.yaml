@@ -23,6 +23,7 @@ resources:
   - local-path-provisioner
   - mealie
   - metallb
+  - metube
   - metrics-server
   - minecraft
   - mini-crawler
@@ -36,6 +37,7 @@ resources:
 
   - nvidia-system
 
+  - omni
   - omni-cd
   - paperless-ngx
   - reaparr
@@ -58,3 +60,4 @@ resources:
   - pdfcraft
   - plex
   - pulsys
+  - rabble

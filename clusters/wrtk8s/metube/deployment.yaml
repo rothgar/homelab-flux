@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: metube
+  namespace: metube
+spec:
+  replicas: 1
+  strategy:
+    # Recreate — single-writer NFS PVC (RWO), rolling would deadlock on
+    # the mount handoff.
+    type: Recreate
+  selector:
+    matchLabels:
+      app: metube
+  template:
+    metadata:
+      labels:
+        app: metube
+    spec:
+      containers:
+        - name: metube
+          image: ghcr.io/alexta69/metube:latest
+          ports:
+            - containerPort: 8081
+              name: http
+          env:
+            # Run as UID/GID 65534 to match the NFS export mapping used
+            # elsewhere (paperless, etc.). Overrides the image default of 1000.
+            - name: PUID
+              value: "65534"
+            - name: PGID
+              value: "65534"
+          volumeMounts:
+            - name: downloads
+              mountPath: /downloads
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              memory: 1Gi
+      volumes:
+        - name: downloads
+          persistentVolumeClaim:
+            claimName: metube-downloads
