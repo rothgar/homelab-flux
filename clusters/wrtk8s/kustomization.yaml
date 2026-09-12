@@ -37,7 +37,6 @@ resources:
 
   - nvidia-system
 
-  - omni
   - omni-cd
   - paperless-ngx
   - reaparr
