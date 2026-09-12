@@ -17,6 +17,14 @@ spec:
       labels:
         app: metube
     spec:
+      # Force pod uid/gid so writes to the NFS export land as 65534:65534
+      # (Synology export maps to nobody). Also fsGroup so kubelet chowns
+      # the mount on mount. MeTube's own PUID/PGID env vars are set below
+      # for its internal drop-privileges step. Same pattern as paperless.
+      securityContext:
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
       containers:
         - name: metube
           image: ghcr.io/alexta69/metube:latest
