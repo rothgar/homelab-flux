@@ -51,7 +51,6 @@ resources:
   - traefik
   - vllm-system
   - whisper-webui
-  - youtarr
   - arm
   - audiomass
   - bambustudio
