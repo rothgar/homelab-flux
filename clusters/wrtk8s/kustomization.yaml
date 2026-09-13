@@ -4,6 +4,7 @@ resources:
   - cloudnative-pg
   - cert-manager
   - controld-exporter
+  - ctrld
   - descheduler
   - external-dns
   - external-secrets

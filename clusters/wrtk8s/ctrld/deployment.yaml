@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ctrld
+  namespace: ctrld
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ctrld
+  template:
+    metadata:
+      labels:
+        app: ctrld
+    spec:
+      containers:
+        - name: ctrld
+          image: controldns/ctrld:v1.5.7
+          # `run` is the foreground mode (`start` is for daemonizing as a
+          # system service). `--cd $RESOLVER_ID` pulls the upstream URL +
+          # ruleset from Control D; --listen 0.0.0.0:53 exposes on all
+          # container interfaces so the ClusterIP Service can front it.
+          args:
+            - run
+            - --cd
+            - $(RESOLVER_ID)
+            - --listen
+            - 0.0.0.0:53
+          env:
+            - name: RESOLVER_ID
+              valueFrom:
+                secretKeyRef:
+                  name: ctrld-resolver-id
+                  key: id
+          ports:
+            - containerPort: 53
+              name: dns-udp
+              protocol: UDP
+            - containerPort: 53
+              name: dns-tcp
+              protocol: TCP
+          securityContext:
+            # port 53 is <1024 so needs the bind capability; drop the rest.
+            capabilities:
+              add: ["NET_BIND_SERVICE"]
+              drop: ["ALL"]
+            runAsNonRoot: true
+            runAsUser: 1000
+          resources:
+            requests:
+              cpu: 25m
+              memory: 32Mi
+            limits:
+              memory: 128Mi
+          readinessProbe:
+            tcpSocket:
+              port: dns-tcp
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: dns-tcp
+            initialDelaySeconds: 15
+            periodSeconds: 30
