@@ -1,0 +1,12 @@
+# Talos 1.14 online XFS scrub (`xfs_scrub`). One week per volume, hashed
+# per node + volume ID so scrubs stagger across the cluster instead of
+# hitting every disk on Sunday. Every wrtk8s node's EPHEMERAL + system
+# volumes are XFS, so this catches early metadata/data corruption on
+# all of them (mini NVMe, iota SATA SSD, spark/sparky NVMe when they
+# rejoin). Runs online — safe on live filesystems, moderate IO overhead.
+#
+# Non-XFS volumes (e.g. any future btrfs, ext4 user volumes) are silently
+# skipped.
+apiVersion: v1alpha1
+kind: FilesystemScrubConfig
+interval: 168h0m0s

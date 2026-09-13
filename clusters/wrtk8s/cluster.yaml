@@ -10,6 +10,7 @@ patches:
   - file: patches/mirrors.yaml
   - file: patches/resolver.yaml
   - file: patches/fstrim.yaml
+  - file: patches/fs-scrub.yaml
 ---
 kind: ControlPlane
 machines:
