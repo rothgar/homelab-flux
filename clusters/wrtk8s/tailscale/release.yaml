@@ -15,3 +15,8 @@ spec:
   values:
     operatorConfig:
       hostname: wrtk8s-operator
+      # OAuth client in 1Password (operator-oauth) is scoped to `tag:k8s`,
+      # not the chart default `tag:k8s-operator`. Match it or the operator
+      # 400s on `requested tags [...] are invalid or not permitted`.
+      defaultTags:
+        - "tag:k8s"
