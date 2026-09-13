@@ -21,7 +21,10 @@ spec:
           # Control D; --listen exposes on all container interfaces so
           # the ClusterIP Service can front it.
           args:
-            - --cd=$(RESOLVER_ID)
+            # In no-config mode ctrld requires both --primary_upstream
+            # and --listen explicitly; --cd alone isn't enough (it's
+            # the Control D lookup hint, not a full upstream URL).
+            - --primary_upstream=https://freedns.controld.com/$(RESOLVER_ID)
             - --listen=0.0.0.0:53
           env:
             - name: RESOLVER_ID
