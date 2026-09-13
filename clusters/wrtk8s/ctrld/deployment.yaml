@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: ctrld
-          image: controldns/ctrld:v1.5.7
+          image: controldns/ctrld:1.5.7
           # `run` is the foreground mode (`start` is for daemonizing as a
           # system service). `--cd $RESOLVER_ID` pulls the upstream URL +
           # ruleset from Control D; --listen 0.0.0.0:53 exposes on all
