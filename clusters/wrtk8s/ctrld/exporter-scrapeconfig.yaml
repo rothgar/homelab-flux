@@ -1,3 +1,6 @@
+# Lives in monitoring ns for the kube-prometheus-stack Operator to pick
+# it up (label release=kube-prometheus-stack). Target host tracks the
+# exporter Service's new location in the ctrld namespace.
 apiVersion: monitoring.coreos.com/v1alpha1
 kind: ScrapeConfig
 metadata:
@@ -10,6 +13,6 @@ spec:
   scrapeInterval: 60s
   staticConfigs:
     - targets:
-        - "controld-exporter.controld-exporter.svc.cluster.local:10034"
+        - "controld-exporter.ctrld.svc.cluster.local:10034"
       labels:
         job: controld-exporter

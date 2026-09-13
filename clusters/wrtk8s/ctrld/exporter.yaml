@@ -1,8 +1,12 @@
+# Control D exporter (was in its own controld-exporter/ ns, folded in
+# here 2026-09-13 alongside the ctrld resolver so both Control D
+# workloads live in one namespace).
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: controld-exporter
-  namespace: controld-exporter
+  namespace: ctrld
 spec:
   replicas: 1
   selector:
@@ -35,3 +39,37 @@ spec:
               cpu: 50m
             limits:
               memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: controld-exporter
+  namespace: ctrld
+  labels:
+    app: controld-exporter
+spec:
+  selector:
+    app: controld-exporter
+  ports:
+    - port: 10034
+      targetPort: 10034
+      protocol: TCP
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: controld-api-key
+  namespace: ctrld
+spec:
+  refreshInterval: 12h
+  secretStoreRef:
+    name: onepassword
+    kind: ClusterSecretStore
+  target:
+    name: controld-api-key
+  data:
+    # 1Password item stays under its old name so we don't have to touch
+    # the vault; only the K8s namespace moved.
+    - secretKey: api-key
+      remoteRef:
+        key: controld-exporter_controld-api-key/api-key
