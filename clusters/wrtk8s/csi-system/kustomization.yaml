@@ -7,3 +7,7 @@ resources:
   - nfs-source.yaml
   - nfs-release.yaml
   - nfs-storageclass.yaml
+  - synology-csi-driver.yaml
+  - synology-controller.yaml
+  - synology-node.yaml
+  - synology-storage-class.yaml

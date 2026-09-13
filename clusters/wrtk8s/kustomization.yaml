@@ -15,7 +15,6 @@ resources:
   - hockeytime
   - home-assistant
   - immich
-  - synology-csi
   - edgetpu-system
   - keda
   - kepler
