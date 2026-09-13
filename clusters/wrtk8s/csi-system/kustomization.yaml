@@ -4,3 +4,6 @@ resources:
   - namespace.yaml
   - local-path-source.yaml
   - local-path-release.yaml
+  - nfs-source.yaml
+  - nfs-release.yaml
+  - nfs-storageclass.yaml
