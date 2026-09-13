@@ -16,14 +16,12 @@ spec:
       containers:
         - name: ctrld
           image: controldns/ctrld:1.5.7
-          # `run` is the foreground mode (`start` is for daemonizing as a
-          # system service and only there does the `--cd` shortcut work).
-          # In `run` we build the upstream URL from the Resolver ID
-          # ourselves. Kubernetes interpolates $(RESOLVER_ID) from the
-          # env below into the arg at pod start.
+          # The container ENTRYPOINT is already `ctrld run`, so args
+          # here are just flags. --cd pulls the upstream + ruleset from
+          # Control D; --listen exposes on all container interfaces so
+          # the ClusterIP Service can front it.
           args:
-            - run
-            - --primary_upstream=https://freedns.controld.com/$(RESOLVER_ID)
+            - --cd=$(RESOLVER_ID)
             - --listen=0.0.0.0:53
           env:
             - name: RESOLVER_ID
