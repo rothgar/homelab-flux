@@ -44,7 +44,7 @@ resources:
   - resolve-db
   - reloader
   - rpi-led-daemon
-  - tailscale-operator
+  - tailscale
   - timesync
   - tts
   - talos-remote-config

@@ -1,8 +1,9 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: tailscale-operator
+  name: tailscale
   labels:
+    # Tailscale operator + proxy StatefulSets need hostNetwork/CAP_NET_ADMIN
     pod-security.kubernetes.io/enforce: privileged
     pod-security.kubernetes.io/audit: privileged
     pod-security.kubernetes.io/warn: privileged

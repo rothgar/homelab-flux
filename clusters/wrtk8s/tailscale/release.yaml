@@ -2,7 +2,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: tailscale-operator
-  namespace: tailscale-operator
+  namespace: tailscale
 spec:
   interval: 5m
   chart:
@@ -11,7 +11,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: tailscale
-        namespace: tailscale-operator
+        namespace: tailscale
   values:
     operatorConfig:
       hostname: wrtk8s-operator
