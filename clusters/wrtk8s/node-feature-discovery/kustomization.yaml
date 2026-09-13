@@ -1,7 +1,8 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - namespace.yaml
-  - source.yaml
-  - release.yaml
+  # No helm install here — the nvidia-gpu-operator chart already brings
+  # its own NFD subchart in the nvidia-system namespace. NodeFeatureRule
+  # is cluster-scoped so the existing NFD master picks it up regardless
+  # of what namespace the CR lives in.
   - amdgpu-rule.yaml
