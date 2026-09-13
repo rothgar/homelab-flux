@@ -4,9 +4,15 @@ metadata:
   name: plex-config
   namespace: plex
 spec:
+  # iSCSI (block) instead of node-local local-path: Plex's DB is SQLite
+  # with heavy fsync/small-write patterns and node-pinned storage means
+  # the pod can't reschedule onto other amdgpu-labelled workers. iSCSI
+  # lets any node NFD tags with `feature.node.kubernetes.io/amdgpu-present=true`
+  # reattach the same volume. Restic restore in the initContainer still
+  # works the same.
   accessModes:
     - ReadWriteOnce
-  storageClassName: local-path
+  storageClassName: synology-iscsi
   resources:
     requests:
       storage: 50Gi

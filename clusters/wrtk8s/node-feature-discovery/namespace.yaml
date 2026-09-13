@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: node-feature-discovery
+  labels:
+    # nfd-worker DaemonSet needs hostPath /sys/bus/pci etc. + procMount
+    pod-security.kubernetes.io/enforce: privileged

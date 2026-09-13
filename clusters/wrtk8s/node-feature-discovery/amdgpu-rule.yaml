@@ -1,0 +1,24 @@
+# Publish `feature.node.kubernetes.io/amdgpu-present=true` on any node
+# with a PCI display controller from AMD/ATI (vendor 1002, class 0300).
+# Plex uses this label for VAAPI transcoding scheduling instead of
+# hand-maintaining a nodeLabels patch in cluster.yaml.
+apiVersion: nfd.k8s-sigs.io/v1alpha1
+kind: NodeFeatureRule
+metadata:
+  name: amdgpu-present
+spec:
+  rules:
+    - name: "amdgpu"
+      labels:
+        "amdgpu-present": "true"
+      matchFeatures:
+        - feature: pci.device
+          matchExpressions:
+            vendor:
+              op: In
+              value: ["1002"]
+            class:
+              op: In
+              # 0300 = VGA compatible controller (iGPU + most dGPUs)
+              # 0380 = Other display controller (rare AMD headless)
+              value: ["0300", "0380"]

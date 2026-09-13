@@ -34,6 +34,7 @@ resources:
   - mqtt
 
   - nvidia-system
+  - node-feature-discovery
 
   - omni-cd
   - paperless-ngx

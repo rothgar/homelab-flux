@@ -4,7 +4,11 @@ metadata:
   name: plex
   namespace: plex
 spec:
-  replicas: 0
+  replicas: 1
+  strategy:
+    # Recreate — iSCSI RWO can't be handed off during a rolling upgrade,
+    # kubelet on the old node blocks the new pod's Attach.
+    type: Recreate
   selector:
     matchLabels:
       app: plex
@@ -14,9 +18,19 @@ spec:
         app: plex
     spec:
       priorityClassName: plex-high-priority
-      runtimeClassName: nvidia
+      # AMD VAAPI transcoding on any node NFD flags as having an AMD
+      # display controller (see node-feature-discovery/amdgpu-rule.yaml).
+      # Currently only mini; add more AMD-accelerator nodes and NFD will
+      # label them within a scan cycle. NVIDIA GPU slot on mini stays
+      # free for whisper-webui.
       nodeSelector:
-        nvidia.com/gpu: "true"
+        feature.node.kubernetes.io/amdgpu-present: "true"
+      securityContext:
+        # 44 = video (Debian/Ubuntu convention, matches /dev/dri owner),
+        # 109 = render (needed for the renderD128 node itself). The
+        # linuxserver.io Plex image runs as PUID/PGID 1027/100, neither
+        # of which is in these groups by default, so add them explicitly.
+        supplementalGroups: [44, 109]
       initContainers:
         - name: restore-backup
           image: restic/restic:latest
@@ -57,18 +71,19 @@ spec:
               value: "100"
             - name: DEBUG
               value: "true"
-            - name: NVIDIA_VISIBLE_DEVICES
-              value: "all"
-            - name: NVIDIA_DRIVER_CAPABILITIES
-              value: "compute,video,utility"
           resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
             limits:
-              nvidia.com/gpu: 1
+              memory: 4Gi
           volumeMounts:
             - name: data
               mountPath: /config/Library/Application Support
             - name: transcode
               mountPath: /transcode
+            - name: dri
+              mountPath: /dev/dri
             - name: movies
               mountPath: /data/movies
             - name: music
@@ -94,6 +109,9 @@ spec:
             claimName: plex-config-backup
         - name: transcode
           emptyDir: {}
+        - name: dri
+          hostPath:
+            path: /dev/dri
         - name: movies
           persistentVolumeClaim:
             claimName: plex-movies
