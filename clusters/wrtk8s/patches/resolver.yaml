@@ -7,4 +7,13 @@
 apiVersion: v1alpha1
 kind: ResolverConfig
 searchDomains:
-  domains: []
+  # `.invalid` is RFC 2606-reserved and guaranteed to return NXDOMAIN,
+  # so setting a single-entry list here (a) survives Omni's YAML
+  # serialization — which strips `domains: []` down to nothing — and
+  # (b) overrides the DHCP-supplied `jgarr.net` search domain that was
+  # combining with the `*.jgarr.net` wildcard to hijack external DNS.
+  # Cost: one extra NXDOMAIN lookup per short external hostname before
+  # glibc falls through to the absolute name.
+  domains:
+    - talos.invalid
+  disableDefault: true
