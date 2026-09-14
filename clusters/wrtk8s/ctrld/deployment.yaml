@@ -16,15 +16,19 @@ spec:
       containers:
         - name: ctrld
           image: controldns/ctrld:1.5.7
-          # The container ENTRYPOINT is already `ctrld run`, so args
-          # here are just flags. --cd pulls the upstream + ruleset from
-          # Control D; --listen exposes on all container interfaces so
-          # the ClusterIP Service can front it.
+          # Registered / daemon-in-container mode: --cd pulls the full
+          # resolver config from Control D at boot AND registers this
+          # instance so it appears in the Control D dashboard for
+          # filtering + analytics. --config points at a writable path
+          # where ctrld persists the device_id token so the same
+          # dashboard endpoint identity survives pod restarts
+          # (emptyDir below — losing it just triggers a fresh
+          # re-registration on next boot with a new device_id).
+          # --custom-hostname is the label that shows in the dashboard.
           args:
-            # In no-config mode ctrld requires both --primary_upstream
-            # and --listen explicitly; --cd alone isn't enough (it's
-            # the Control D lookup hint, not a full upstream URL).
-            - --primary_upstream=https://freedns.controld.com/$(RESOLVER_ID)
+            - --cd=$(RESOLVER_ID)
+            - --config=/var/lib/ctrld/ctrld.toml
+            - --custom-hostname=wrtk8s-ctrld
             - --listen=0.0.0.0:53
           env:
             - name: RESOLVER_ID
@@ -52,6 +56,9 @@ spec:
               memory: 32Mi
             limits:
               memory: 128Mi
+          volumeMounts:
+            - name: state
+              mountPath: /var/lib/ctrld
           readinessProbe:
             tcpSocket:
               port: dns-tcp
@@ -62,3 +69,6 @@ spec:
               port: dns-tcp
             initialDelaySeconds: 15
             periodSeconds: 30
+      volumes:
+        - name: state
+          emptyDir: {}
