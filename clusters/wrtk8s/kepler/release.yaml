@@ -29,6 +29,16 @@ spec:
       # Restrict to amd64 nodes until arm64 images ship.
       nodeSelector:
         kubernetes.io/arch: amd64
+      # Chart default livenessProbe timeoutSeconds=1s. Kepler's /metrics
+      # scrape enumerates every process/container/pod on the node; on the
+      # control plane (mini, ~60+ pods) each compute cycle takes ~1.1s
+      # and the probe times out mid-cycle → kubelet kills → CrashLoop
+      # (observed ~867 restarts over 3 days). Bump the probe budget to
+      # 10s so the exporter has room to breathe.
+      livenessProbe:
+        timeoutSeconds: 10
+      readinessProbe:
+        timeoutSeconds: 10
 
     config:
       # Chart default is 5s, which pinned Kepler's own attributed power at ~2x
