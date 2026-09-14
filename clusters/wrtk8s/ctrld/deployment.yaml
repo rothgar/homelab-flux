@@ -27,6 +27,7 @@ spec:
           # --custom-hostname is the label that shows in the dashboard.
           args:
             - --cd=$(RESOLVER_ID)
+            - --primary_upstream=https://freedns.controld.com/$(RESOLVER_ID)
             - --config=/var/lib/ctrld/ctrld.toml
             - --custom-hostname=wrtk8s-ctrld
             - --listen=0.0.0.0:53
