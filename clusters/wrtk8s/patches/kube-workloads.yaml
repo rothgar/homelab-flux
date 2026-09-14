@@ -9,7 +9,6 @@
 ---
 apiVersion: v1alpha1
 kind: KubePrismConfig
-enabled: true
 port: 7445
 ---
 # $patch: delete drops the default KubeFlannelCNIConfig doc that Talos
