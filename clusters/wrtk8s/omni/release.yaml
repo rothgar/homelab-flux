@@ -1,0 +1,120 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: omni
+  namespace: omni
+spec:
+  interval: 10m
+  chart:
+    spec:
+      chart: omni
+      # 2.11.0 exposes registries.factories.primary.{url,username,password}
+      # for the Enterprise Image Factory; the older 2.5.x flat fields
+      # (imageFactoryBaseURL/…) are deprecated equivalents.
+      version: 2.11.0
+      sourceRef:
+        kind: HelmRepository
+        name: siderolabs
+        namespace: omni
+  valuesFrom:
+    # Enterprise factory creds sourced from 1Password via ESO
+    # (see external-secret.yaml + [[eso-onepassword]] memory).
+    - kind: Secret
+      name: omni-factory-creds
+      valuesKey: username
+      targetPath: config.registries.factories.primary.username
+    - kind: Secret
+      name: omni-factory-creds
+      valuesKey: password
+      targetPath: config.registries.factories.primary.password
+  values:
+    # Omni requires a support contract for production use (BSL license);
+    # this install is for managing OTHER clusters/machines — wrtk8s itself
+    # stays on hosted Omni to avoid loopback recovery hazards.
+    config:
+      account:
+        # UUID minted once via `uuidgen` — DO NOT change after first boot,
+        # etcd data is tied to it.
+        id: 8f3e3d18-6c1c-4d20-9dc4-2d05f80a55c6
+        name: wrtk8s-omni
+      auth:
+        auth0:
+          enabled: true
+          clientID: UGraEnmhVsflBPvjAfbHJioXgs2YEKhu
+          domain: dev-vsvrygkic7sf1xrk.us.auth0.com
+        # Bootstrap the first admin on initial startup.
+        initialUsers:
+          - justin.garrison@siderolabs.com
+      services:
+        api:
+          advertisedURL: https://omni.jgarr.net
+        kubernetesProxy:
+          advertisedURL: https://kubernetes.jgarr.net
+        machineAPI:
+          advertisedURL: https://siderolink.jgarr.net
+        siderolink:
+          wireGuard:
+            # MetalLB pins service.wireguard to 10.1.1.170 (see service
+            # block below), port 50180 is the LB-mode WireGuard port from
+            # the chart defaults.
+            advertisedEndpoint: "10.1.1.170:50180"
+      registries:
+        factories:
+          primary:
+            # Enterprise Image Factory (FIPS/SBOM/VEX). Points machines
+            # at authenticated builds instead of the public factory.talos.dev.
+            url: https://factory.siderolabs.com
+            # username/password come from valuesFrom above (1Password → ESO).
+          secondary:
+            # Public factory as fallback — no auth needed. Useful when
+            # a schematic isn't published under the Enterprise variant or
+            # for machines managed under a non-Enterprise-entitled path.
+            url: https://factory.talos.dev
+
+    etcdEncryptionKey:
+      # Secret was created out-of-band via `kubectl create secret ...
+      # --from-file=omni.asc=/tmp/omni.asc`. The private key file
+      # (/tmp/omni.asc at generation time) MUST be backed up — losing it
+      # + losing the Secret makes all Omni etcd data unrecoverable.
+      existingSecret: omni-gpg-key
+
+    service:
+      wireguard:
+        # LoadBalancer + MetalLB, pinned IP → matches advertisedEndpoint above.
+        type: LoadBalancer
+        port: 50180
+        annotations:
+          metallb.io/loadBalancerIPs: "10.1.1.170"
+          external-dns.alpha.kubernetes.io/hostname: siderolink.jgarr.net
+
+    ingress:
+      main:
+        enabled: true
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-prod
+        className: traefik
+        host: omni.jgarr.net
+        tls:
+          - secretName: omni-tls
+            hosts:
+              - omni.jgarr.net
+      kubernetesProxy:
+        enabled: true
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-prod
+        className: traefik
+        host: kubernetes.jgarr.net
+        tls:
+          - secretName: omni-k8s-tls
+            hosts:
+              - kubernetes.jgarr.net
+      siderolinkApi:
+        enabled: true
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-prod
+        className: traefik
+        host: siderolink.jgarr.net
+        tls:
+          - secretName: omni-siderolink-tls
+            hosts:
+              - siderolink.jgarr.net

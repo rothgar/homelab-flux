@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: omni
+  labels:
+    # Omni ships hostNetwork WireGuard, needs privileged PSA
+    pod-security.kubernetes.io/enforce: privileged

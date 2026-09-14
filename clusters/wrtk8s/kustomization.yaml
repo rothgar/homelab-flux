@@ -36,6 +36,7 @@ resources:
   - nvidia-system
   - node-feature-discovery
 
+  - omni
   - omni-cd
   - paperless-ngx
   - reaparr

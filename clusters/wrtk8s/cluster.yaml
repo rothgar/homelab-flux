@@ -5,7 +5,7 @@ kubernetes:
 talos:
   version: v1.14.0
 features:
-  enableWorkloadProxy: false
+  enableWorkloadProxy: true
 patches:
   - file: patches/mirrors.yaml
   - file: patches/resolver.yaml
