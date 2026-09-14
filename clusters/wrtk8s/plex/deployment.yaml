@@ -59,7 +59,7 @@ spec:
               mountPath: /backup
       containers:
         - name: plex
-          image: lscr.io/linuxserver/plex:1.43.0.10492-121068a07-ls295
+          image: lscr.io/linuxserver/plex:1.43.4.10903-e5521bd8c-ls324
           ports:
             - containerPort: 32400
           env:
