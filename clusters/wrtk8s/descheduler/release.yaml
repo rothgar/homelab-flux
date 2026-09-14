@@ -35,6 +35,25 @@ spec:
                   cpu: 50
                   memory: 50
                   pods: 50
+                # Use actual metrics-server data instead of pod.spec.resources.requests.
+                # Most wrtk8s workloads don't set requests, so request-based
+                # utilization always thought mini was under-used and never
+                # evicted anything. Metrics-based sees real CPU/memory.
+                metricsUtilization:
+                  source: KubernetesMetrics
+            # Catch flapping pods (like the Kepler CrashLoop that hit 867
+            # restarts) so the Deployment controller places fresh copies,
+            # ideally on a different node.
+            - name: RemovePodsHavingTooManyRestarts
+              args:
+                podRestartThreshold: 100
+                includingInitContainers: true
+            # Auto-clean pods in Failed phase (hockeytime cronjob orphans,
+            # OOM-killed pods, etc.) after 1h so they don't accumulate.
+            - name: RemoveFailedPods
+              args:
+                minPodLifetimeSeconds: 3600
+                includingInitContainers: true
           plugins:
             balance:
               enabled:
@@ -45,3 +64,5 @@ spec:
                 - RemovePodsViolatingNodeTaints
                 - RemovePodsViolatingNodeAffinity
                 - RemovePodsViolatingInterPodAntiAffinity
+                - RemovePodsHavingTooManyRestarts
+                - RemoveFailedPods
