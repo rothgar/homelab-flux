@@ -87,6 +87,18 @@ spec:
           metallb.io/loadBalancerIPs: "10.1.1.170"
           external-dns.alpha.kubernetes.io/hostname: siderolink.jgarr.net
 
+    persistence:
+      # Omni's etcd/state needs a durable RWO PV; local-path failed on
+      # pi4-2 (read-only /var/mnt) and would tie us to whichever node
+      # first-consumer picked anyway.
+      storageClassName: synology-iscsi
+      size: 20Gi
+
+    # Pin to mini so the iSCSI RWO PV always attaches to the same node
+    # (also avoids scheduling this ~heavy workload onto a Pi).
+    nodeSelector:
+      kubernetes.io/hostname: mini
+
     ingress:
       main:
         enabled: true
