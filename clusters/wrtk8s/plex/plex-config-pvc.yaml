@@ -15,7 +15,10 @@ spec:
   storageClassName: synology-iscsi
   resources:
     requests:
-      storage: 50Gi
+      # 200Gi covers the ~120G legacy config transfer plus regen headroom
+      # for Media/ (chapter thumbs, scrubbing previews) which grow to match
+      # the size of the library. synology-iscsi supports online expansion.
+      storage: 200Gi
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
