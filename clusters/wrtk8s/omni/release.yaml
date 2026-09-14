@@ -44,10 +44,8 @@ spec:
           domain: dev-vsvrygkic7sf1xrk.us.auth0.com
         # Bootstrap the first admin on initial startup.
         initialUsers:
+          - justinleegarrison@gmail.com
           - justin.garrison@siderolabs.com
-        # Elevates this user to Admin on every start — break-glass path
-        # for the actual account signed in through Auth0.
-        recoveryAdmin: justinleegarrison@gmail.com
       services:
         api:
           advertisedURL: https://omni.jgarr.net
