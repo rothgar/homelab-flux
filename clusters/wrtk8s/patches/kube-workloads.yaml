@@ -1,27 +1,19 @@
-# Talos 1.14 typed-doc replacement for the old v1alpha1
-# `cluster.network.cni.name: none` / `cluster.proxy.disabled: true` /
-# `cluster.coreDNS.disabled: true` combo. Tells Talos NOT to install
-# its bundled Flannel / kube-proxy / CoreDNS — Flux manages those from
-# clusters/wrtk8s/flannel/ so we don't want them fighting.
+# Tells Talos NOT to install its bundled Flannel / kube-proxy / CoreDNS —
+# Flux manages those from clusters/wrtk8s/flannel/ so we don't want them
+# fighting.
 #
-# KubePrism stays enabled so kubelet reaches the API via
-# localhost:7445 without a load balancer.
----
-apiVersion: v1alpha1
-kind: KubePrismConfig
-port: 7445
----
-# $patch: delete drops the default KubeFlannelCNIConfig doc that Talos
-# renders when a Flannel CNI would otherwise be installed. Matches the
-# pattern used in the upstream Cilium-on-Talos deployment guide.
-apiVersion: v1alpha1
-kind: KubeFlannelCNIConfig
-$patch: delete
----
-apiVersion: v1alpha1
-kind: KubeProxyConfig
-enabled: false
----
-apiVersion: v1alpha1
-kind: KubeCoreDNSConfig
-enabled: false
+# Written as a v1alpha1 nested-map patch (not the Talos 1.14 typed docs)
+# because Omni 1.10+ still emits `.machine.features.kubePrism` and
+# `.machine.cluster.proxy` in the base config, and Talos 1.14 rejects
+# having both shapes present ("KubePrism config in v1alpha1 config can't
+# be used with KubePrismConfig document"). See [[omni-1-10-4-kube-
+# upgrade-double-emit]] memory for the same class of issue in the
+# Omni-generated kubernetes-upgrade patch.
+cluster:
+  network:
+    cni:
+      name: none
+  proxy:
+    disabled: true
+  coreDNS:
+    disabled: true
