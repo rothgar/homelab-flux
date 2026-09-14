@@ -1,0 +1,52 @@
+# Corefile rendered as a Secret via ESO templating so the Control D
+# resolver ID stays in 1Password (item `ctrld_ctrld-resolver-id`, field
+# `password`) instead of being hardcoded into git. CoreDNS mounts this
+# Secret at /etc/coredns/Corefile (see coredns.yaml Deployment).
+#
+# forward is DoT-only to Control D's two public edge IPs. tls_servername
+# routes to the account-scoped resolver via SNI. No LAN DNS fallback —
+# CoreDNS's forward plugin can't mix DoT + plain in one block, and a
+# plain LAN fallback would silently bypass filtering anyway.
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: coredns-corefile
+  namespace: kube-system
+spec:
+  refreshInterval: 12h
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: onepassword
+  target:
+    name: coredns-corefile
+    template:
+      engineVersion: v2
+      data:
+        Corefile: |
+          .:53 {
+              errors
+              health {
+                  lameduck 5s
+              }
+              ready
+              kubernetes cluster.local in-addr.arpa ip6.arpa {
+                  pods insecure
+                  fallthrough in-addr.arpa ip6.arpa
+                  ttl 30
+              }
+              prometheus :9153
+              forward . tls://76.76.2.11 tls://76.76.10.11 {
+                  tls_servername {{ .id }}.freedns.controld.com
+                  health_check 5s
+                  policy sequential
+                  max_concurrent 1000
+              }
+              cache 30
+              loop
+              reload
+              loadbalance
+          }
+  data:
+    - secretKey: id
+      remoteRef:
+        key: ctrld_ctrld-resolver-id/password

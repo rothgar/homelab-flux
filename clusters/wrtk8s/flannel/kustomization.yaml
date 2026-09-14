@@ -6,3 +6,4 @@ resources:
   - daemonset.yaml
   - kube-proxy.yaml
   - coredns.yaml
+  - coredns-corefile.yaml
