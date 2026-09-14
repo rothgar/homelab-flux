@@ -35,9 +35,11 @@ spec:
       # and the probe times out mid-cycle → kubelet kills → CrashLoop
       # (observed ~867 restarts over 3 days). Bump the probe budget to
       # 10s so the exporter has room to breathe.
+      # Merged with chart-default httpGet /metrics on port http; only
+      # override timeoutSeconds. Don't touch readinessProbe — chart
+      # ships it empty and adding a naked timeoutSeconds fails K8s
+      # validation ("must specify a handler type").
       livenessProbe:
-        timeoutSeconds: 10
-      readinessProbe:
         timeoutSeconds: 10
 
     config:
