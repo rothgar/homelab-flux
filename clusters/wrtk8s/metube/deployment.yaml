@@ -27,7 +27,7 @@ spec:
         fsGroup: 65534
       containers:
         - name: metube
-          image: ghcr.io/alexta69/metube:latest
+          image: ghcr.io/alexta69/metube:2026.08.28
           ports:
             - containerPort: 8081
               name: http

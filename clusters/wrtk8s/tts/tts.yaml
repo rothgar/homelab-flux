@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: tts
-          image: ghcr.io/matatonic/openedai-speech
+          image: ghcr.io/matatonic/openedai-speech:0.18.2
           ports:
             - containerPort: 8000
           env:

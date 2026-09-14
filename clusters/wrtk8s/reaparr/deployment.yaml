@@ -28,7 +28,7 @@ spec:
         fsGroup: 1001
       containers:
         - name: reaparr
-          image: reaparr/reaparr:latest
+          image: reaparr/reaparr:0.39.0
           ports:
             - containerPort: 7000
           env:

@@ -17,7 +17,7 @@ spec:
         kubernetes.io/arch: amd64
       containers:
         - name: bedrock
-          image: itzg/minecraft-bedrock-server:latest
+          image: itzg/minecraft-bedrock-server:2026.8.2
           ports:
             - containerPort: 19132
               protocol: UDP

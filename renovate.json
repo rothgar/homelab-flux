@@ -24,6 +24,22 @@
       "description": "linuxserver tags are <semver>-<gitsha>-lsN; Renovate's default docker versioning treats the tail as opaque and skips bumps. Loose versioning matches on the leading semver."
     },
     {
+      "matchDepNames": [
+        "ghcr.io/alexta69/metube",
+        "ghcr.io/miniflux/miniflux",
+        "ghcr.io/paperless-ngx/paperless-ngx",
+        "ghcr.io/pdfcrafttool/pdfcraft",
+        "itzg/minecraft-server",
+        "itzg/minecraft-bedrock-server",
+        "automaticrippingmachine/automatic-ripping-machine",
+        "rommapp/romm"
+      ],
+      "matchUpdateTypes": ["minor", "patch", "digest"],
+      "automerge": true,
+      "platformAutomerge": true,
+      "description": "Auto-merge minor/patch bumps for stateless leaf apps. Major bumps still require review. Needs GitHub Settings → General → 'Allow auto-merge' enabled at repo level."
+    },
+    {
       "matchDepNames": ["nvcr.io/nvidia/vllm"],
       "allowedVersions": "/^(2[0-5]\\.\\d+|26\\.0[0-4])-py\\d+$/",
       "description": "Pin nvcr.io/nvidia/vllm — 26.06 segfaults in cuStreamCreateWithPriority on GB10 with driver 595. Docker versioning can't parse the -py3 suffix, so allowedVersions is a regex allowing 20.xx-py* through 26.04-py*."

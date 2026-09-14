@@ -28,7 +28,7 @@ spec:
               mountPath: /music
       containers:
         - name: arm
-          image: automaticrippingmachine/automatic-ripping-machine:latest
+          image: automaticrippingmachine/automatic-ripping-machine:2.24.3
           ports:
             - containerPort: 8080
           env:
