@@ -20,8 +20,7 @@ patches:
     inline:
       cluster:
         allowSchedulingOnControlPlanes: true
-  - file: patches/flannel.yaml
-  - file: patches/kube-proxy.yaml
+  - file: patches/kube-workloads.yaml
 ---
 kind: Workers
 machines:
