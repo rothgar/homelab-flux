@@ -48,8 +48,14 @@ data:
             ttl 30
         }
         prometheus :9153
-        forward . /etc/resolv.conf {
+        # Forward external names to ctrld (Control D pull-through resolver
+        # in the ctrld namespace) → filtered upstream DNS with the LAN
+        # DNS (10.1.1.4) kept as a fallback for the ~5s window where
+        # ctrld is unavailable (rollout, node loss, etc.).
+        forward . 10.103.143.230 10.1.1.4 {
             max_concurrent 1000
+            policy sequential
+            health_check 5s
         }
         cache 30
         loop

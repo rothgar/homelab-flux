@@ -22,7 +22,6 @@ patches:
         allowSchedulingOnControlPlanes: true
   - file: patches/flannel.yaml
   - file: patches/kube-proxy.yaml
-  - file: patches/coredns.yaml
 ---
 kind: Workers
 machines:
