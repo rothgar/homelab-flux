@@ -18,7 +18,7 @@ data:
 
     [[devices]]
     host = "10.1.1.27"
-    alias = "mac mini"
+    alias = "sparky"
 
     [[devices]]
     host = "10.1.1.2"
@@ -30,4 +30,4 @@ data:
 
     [[devices]]
     host = "10.1.2.12"
-    alias = "3d"
+    alias = "m1n1"
