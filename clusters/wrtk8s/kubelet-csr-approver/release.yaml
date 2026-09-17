@@ -14,6 +14,9 @@ spec:
         namespace: kubelet-csr-approver
   values:
     providerIpPrefixes:
-      - 10.1.0.0/22
+      # LAN is 10.1.0.0/16 in aggregate; sparky was landing in 10.1.15.0/24
+      # (different DHCP scope from mini/z/iota which live in 10.1.0.0/22),
+      # so its kubelet CSRs were denied for out-of-prefix SAN IP.
+      - 10.1.0.0/16
     providerRegex: ".*"
     bypassDnsResolution: true
