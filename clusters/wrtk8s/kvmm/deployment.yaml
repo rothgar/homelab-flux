@@ -5,6 +5,9 @@ metadata:
   namespace: default
   labels:
     app: kvmm
+  annotations:
+    # Auto-restart when the mounted ConfigMap/Secret changes.
+    reloader.stakater.com/auto: "true"
 spec:
   replicas: 1
   selector:
