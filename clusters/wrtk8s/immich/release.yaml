@@ -23,6 +23,15 @@ spec:
       enabled: true
       controllers:
         main:
+          # Keep immich-server on nodes whose LAN IP is in the Synology's
+          # NFS export allowlist. sparky (spark) sits on a different DHCP
+          # scope (10.1.15.0/24) that the Synology's `/volume1/pictures`
+          # and CSI-provisioned `/volume1/kubernetes/*` exports don't
+          # accept — mounts fail with "access denied by server". Remove
+          # this once the Synology exports are widened to 10.1.0.0/16.
+          pod:
+            nodeSelector:
+              kubernetes.io/arch: amd64
           containers:
             main:
               image:
