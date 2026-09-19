@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: valkey
-          image: valkey/valkey:8.1-alpine
+          image: valkey/valkey:9.2-alpine
           args:
             - --maxmemory
             - 512mb
