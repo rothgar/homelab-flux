@@ -26,6 +26,17 @@ spec:
       labels:
         app: tsidp
     spec:
+      # Avoid `spark` — that node is missing the siderolabs/iscsi-tools
+      # extension right now, so the synology-iscsi PVC can't mount there.
+      # Remove this affinity block once sparky's extension list is fixed.
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: NotIn
+                    values: [spark]
       containers:
         - name: tsidp
           image: ghcr.io/tailscale/tsidp:latest

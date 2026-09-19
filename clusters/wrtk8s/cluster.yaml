@@ -122,6 +122,7 @@ kind: Machine
 systemExtensions:
   - siderolabs/nonfree-kmod-nvidia-production
   - siderolabs/nvidia-container-toolkit-production
+  - siderolabs/iscsi-tools
 name: d68614b6-bfde-11d3-8000-4cbb472dcf87  # sparky (DGX Spark GB10)
 kernelArgs:
   - talos.dashboard.disabled=1
