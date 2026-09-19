@@ -1,24 +1,29 @@
 ---
-# Backend Service that the Ingress targets. Plain ClusterIP, HTTP on 8081.
+# Backend Service that the tailscale Ingress targets. mecatui uses the
+# gRPC (h2c) port; the appProtocol hint tells the tailscale operator's
+# proxy to speak HTTP/2 cleartext to it instead of HTTP/1.1 (which was
+# producing a 502 with "malformed header: missing HTTP content-type"
+# from the operator's Envoy layer).
 apiVersion: v1
 kind: Service
 metadata:
-  name: mecatl-http
+  name: mecatl-grpc
   namespace: mecatl
 spec:
   type: ClusterIP
   selector:
     app.kubernetes.io/name: mecak8s
   ports:
-    - name: http
-      port: 8081
-      targetPort: 8081
+    - name: grpc
+      port: 8080
+      targetPort: 8080
+      appProtocol: h2c
 ---
-# Tailscale Ingress: operator provisions a proxy that terminates TLS with
-# a tailnet-issued cert and forwards decrypted HTTP to mecatl-http:8081.
-# Necessary because mecak8s speaks plain HTTP on 8081 (security.tls-
-# TerminatedUpstream=true) and the previous tailscale.com/expose Service
-# was only L4 DNAT — TLS clients like mecatui got "not a TLS handshake".
+# Tailscale Ingress: operator provisions a proxy that terminates TLS
+# with a tailnet-issued cert and forwards decrypted HTTP/2 (h2c) to
+# mecatl-grpc:8080. Necessary because mecak8s speaks plaintext on 8080
+# (security.tlsTerminatedUpstream=true) and the previous L4 Service
+# wrapper gave mecatui "not a TLS handshake" errors.
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -27,13 +32,12 @@ metadata:
 spec:
   ingressClassName: tailscale
   tls:
-    # `tailscale` IngressClass treats the first `tls.hosts[0]` value as
-    # the MagicDNS hostname to register (matches operator docs). Cert is
-    # provisioned automatically by the tailscale control plane.
+    # `tailscale` IngressClass treats tls.hosts[0] as the MagicDNS
+    # hostname to register. Cert is provisioned automatically.
     - hosts:
         - mecatl
   defaultBackend:
     service:
-      name: mecatl-http
+      name: mecatl-grpc
       port:
-        number: 8081
+        number: 8080
