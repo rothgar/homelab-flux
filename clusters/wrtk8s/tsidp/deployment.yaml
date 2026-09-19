@@ -29,6 +29,13 @@ spec:
       # Avoid `spark` — that node is missing the siderolabs/iscsi-tools
       # extension right now, so the synology-iscsi PVC can't mount there.
       # Remove this affinity block once sparky's extension list is fixed.
+      # tsidp writes tsnet state (log rotation etc.) as its runtime UID;
+      # the fresh iSCSI PV is owned by root:root, so kubelet needs to
+      # chown-recursive to a group tsidp is in. `fsGroup: 0` matches the
+      # container's default root runtime, unblocking the permission-denied
+      # write to /data/tailscaled.log.conf on first boot.
+      securityContext:
+        fsGroup: 0
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
