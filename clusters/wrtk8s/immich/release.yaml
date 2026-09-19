@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: immich
-      version: "0.12.0"
+      version: "0.13.2"
       sourceRef:
         kind: HelmRepository
         name: immich
@@ -35,7 +35,8 @@ spec:
           containers:
             main:
               image:
-                tag: v2.5.6
+                # renovate: image=ghcr.io/immich-app/immich-server
+                tag: v3.2.2
               env:
                 DB_URL: "postgresql://immich:immich@immich-postgres:5432/immich"
                 # Route ML calls through KEDA HTTP interceptor so the ML
@@ -56,7 +57,8 @@ spec:
           containers:
             main:
               image:
-                tag: v2.5.6-cuda
+                # renovate: image=ghcr.io/immich-app/immich-machine-learning
+                tag: v3.2.2-cuda
               env:
                 DB_URL: "postgresql://immich:immich@immich-postgres:5432/immich"
               resources:
