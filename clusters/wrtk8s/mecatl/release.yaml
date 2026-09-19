@@ -1,0 +1,88 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: mecak8s
+  namespace: mecatl
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: mecak8s
+      version: 0.0.38
+      sourceRef:
+        kind: HelmRepository
+        name: stacklok
+        namespace: mecatl
+  # Chart doesn't expose hostAliases as a value, so inject it post-render
+  # via kustomize. Pins `ai.gerbil-dragon.ts.net` to the static ClusterIP
+  # of the tailscale-operator egress Service (see egress-ai.yaml), so
+  # HTTPS to the tailnet FQDN routes via cluster DNS + operator DNAT
+  # while TLS SNI matches the tailnet-side cert.
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              kind: Deployment
+              name: mecak8s
+            patch: |
+              - op: add
+                path: /spec/template/spec/hostAliases
+                value:
+                  - ip: 10.100.100.20
+                    hostnames:
+                      - ai.gerbil-dragon.ts.net
+  values:
+    # Single replica for a homelab; PDB below is disabled to match.
+    replicaCount: 1
+    podDisruptionBudget:
+      enabled: false
+
+    # Real (non-mock) provider, but OIDC is deferred until tsidp is stood
+    # up on the tailnet. Tailnet-as-auth-boundary + tailscale-operator
+    # ingress (see tailscale-ingress.yaml) is the current trust model.
+    mockProvider: false
+    security:
+      allowUnsafeRealProvider: true
+      tlsTerminatedUpstream: true
+
+    # Pod TLS disabled — tailscale-operator terminates TLS at the ingress
+    # proxy and forwards plaintext to this ClusterIP.
+    tls:
+      enabled: false
+
+    # Deferred until tsidp exists at tsidp.gerbil-dragon.ts.net. Once it's
+    # up, flip enabled: true and set issuer/audience; add a matching
+    # egress-tsidp.yaml + hostAlias so JWKS discovery works.
+    oidc:
+      enabled: false
+
+    # In-cluster Valkey (see valkey.yaml). No auth — reachable only from
+    # this ns. If you add persistence + a password later, project the
+    # password Secret here.
+    redis:
+      endpoint: valkey.mecatl.svc.cluster.local:6379
+
+    # cliconfig selects provider from env var presence. OPENAI_API_KEY +
+    # OPENAI_BASE_URL routes to the tailnet endpoint via the operator
+    # egress Service (see egress-ai.yaml + hostAliases below).
+    extraEnv:
+      - name: OPENAI_API_KEY
+        valueFrom:
+          secretKeyRef:
+            name: mecatl-llm
+            key: OPENAI_API_KEY
+      - name: OPENAI_BASE_URL
+        value: https://ai.gerbil-dragon.ts.net/v1
+
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 1000m
+        memory: 512Mi
+
+    service:
+      type: ClusterIP
+      grpcPort: 8080
+      httpPort: 8081

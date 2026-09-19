@@ -1,0 +1,60 @@
+---
+# Standalone Valkey (Redis fork). Memory-only — session state on this cluster
+# is treated as ephemeral (agent sessions are short-lived and clients replay).
+# Add a PVC + `--dir /data --appendonly yes` later if you want durability
+# across restarts.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: valkey
+  namespace: mecatl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: valkey
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: valkey
+    spec:
+      containers:
+        - name: valkey
+          image: valkey/valkey:8.1-alpine
+          args:
+            - --maxmemory
+            - 512mb
+            - --maxmemory-policy
+            - allkeys-lru
+            - --save
+            - ""
+            - --appendonly
+            - "no"
+          ports:
+            - name: redis
+              containerPort: 6379
+          readinessProbe:
+            tcpSocket:
+              port: redis
+            initialDelaySeconds: 5
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              memory: 640Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: valkey
+  namespace: mecatl
+spec:
+  selector:
+    app: valkey
+  ports:
+    - name: redis
+      port: 6379
+      targetPort: redis

@@ -1,0 +1,27 @@
+---
+# Exposes the chart-managed mecak8s Service on the tailnet as
+# mecatl.gerbil-dragon.ts.net. Uses the same annotation pattern as
+# clusters/wrtk8s/plex/deployment.yaml plex-ts Service (tailscale
+# operator sidecar), so the operator terminates TLS at the tailnet
+# edge and forwards plaintext to the underlying ClusterIP:
+#   * https://mecatl.gerbil-dragon.ts.net/  → :8081 (HTTP/SSE)
+#
+# The gRPC port (:8080) is only reachable in-cluster; add a second
+# tailscale Service with a `port: 8080` selector if you need gRPC on
+# the tailnet later.
+apiVersion: v1
+kind: Service
+metadata:
+  name: mecatl-ts
+  namespace: mecatl
+  annotations:
+    tailscale.com/expose: "true"
+    tailscale.com/hostname: "mecatl"
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: mecak8s
+  ports:
+    - name: https
+      port: 443
+      targetPort: 8081

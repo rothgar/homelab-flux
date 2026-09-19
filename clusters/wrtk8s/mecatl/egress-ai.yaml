@@ -1,0 +1,19 @@
+---
+# Tailscale-operator egress to the tailnet LLM endpoint. The operator
+# provisions a proxy pod on this Service's tailnet identity and DNATs
+# ClusterIP traffic through it to `ai.gerbil-dragon.ts.net`.
+#
+# Static ClusterIP lets the mecatl Deployment's `hostAliases` block pin
+# `ai.gerbil-dragon.ts.net → 10.100.100.20` so the pod's HTTPS URL uses
+# the tailnet FQDN (TLS SNI matches the tailnet-side cert) but DNS
+# resolves inside the cluster to this Service.
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-tailnet
+  namespace: mecatl
+  annotations:
+    tailscale.com/tailnet-fqdn: ai.gerbil-dragon.ts.net
+spec:
+  type: ExternalName
+  externalName: placeholder.ts.net

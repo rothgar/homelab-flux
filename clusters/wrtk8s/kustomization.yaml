@@ -21,6 +21,7 @@ resources:
   - kubelet-csr-approver
   - kvmm
   - mealie
+  - mecatl
   - metallb
   - metube
   - metrics-server
