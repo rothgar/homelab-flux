@@ -1,27 +1,39 @@
 ---
-# Exposes the chart-managed mecak8s Service on the tailnet as
-# mecatl.gerbil-dragon.ts.net. Uses the same annotation pattern as
-# clusters/wrtk8s/plex/deployment.yaml plex-ts Service (tailscale
-# operator sidecar), so the operator terminates TLS at the tailnet
-# edge and forwards plaintext to the underlying ClusterIP:
-#   * https://mecatl.gerbil-dragon.ts.net/  → :8081 (HTTP/SSE)
-#
-# The gRPC port (:8080) is only reachable in-cluster; add a second
-# tailscale Service with a `port: 8080` selector if you need gRPC on
-# the tailnet later.
+# Backend Service that the Ingress targets. Plain ClusterIP, HTTP on 8081.
 apiVersion: v1
 kind: Service
 metadata:
-  name: mecatl-ts
+  name: mecatl-http
   namespace: mecatl
-  annotations:
-    tailscale.com/expose: "true"
-    tailscale.com/hostname: "mecatl"
 spec:
   type: ClusterIP
   selector:
     app.kubernetes.io/name: mecak8s
   ports:
-    - name: https
-      port: 443
+    - name: http
+      port: 8081
       targetPort: 8081
+---
+# Tailscale Ingress: operator provisions a proxy that terminates TLS with
+# a tailnet-issued cert and forwards decrypted HTTP to mecatl-http:8081.
+# Necessary because mecak8s speaks plain HTTP on 8081 (security.tls-
+# TerminatedUpstream=true) and the previous tailscale.com/expose Service
+# was only L4 DNAT — TLS clients like mecatui got "not a TLS handshake".
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mecatl
+  namespace: mecatl
+spec:
+  ingressClassName: tailscale
+  tls:
+    # `tailscale` IngressClass treats the first `tls.hosts[0]` value as
+    # the MagicDNS hostname to register (matches operator docs). Cert is
+    # provisioned automatically by the tailscale control plane.
+    - hosts:
+        - mecatl
+  defaultBackend:
+    service:
+      name: mecatl-http
+      port:
+        number: 8081
