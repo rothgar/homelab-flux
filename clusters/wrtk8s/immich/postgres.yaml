@@ -41,7 +41,11 @@ spec:
         kubernetes.io/hostname: mini
       containers:
         - name: postgres
-          image: tensorchord/pgvecto-rs:pg16-v0.2.1
+          # Immich's bundled Postgres image. Ships pg16 + vchord + pgvector +
+          # pgvectors 0.2.1 so the existing `vectors` extension data stays
+          # readable and immich-server v3+ can migrate it to vchord in-place.
+          # renovate: image=ghcr.io/immich-app/postgres
+          image: ghcr.io/immich-app/postgres:16-vectorchord0.3.0-pgvector0.8.0-pgvectors0.2.1
           envFrom:
             - secretRef:
                 name: immich-postgres
