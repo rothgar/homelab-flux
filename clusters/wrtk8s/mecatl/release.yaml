@@ -23,12 +23,18 @@ spec:
         patches:
           - target:
               kind: Deployment
-              name: mecak8s
+              name: mecak8s-mecak8s
             patch: |
               - op: add
                 path: /spec/template/spec/hostAliases
                 value:
-                  - ip: 10.100.100.20
+                  # This is the tailscale-operator egress proxy pod IP for
+                  # ai-tailnet (headless Service in the tailscale ns).
+                  # FRAGILE: pod IP changes on operator-proxy restart —
+                  # follow up with a tailscale.com/v1alpha1 DNSConfig
+                  # singleton + a `forward ts.net <ns-ip>` block in the
+                  # CoreDNS Corefile so this alias becomes unnecessary.
+                  - ip: 10.244.3.174
                     hostnames:
                       - ai.gerbil-dragon.ts.net
   values:
