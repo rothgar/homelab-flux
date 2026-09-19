@@ -61,6 +61,13 @@ spec:
     # password Secret here.
     redis:
       endpoint: valkey.mecatl.svc.cluster.local:6379
+      # Explicitly clear the chart's default caKey="ca.pem" — otherwise
+      # the chart's schema check demands a credentialsSecret. In-cluster
+      # Valkey is plaintext, no auth.
+      credentialsSecret: ""
+      passwordKey: ""
+      usernameKey: ""
+      caKey: ""
 
     # cliconfig selects provider from env var presence. OPENAI_API_KEY +
     # OPENAI_BASE_URL routes to the tailnet endpoint via the operator
