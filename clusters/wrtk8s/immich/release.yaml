@@ -8,7 +8,11 @@ spec:
   chart:
     spec:
       chart: immich
-      version: "0.13.2"
+      # immich-0.13.2 is tagged in git but not yet published to the
+      # https://immich-app.github.io/immich-charts index (index.yaml
+      # tops out at 0.12.0). Stay on 0.12.0 for the chart itself; the
+      # image tags below carry the actual app version bump.
+      version: "0.12.0"
       sourceRef:
         kind: HelmRepository
         name: immich
