@@ -66,12 +66,7 @@ spec:
     # this ns. If you add persistence + a password later, project the
     # password Secret here.
     redis:
-      # ClusterIP instead of DNS name — mecated's go-redis client was
-      # timing out on the FQDN form even though a busybox pod sharing
-      # the same netns resolves and connects fine. Suspect the distroless
-      # base image or the pure-Go resolver interacting badly. Revisit if
-      # this becomes stale on Service recreation.
-      endpoint: 10.108.12.136:6379
+      endpoint: valkey.mecatl.svc.cluster.local:6379
       # Explicitly clear the chart's default caKey="ca.pem" — otherwise
       # the chart's schema check demands a credentialsSecret. In-cluster
       # Valkey is plaintext, no auth.
@@ -83,6 +78,13 @@ spec:
     # cliconfig selects provider from env var presence. OPENAI_API_KEY +
     # OPENAI_BASE_URL routes to the tailnet endpoint via the operator
     # egress Service (see egress-ai.yaml + hostAliases below).
+    # The chart forces `--redis-tls` unless redis.local.enabled=true. Our
+    # in-cluster valkey is plaintext, so the appended --redis-allow-plaintext
+    # bypasses the TLS handshake attempt (which was the root cause of the
+    # "connection pool: failed to dial" the go-redis client kept hitting).
+    extraArgs:
+      - --redis-allow-plaintext
+
     extraEnv:
       - name: OPENAI_API_KEY
         valueFrom:
