@@ -31,7 +31,7 @@ spec:
               mountPath: /app/data
       containers:
         - name: mealie
-          image: ghcr.io/mealie-recipes/mealie:v3.26.0
+          image: ghcr.io/mealie-recipes/mealie:v3.27.0
           env:
             - name: PUID
               value: "1000"
