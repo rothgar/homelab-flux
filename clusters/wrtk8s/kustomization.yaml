@@ -50,6 +50,7 @@ resources:
   - tts
   - talos-remote-config
   - traefik
+  - tsidp
   - vllm-system
   - whisper-webui
   - arm

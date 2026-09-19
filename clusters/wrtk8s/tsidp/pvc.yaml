@@ -1,0 +1,18 @@
+---
+# Persistent state for tsnet (node identity, keys) and tsidp (OIDC signing
+# keys, issued client secrets). Losing this Volume means tsidp joins the
+# tailnet as a new node and rotates its OIDC signing key — every mecatl
+# session would need to re-enroll. Small (1Gi is plenty) but RWO on
+# synology-iscsi for durability + fast fsync.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: tsidp-data
+  namespace: tsidp
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: synology-iscsi
+  resources:
+    requests:
+      storage: 1Gi

@@ -1,0 +1,71 @@
+---
+# Tailscale OIDC identity provider. Runs as a tsnet node (not through
+# the tailscale operator sidecar) — the process joins the tailnet
+# directly using TS_AUTHKEY on first boot, then reuses persisted state
+# from the mounted PVC. Serves OIDC at https://tsidp.gerbil-dragon.ts.net
+# with a tailnet-issued TLS cert (auto-renewed).
+#
+# Consumers (mecatl, headlamp, ...) point their `oidc.issuer` at that
+# URL. The tailnet's ACL determines who can reach tsidp.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tsidp
+  namespace: tsidp
+spec:
+  replicas: 1
+  strategy:
+    # Recreate — single-writer PVC + tsnet state that can't safely
+    # overlap between two pods.
+    type: Recreate
+  selector:
+    matchLabels:
+      app: tsidp
+  template:
+    metadata:
+      labels:
+        app: tsidp
+    spec:
+      containers:
+        - name: tsidp
+          image: ghcr.io/tailscale/tsidp:latest
+          env:
+            # tsidp is pre-1.0 and gated behind this env var upstream.
+            - name: TAILSCALE_USE_WIP_CODE
+              value: "1"
+            - name: TS_STATE_DIR
+              value: /data
+            - name: TS_HOSTNAME
+              value: tsidp
+            # OAuth token exchange for MCP + agent flows (mecatl needs
+            # this if we ever add MCP servers behind tsidp).
+            - name: TSIDP_ENABLE_STS
+              value: "1"
+            - name: TS_AUTHKEY
+              valueFrom:
+                secretKeyRef:
+                  name: tsidp-authkey
+                  key: TS_AUTHKEY
+                  optional: true    # once first boot completes, key
+                                    # isn't needed; state comes from PVC
+          ports:
+            - name: https
+              containerPort: 443
+          readinessProbe:
+            tcpSocket:
+              port: https
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              memory: 256Mi
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: tsidp-data
