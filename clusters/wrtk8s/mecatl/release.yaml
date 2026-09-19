@@ -66,7 +66,12 @@ spec:
     # this ns. If you add persistence + a password later, project the
     # password Secret here.
     redis:
-      endpoint: valkey.mecatl.svc.cluster.local:6379
+      # ClusterIP instead of DNS name — mecated's go-redis client was
+      # timing out on the FQDN form even though a busybox pod sharing
+      # the same netns resolves and connects fine. Suspect the distroless
+      # base image or the pure-Go resolver interacting badly. Revisit if
+      # this becomes stale on Service recreation.
+      endpoint: 10.108.12.136:6379
       # Explicitly clear the chart's default caKey="ca.pem" — otherwise
       # the chart's schema check demands a credentialsSecret. In-cluster
       # Valkey is plaintext, no auth.
