@@ -37,6 +37,15 @@ spec:
                   - ip: 10.244.3.174
                     hostnames:
                       - ai.gerbil-dragon.ts.net
+              # The chart always emits `--redis-tls` when caKey is empty
+              # AND local.enabled is false, and there's no chart value to
+              # disable it directly. We already appended
+              # `--redis-allow-plaintext` via extraArgs, but the args are
+              # order-sensitive — remove the earlier `--redis-tls` so
+              # plaintext wins. Index 9 matches the position in the
+              # rendered args list (see kubectl get pod ... -o jsonpath).
+              - op: remove
+                path: /spec/template/spec/containers/0/args/9
   values:
     # Single replica for a homelab; PDB below is disabled to match.
     replicaCount: 1
