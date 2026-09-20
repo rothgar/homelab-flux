@@ -55,6 +55,8 @@ spec:
       labels:
         app: garage
     spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
       containers:
         - name: garage
           image: dxflrs/garage:latest

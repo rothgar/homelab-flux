@@ -25,6 +25,11 @@ spec:
     # and CNPG's docs specifically recommend block storage for prod.
     storageClass: synology-iscsi
 
+  # synology-iscsi requires iscsiadm, which is only present on amd64 nodes.
+  affinity:
+    nodeSelector:
+      kubernetes.io/arch: amd64
+
   resources:
     requests:
       memory: 256Mi
