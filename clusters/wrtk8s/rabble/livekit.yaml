@@ -21,7 +21,7 @@ spec:
       enableServiceLinks: false
       containers:
         - name: livekit
-          image: livekit/livekit-server:v1.13.5
+          image: livekit/livekit-server:v1.13.7
           imagePullPolicy: IfNotPresent
           args:
             - "--bind"
