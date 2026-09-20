@@ -37,6 +37,8 @@ spec:
       labels:
         app: rabble-app
     spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
