@@ -59,7 +59,7 @@ spec:
         kubernetes.io/arch: amd64
       containers:
         - name: garage
-          image: ghcr.io/dxflrs/garage:v1.0.2
+          image: dxflrs/garage:v2.4.1
           imagePullPolicy: IfNotPresent
           command:
             - garage
