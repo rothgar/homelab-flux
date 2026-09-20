@@ -13,6 +13,17 @@ spec:
       labels:
         app: reaparr
     spec:
+      # spark can't mount the Synology NFS PVCs for this workload (server
+      # returns NOENT); pi4-1 has been carrying it fine for months. Pin
+      # away from spark until that's diagnosed.
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: NotIn
+                    values: [spark]
       initContainers:
         - name: fix-permissions
           image: busybox:1.38
