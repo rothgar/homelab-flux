@@ -1,0 +1,114 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: livekit
+  namespace: rabble
+  labels:
+    app: livekit
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: livekit
+  template:
+    metadata:
+      labels:
+        app: livekit
+    spec:
+      # Disable automatic service env vars (e.g. LIVEKIT_PORT=tcp://...) which
+      # crash the LiveKit server because it tries to parse them as command-line
+      # flags.
+      enableServiceLinks: false
+      containers:
+        - name: livekit
+          image: livekit/livekit-server:v1.13.5
+          imagePullPolicy: IfNotPresent
+          args:
+            - "--bind"
+            - "0.0.0.0"
+            # Single UDP ICE media port (7882), matching the LoadBalancer Service.
+            - "--udp-port"
+            - "7882"
+            - "--keys"
+            - "devkey: devsecret0123456789abcdef0123456789abcdef"
+            # Advertise the node's internal IP to clients as the ICE host
+            # candidate. Resolved from the downward-API hostIP (a stable
+            # fieldRef), not from $(spec.nodeName) which yields a name, not
+            # an IP.
+            - "--node-ip"
+            - "$(NODE_IP)"
+            - "--dev"
+          env:
+            - name: NODE_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+          # NOTE -- TURN / symmetric-NAT caveat:
+          # In this homelab the node's internal IP (status.hostIP) is on the
+          # same L2 as clients and reachable through MetalLB, so `--node-ip`
+          # yields a working host candidate. Behind strict corporate/mobile
+          # symmetric NATs this single candidate will NOT be enough — you
+          # need a TURN server (coturn, TLS on 443) reachable from clients.
+          #   * If the MetalLB LoadBalancer external IP differs from the node
+          #     IP and clients can reach the LB IP but not the node IP, add
+          #     `--advertise-ip <LB_EXTERNAL_IP>` (and/or an explicit
+          #     `--node-ip <LB_EXTERNAL_IP>` once known) so LiveKit hands out
+          #     a candidate that actually routes.
+          #   * The public WSS signaling plane is terminated by the
+          #     rabble-livekit Ingress; UDP 7882 media is NOT proxied by the
+          #     Ingress and is published directly via the LoadBalancer.
+          ports:
+            - name: signaling
+              containerPort: 7880
+            - name: tcp-ice
+              containerPort: 7881
+            - name: udp-ice
+              containerPort: 7882
+              protocol: UDP
+          readinessProbe:
+            tcpSocket:
+              port: 7880
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            tcpSocket:
+              port: 7880
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 1000m
+              memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: livekit
+  namespace: rabble
+  labels:
+    app: livekit
+spec:
+  type: LoadBalancer
+  selector:
+    app: livekit
+  ports:
+    # TCP signaling. Referenced as the backend of the rabble-livekit Ingress
+    # (WSS plane) and by the app via LIVEKIT_URL. Exposed on the LoadBalancer
+    # too so a client can hit raw ws:// directly if desired.
+    - name: signaling
+      port: 7880
+      targetPort: 7880
+    # TCP ICE candidate — helpful when UDP is blocked.
+    - name: tcp-ice
+      port: 7881
+      targetPort: 7881
+    # UDP ICE media plane. In production you typically expose a whole range
+    # (e.g. 50000-50100) and rely on the network layer to route it to the pod;
+    # single port 7882 is fine for the --dev single-port setup.
+    - name: udp-ice
+      port: 7882
+      targetPort: 7882
+      protocol: UDP

@@ -1,0 +1,97 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rabble-app-env
+  namespace: rabble
+data:
+  NODE_ENV: production
+  PORT: "3000"
+  HOSTNAME: 0.0.0.0
+  NEXT_PUBLIC_APP_URL: https://rabble.gerbil-dragon.ts.net
+  PUBLIC_URL: https://rabble.gerbil-dragon.ts.net
+  DATABASE_URL: postgresql://bluesky:bluesky@rabble-db-rw.rabble.svc.cluster.local.:5432/bluesky_spaces?schema=public
+  LIVEKIT_URL: ws://livekit.rabble.svc.cluster.local.:7880
+  # Public LiveKit URL exposed to browser clients (WSS signaling plane, TLS
+  # terminated by the rabble-livekit Tailscale Ingress). The SDK appends
+  # /rtc/v1/... to this base.
+  LIVEKIT_PUBLIC_URL: wss://rabble-livekit.gerbil-dragon.ts.net
+  RECORDING_BUCKET: rabble-recordings
+  S3_ENDPOINT: http://garage:3900
+  S3_REGION: us-east-1
+  LOGO_URL: https://rabble.gerbil-dragon.ts.net/logo.png
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabble-app
+  namespace: rabble
+  labels:
+    app: rabble-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabble-app
+  template:
+    metadata:
+      labels:
+        app: rabble-app
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: rabble
+          image: cr.jgarr.net/rabble:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - configMapRef:
+                name: rabble-app-env
+            # Secrets are injected last so values here (e.g. the real
+            # DATABASE_URL / LIVEKIT_API_KEY) override the ConfigMap
+            # placeholders.
+            - secretRef:
+                name: rabble-app-secrets
+                optional: false
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            failureThreshold: 4
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabble-app
+  namespace: rabble
+spec:
+  selector:
+    app: rabble-app
+  ports:
+    - port: 80
+      targetPort: 3000

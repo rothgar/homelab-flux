@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: livekit-egress-config
+  namespace: rabble
+data:
+  livekit-egress.yaml: |
+    redis:
+      address: redis:6379
+    api_key: devkey
+    api_secret: devsecret0123456789abcdef0123456789abcdef
+    ws_url: ws://livekit:7880
+    log_level: info
+    s3:
+      endpoint: http://garage:3900
+      region: us-east-1
+      bucket: rabble-recordings
+      access_key: GKab260e8ace5111aec9df478455183be5
+      secret: 7c019c0f349f40bcadb2c0eb6ef9d3ff42d4f03f947a471d1d01d09757531822
+      force_path_style: true
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: livekit-egress
+  namespace: rabble
+  labels:
+    app: livekit-egress
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: livekit-egress
+  template:
+    metadata:
+      labels:
+        app: livekit-egress
+    spec:
+      containers:
+        - name: egress
+          image: livekit/egress:latest
+          imagePullPolicy: IfNotPresent
+          entrypoint: ["/tini", "--"]
+          command: ["egress", "--config", "/etc/livekit-egress.yaml"]
+          volumeMounts:
+            - name: livekit-egress-config
+              mountPath: /etc/livekit-egress.yaml
+              subPath: livekit-egress.yaml
+              readOnly: true
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 1000m
+              memory: 1024Mi
+      volumes:
+        - name: livekit-egress-config
+          configMap:
+            name: livekit-egress-config

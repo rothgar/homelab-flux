@@ -1,0 +1,49 @@
+# Tailscale Ingresses. The Tailscale Kubernetes operator serves each host at
+# <host>.gerbil-dragon.ts.net with a MagicDNS certificate — no cert-manager or
+# external-dns annotations needed. Mirrors the paperless-ngx / immich pattern.
+# NOTE: the tailscale operator only proxies TCP/HTTP and CANNOT proxy UDP, so
+# the LiveKit UDP media plane stays on the MetalLB LoadBalancer Service (see
+# livekit.yaml); this Ingress only carries the WSS signaling plane.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: rabble-tailscale
+  namespace: rabble
+spec:
+  ingressClassName: tailscale
+  rules:
+    - host: rabble
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: rabble-app
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - rabble
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: rabble-livekit-tailscale
+  namespace: rabble
+spec:
+  ingressClassName: tailscale
+  rules:
+    - host: rabble-livekit
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: livekit
+                port:
+                  number: 7880
+  tls:
+    - hosts:
+        - rabble-livekit

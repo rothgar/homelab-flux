@@ -1,0 +1,33 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: rabble-db
+  namespace: rabble
+spec:
+  instances: 1
+  # Single-instance homelab DB — the auto-generated PDB (minAvailable=1) blocks
+  # node drains during Talos upgrades. Disable it so drain proceeds; the ~30s
+  # postgres restart on a new node is acceptable downtime.
+  enablePDB: false
+  imageName: ghcr.io/cloudnative-pg/postgresql:17
+
+  bootstrap:
+    initdb:
+      database: bluesky_spaces
+      owner: bluesky
+      secret:
+        name: rabble-db-credentials
+
+  storage:
+    size: 5Gi
+    # iSCSI (block) instead of NFS — postgres's fsync + small-random-write
+    # patterns are notoriously unfriendly to NFS's client-cache/RPC model,
+    # and CNPG's docs specifically recommend block storage for prod.
+    storageClass: synology-iscsi
+
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+    limits:
+      memory: 512Mi

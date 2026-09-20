@@ -1,0 +1,71 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: rabble-migrate
+  namespace: rabble
+  labels:
+    app: rabble-migrate
+spec:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 600
+  template:
+    metadata:
+      labels:
+        app: rabble-migrate
+    spec:
+      restartPolicy: OnFailure
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+        - name: wait-for-postgres
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              echo "Waiting for postgres..."
+              # Use the cluster FQDN and a short connect timeout so the probe
+              # does not hang if DNS or the port is temporarily unreachable.
+              # Trailing dot prevents the host's DNS search domains from being
+              # appended (e.g. .jgarr.net), which would resolve to a public IP.
+              PG_HOST="rabble-db-rw.rabble.svc.cluster.local."
+              until nc -w 2 -z "${PG_HOST}" 5432; do
+                echo "postgres not ready yet"; sleep 3
+              done
+              echo "postgres is ready"
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+      containers:
+        - name: rabble-migrate
+          image: cr.jgarr.net/rabble:latest
+          imagePullPolicy: IfNotPresent
+          # prisma migrate deploy (NOT db push). Deploys only new migration
+          # files against the schema_migrations table.
+          command:
+            - node
+            - node_modules/prisma/build/index.js
+            - migrate
+            - deploy
+          env:
+            - name: DATABASE_URL
+              value: postgresql://bluesky:bluesky@rabble-db-rw.rabble.svc.cluster.local.:5432/bluesky_spaces?schema=public
+            # prisma's engine cache needs a writable home; the image runs
+            # non-root and /tmp is always writable.
+            - name: HOME
+              value: /tmp
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

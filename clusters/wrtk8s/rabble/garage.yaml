@@ -1,0 +1,142 @@
+# Single-node Garage S3-compatible object store (DEV).
+# Uses the official Garage image (dxflrs/garage — note: "deuxfleurs/garage" is
+# not the published image name) with the v2.3.0+ automatic single-node
+# bootstrap: `garage server --single-node --default-bucket` reads
+# GARAGE_DEFAULT_ACCESS_KEY / GARAGE_DEFAULT_SECRET_KEY / GARAGE_DEFAULT_BUCKET
+# and, at startup, assigns the node layout (replication_factor = 1) and creates
+# the default bucket plus an API key bound to it. This is the modern, fully
+# automated replacement for the manual `garage layout assign/apply` +
+# `bucket create` + `key create` + `bucket allow` sequence documented in the
+# Garage Quick Start. Credentials are sourced from the rabble-app-secrets
+# Secret (S3_ACCESS_KEY / S3_SECRET_KEY) so the app and egress stay in sync.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: garage-config
+  namespace: rabble
+data:
+  garage.toml: |
+    # Single-node layout, no redundancy (DEV only).
+    replication_factor = 1
+    # sqlite is the friendliest metadata engine for a single node on NFS.
+    db_engine = "sqlite"
+    metadata_dir = "/var/lib/garage/meta"
+    data_dir = "/var/lib/garage/data"
+    rpc_bind_addr = "[::]:3901"
+    rpc_secret = "bd0a4764e8ea2f8b74b437aa2c42e2fb31546f3aca4dabf6367188f2c2c63922"
+
+    [s3_api]
+    # The S3 endpoint used by the app and egress.
+    s3_region = "us-east-1"
+    api_bind_addr = "[::]:3900"
+
+    [s3_web]
+    bind_addr = "[::]:3902"
+
+    [admin]
+    api_bind_addr = "0.0.0.0:3903"
+    admin_token = "JTCXqQ0EQGJf3OqwoR1HqU29QvZZy0JsQ8S8Lj2p8Cg="
+    metrics_token = "IECwRQ1S6ly9xHhW3L09F5gC52qHfadL8LoBuHPg5wg="
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: garage
+  namespace: rabble
+  labels:
+    app: garage
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: garage
+  template:
+    metadata:
+      labels:
+        app: garage
+    spec:
+      containers:
+        - name: garage
+          image: dxflrs/garage:latest
+          imagePullPolicy: IfNotPresent
+          command:
+            - garage
+            - server
+            - --config
+            - /etc/garage.toml
+            - --single-node
+            - --default-bucket
+          env:
+            - name: GARAGE_DEFAULT_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: rabble-app-secrets
+                  key: S3_ACCESS_KEY
+            - name: GARAGE_DEFAULT_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: rabble-app-secrets
+                  key: S3_SECRET_KEY
+            - name: GARAGE_DEFAULT_BUCKET
+              value: rabble-recordings
+          ports:
+            - name: s3
+              containerPort: 3900
+            - name: rpc
+              containerPort: 3901
+            - name: admin
+              containerPort: 3903
+          volumeMounts:
+            - name: garage-config
+              mountPath: /etc/garage.toml
+              subPath: garage.toml
+              readOnly: true
+            - name: garage-data
+              mountPath: /var/lib/garage
+          readinessProbe:
+            tcpSocket:
+              port: 3900
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+      volumes:
+        - name: garage-config
+          configMap:
+            name: garage-config
+        - name: garage-data
+          persistentVolumeClaim:
+            claimName: garage-data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: garage-data
+  namespace: rabble
+spec:
+  storageClassName: nfs-synology
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: garage
+  namespace: rabble
+  labels:
+    app: garage
+spec:
+  selector:
+    app: garage
+  ports:
+    - name: s3
+      port: 3900
+      targetPort: 3900

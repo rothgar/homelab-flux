@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - namespace.yaml
+  - secret.yaml
+  - postgres.yaml
+  - migrate-job.yaml
+  - app.yaml
+  - livekit.yaml
+  - redis.yaml
+  - livekit-egress.yaml
+  - garage.yaml
+  - tailscale-ingress.yaml
