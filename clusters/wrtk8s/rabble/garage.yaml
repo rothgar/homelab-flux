@@ -62,7 +62,7 @@ spec:
           image: dxflrs/garage:v2.4.1
           imagePullPolicy: IfNotPresent
           command:
-            - garage
+            - /garage
             - server
             - --config
             - /etc/garage.toml
