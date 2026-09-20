@@ -30,9 +30,6 @@ data:
     s3_region = "us-east-1"
     api_bind_addr = "[::]:3900"
 
-    [s3_web]
-    bind_addr = "[::]:3902"
-
     [admin]
     api_bind_addr = "0.0.0.0:3903"
     admin_token = "JTCXqQ0EQGJf3OqwoR1HqU29QvZZy0JsQ8S8Lj2p8Cg="
@@ -63,9 +60,9 @@ spec:
           imagePullPolicy: IfNotPresent
           command:
             - /garage
-            - server
-            - --config
+            - -c
             - /etc/garage.toml
+            - server
             - --single-node
             - --default-bucket
           env:
