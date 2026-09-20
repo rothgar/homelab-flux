@@ -49,7 +49,7 @@ spec:
       containers:
         - name: rabble-migrate
           image: cr.jgarr.net/rabble:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           # prisma migrate deploy (NOT db push). Deploys only new migration
           # files against the schema_migrations table.
           command:

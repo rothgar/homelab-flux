@@ -48,7 +48,7 @@ spec:
       containers:
         - name: rabble
           image: cr.jgarr.net/rabble:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - containerPort: 3000
           envFrom:
