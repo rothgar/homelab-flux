@@ -1,4 +1,7 @@
 clusters/*/talos
 clusters/*/kube
 clusters/*/kube-sa
+clusters/*/talos-sa
+clusters/*/omniconfig*
 **/.claude/
+omni.env
