@@ -1,0 +1,16 @@
+---
+# Tailscale operator egress Service — provisions a proxy pod in the
+# tailscale ns that joins the tailnet with tag:k8s (which aperture's
+# grants map to admin/**). In-pod DNS then resolves aperture via this
+# k8s ExternalName Service instead of trying to look up the tailnet
+# FQDN directly (which fails: pods don't run tailscaled).
+apiVersion: v1
+kind: Service
+metadata:
+  name: aperture
+  namespace: hermes-agent
+  annotations:
+    tailscale.com/tailnet-fqdn: ai.gerbil-dragon.ts.net
+spec:
+  externalName: unused  # tailscale operator rewrites this
+  type: ExternalName

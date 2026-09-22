@@ -5,6 +5,7 @@ resources:
   - source.yaml
   - release.yaml
   - data-pvc.yaml
+  - aperture-egress.yaml
   # Added in a follow-up commit after the HelmRelease landed the CRD —
   # Flux dry-runs the whole tree before applying, so leaving the CR in
   # the same commit as the operator blocks reconciliation on the first

@@ -18,14 +18,16 @@ spec:
         model:
           provider: custom
           default: hermes-4.3-36b
-          base_url: https://ai.gerbil-dragon.ts.net/v1
-        # Aperture (ai.gerbil-dragon.ts.net) exposes MCP tools at /mcp.
-        # One entry is enough if Aperture proxies multiple upstreams
-        # behind a single surface; split into named entries if per-tool
-        # filtering (tools.include/exclude) becomes useful.
+          # Reach aperture through the Tailscale operator egress proxy
+          # (see aperture-egress.yaml). The proxy joins the tailnet as
+          # tag:k8s, which aperture's ACL grants map to `role:admin,
+          # models:**`. Pods can't resolve *.gerbil-dragon.ts.net
+          # directly (no tailscaled in-pod), so we go via the k8s
+          # ExternalName Service instead of the tailnet FQDN.
+          base_url: http://aperture.hermes-agent.svc.cluster.local/v1
         mcp_servers:
           aperture:
-            url: https://ai.gerbil-dragon.ts.net/mcp
+            url: http://aperture.hermes-agent.svc.cluster.local/mcp
             enabled: true
         # Discord behaviour knobs. Token + allowed users come from the
         # workspace dotEnv Secret below.
