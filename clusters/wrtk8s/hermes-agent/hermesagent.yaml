@@ -2,6 +2,10 @@
 # The `custom` provider (aliases: vllm, ollama, local, llamacpp) is Hermes'
 # generic passthrough for local/OpenAI-compat servers; no key_env => keyless
 # request (Aperture on the tailnet doesn't require auth).
+#
+# Discord bot token + allowed-user ID live in the `hermes-discord` Secret
+# (provisioned via `kubectl create secret` — same out-of-band pattern as
+# the Gotify tokens). Migrate to ExternalSecret + 1Password when convenient.
 apiVersion: agents.hermeum.app/v1alpha1
 kind: HermesAgent
 metadata:
@@ -15,6 +19,27 @@ spec:
           provider: custom
           default: hermes-4.3-36b
           base_url: https://ai.gerbil-dragon.ts.net/v1
+        # Aperture (ai.gerbil-dragon.ts.net) exposes MCP tools at /mcp.
+        # One entry is enough if Aperture proxies multiple upstreams
+        # behind a single surface; split into named entries if per-tool
+        # filtering (tools.include/exclude) becomes useful.
+        mcp_servers:
+          aperture:
+            url: https://ai.gerbil-dragon.ts.net/mcp
+            enabled: true
+        # Discord behaviour knobs. Token + allowed users come from the
+        # workspace dotEnv Secret below.
+        discord:
+          require_mention: true
+          auto_thread: true
+          history_backfill: true
+    workspace:
+      # hermes-discord Secret → $HERMES_HOME/.env, so the discord platform
+      # plugin (auto-enabled once DISCORD_BOT_TOKEN is present) picks up
+      # credentials and the allowlist.
+      dotEnv:
+        secretRef:
+          name: hermes-discord
     storage:
       persistence:
         enabled: true
