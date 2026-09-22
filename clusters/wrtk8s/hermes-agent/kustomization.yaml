@@ -4,6 +4,9 @@ resources:
   - namespace.yaml
   - source.yaml
   - release.yaml
-  # The HelmRelease installs the CRD; Flux retries the CR apply until the
-  # CRD is registered — no explicit ordering needed.
-  - hermesagent.yaml
+  # hermesagent.yaml is intentionally commented out until the operator's
+  # HelmRelease installs its CRD — Flux dry-runs the whole tree before
+  # applying, so listing an unknown-kind resource here blocks the entire
+  # flux-system Kustomization. Re-enable in a follow-up commit once
+  # `kubectl get crd hermesagents.agents.hermeum.app` returns.
+  # - hermesagent.yaml
