@@ -19,7 +19,9 @@ spec:
       persistence:
         enabled: true
         size: 5Gi
-        # Default StorageClass is local-path, which fails on sparky /
-        # RPi nodes (read-only /var/mnt/local-path). Pin to
-        # synology-iscsi so the agent can land anywhere in the cluster.
-        storageClassName: synology-iscsi
+        # nfs-synology instead of local-path (which fails on sparky/RPi
+        # read-only /var/mnt) or synology-iscsi (which comes up owned
+        # root:root and the CRD doesn't expose fsGroup — init container
+        # runs as UID 10000 and can't `mkdir /opt/data/home`). NFS side
+        # respects the container UID directly.
+        storageClassName: nfs-synology
