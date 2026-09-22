@@ -2,3 +2,8 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: hermes-agent
+  labels:
+    # hermes-data-chown Job runs as root to prep the iSCSI PV — needs
+    # privileged PSA. The operator + agent pod carry their own restricted
+    # securityContext, so this only broadens what's *allowed* in the ns.
+    pod-security.kubernetes.io/enforce: privileged

@@ -18,10 +18,9 @@ spec:
     storage:
       persistence:
         enabled: true
-        size: 5Gi
-        # nfs-synology-open sets mountPermissions=0777 on fresh PVCs.
-        # The hermes-agent init container runs as UID 10000; without
-        # 0777 (or an fsGroup the CRD doesn't expose) it can't
-        # `mkdir /opt/data` on either synology-iscsi (root:root) or
-        # plain nfs-synology (Synology's default 0755 mode).
-        storageClassName: nfs-synology-open
+        # existingClaim references the pre-provisioned synology-iscsi
+        # PVC that data-pvc.yaml chowns to 10000:10000 with a one-shot
+        # Job — needed because the CRD doesn't expose
+        # podSecurityContext.fsGroup, iSCSI PVs come up root:root, and
+        # Synology's NFS export refuses UID 10000 writes even at 0777.
+        existingClaim: hermes-data

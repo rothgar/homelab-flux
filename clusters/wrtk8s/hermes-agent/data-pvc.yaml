@@ -1,0 +1,56 @@
+---
+# Pre-provisioned PVC + chown Job — workaround for the hermes-agent
+# operator not exposing podSecurityContext.fsGroup. Synology's NFS
+# export refuses UID 10000 writes regardless of file-mode (probably a
+# DSM export ACL / squash setting), and iSCSI PVs come up owned root:root.
+# Solution: provision on iSCSI (fast, block-level, no UID mapping)
+# and chown the mount to 10000:10000 with a one-shot Job before the
+# operator's StatefulSet takes over.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: hermes-data
+  namespace: hermes-agent
+spec:
+  storageClassName: synology-iscsi
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: hermes-data-chown
+  namespace: hermes-agent
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        app: hermes-data-chown
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: chown
+          image: busybox
+          command:
+            - sh
+            - -c
+            - |
+              set -eux
+              chown -R 10000:10000 /data
+              chmod 0755 /data
+          securityContext:
+            # Run as root so we can chown to 10000:10000 — mistral-system's
+            # privileged PSA level allows this.
+            runAsUser: 0
+            runAsGroup: 0
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: hermes-data
