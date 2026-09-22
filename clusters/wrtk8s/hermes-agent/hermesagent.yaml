@@ -19,9 +19,9 @@ spec:
       persistence:
         enabled: true
         size: 5Gi
-        # nfs-synology instead of local-path (which fails on sparky/RPi
-        # read-only /var/mnt) or synology-iscsi (which comes up owned
-        # root:root and the CRD doesn't expose fsGroup — init container
-        # runs as UID 10000 and can't `mkdir /opt/data/home`). NFS side
-        # respects the container UID directly.
-        storageClassName: nfs-synology
+        # nfs-synology-open sets mountPermissions=0777 on fresh PVCs.
+        # The hermes-agent init container runs as UID 10000; without
+        # 0777 (or an fsGroup the CRD doesn't expose) it can't
+        # `mkdir /opt/data` on either synology-iscsi (root:root) or
+        # plain nfs-synology (Synology's default 0755 mode).
+        storageClassName: nfs-synology-open

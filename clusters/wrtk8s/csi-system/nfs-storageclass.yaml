@@ -10,3 +10,22 @@ reclaimPolicy: Delete
 volumeBindingMode: Immediate
 mountOptions:
   - nfsvers=4.1
+---
+# Same NFS server + share, but chmods each fresh PVC subdir to 0777 at
+# first mount via the nfs.csi.k8s.io mountPermissions parameter. Use
+# this for workloads whose Helm chart / operator runs as a non-root UID
+# and doesn't expose podSecurityContext.fsGroup — e.g. the Hermes agent
+# operator (UID 10000) which otherwise can't `mkdir /opt/data`.
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: nfs-synology-open
+provisioner: nfs.csi.k8s.io
+parameters:
+  server: "10.1.1.4"
+  share: "/volume1/kubernetes"
+  mountPermissions: "0777"
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+mountOptions:
+  - nfsvers=4.1
