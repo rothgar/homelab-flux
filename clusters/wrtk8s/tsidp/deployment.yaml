@@ -69,11 +69,11 @@ spec:
           ports:
             - name: https
               containerPort: 443
-          readinessProbe:
-            tcpSocket:
-              port: https
-            initialDelaySeconds: 15
-            periodSeconds: 10
+          # No readinessProbe: tsidp uses `tsnet` and binds its listener
+          # to the tailnet-assigned IP, not the pod IP. A tcpSocket probe
+          # against the pod IP always fails with connection refused. This
+          # pod isn't fronted by a k8s Service — traffic reaches it only
+          # via tailnet — so k8s-side readiness has no consumer anyway.
           resources:
             requests:
               cpu: 50m
