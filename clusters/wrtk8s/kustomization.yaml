@@ -58,6 +58,7 @@ resources:
   - audiomass
   - bambustudio
   - git
+  - gotify
   - pdfcraft
   - plex
   - pulsys

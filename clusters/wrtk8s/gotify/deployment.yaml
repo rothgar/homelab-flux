@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gotify
+  namespace: gotify
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: gotify
+  template:
+    metadata:
+      labels:
+        app: gotify
+    spec:
+      containers:
+        - name: gotify
+          # renovate: image=ghcr.io/gotify/server
+          image: ghcr.io/gotify/server:3.1.1
+          ports:
+            - name: http
+              containerPort: 80
+          env:
+            - name: TZ
+              value: America/Los_Angeles
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 30
+          volumeMounts:
+            - name: data
+              mountPath: /app/data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: gotify-data

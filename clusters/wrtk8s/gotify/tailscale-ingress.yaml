@@ -1,0 +1,14 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: gotify
+  namespace: gotify
+spec:
+  ingressClassName: tailscale
+  tls:
+    - hosts: [gotify]
+  defaultBackend:
+    service:
+      name: gotify
+      port:
+        number: 80
