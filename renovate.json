@@ -32,12 +32,31 @@
         "itzg/minecraft-server",
         "itzg/minecraft-bedrock-server",
         "automaticrippingmachine/automatic-ripping-machine",
-        "rommapp/romm"
+        "rommapp/romm",
+        "docker.n8n.io/n8nio/n8n",
+        "ghcr.io/open-webui/open-webui"
       ],
       "matchUpdateTypes": ["minor", "patch", "digest"],
       "automerge": true,
       "platformAutomerge": true,
       "description": "Auto-merge minor/patch bumps for stateless leaf apps. Major bumps still require review. Needs GitHub Settings → General → 'Allow auto-merge' enabled at repo level."
+    },
+    {
+      "matchDatasources": ["helm"],
+      "matchDepNames": ["onedev"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true,
+      "platformAutomerge": true,
+      "description": "Auto-merge onedev helm chart minor/patch bumps."
+    },
+    {
+      "matchDepNames": ["lscr.io/linuxserver/plex"],
+      "matchUpdateTypes": ["minor", "patch", "digest"],
+      "automerge": true,
+      "platformAutomerge": true,
+      "automergeSchedule": ["after 4:00am and before 5:00am"],
+      "timezone": "America/Los_Angeles",
+      "description": "Auto-merge plex, but only in the 04:00–05:00 PT window — Plex tags churn frequently and a restart mid-day is disruptive to active streams."
     },
     {
       "matchDepNames": ["nvcr.io/nvidia/vllm"],
