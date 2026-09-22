@@ -1,22 +1,29 @@
+# NousResearch/Hermes-4.3-36B — dense 36B (SeedOssForCausalLM), 72 GB bf16.
+# Pinned to spark; fits comfortably in the GB10's 128 GB unified pool with
+# ~15 GB of headroom at max_model_len=32K + max_num_seqs=4. Bump
+# --dtype fp8 and --kv-cache-dtype fp8 if you want to double the context
+# or fit more concurrent sessions.
+#
+# Tailnet exposure via the Tailscale operator; the LB annotation gives
+# the service an in-tailnet DNS name (hermes-4-3-36b.<tailnet>.ts.net)
+# that Aperture can register as its own upstream. Dot-free hostname
+# because Tailscale rejects DNS-label dots.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: qwen36-27b
+  name: hermes-4-3-36b
   namespace: vllm-system
 spec:
-  # Scaled to 0 while sparky hosts qwen 3.8-27b (and spark keeps the 3.6
-  # 35B A3B MoE). Bump back to 1 to bring 3.6-27b back on sparky — weights
-  # stay cached under /var/mnt/models on sparky so a restart is fast.
-  replicas: 0
+  replicas: 1
   strategy:
     type: Recreate
   selector:
     matchLabels:
-      app: qwen36-27b
+      app: hermes-4-3-36b
   template:
     metadata:
       labels:
-        app: qwen36-27b
+        app: hermes-4-3-36b
     spec:
       terminationGracePeriodSeconds: 15
       runtimeClassName: nvidia
@@ -32,17 +39,18 @@ spec:
                   - key: kubernetes.io/hostname
                     operator: In
                     values:
-                      - sparky
+                      - spark
       containers:
         - name: vllm
-          # v26.06-py3 segfaults in cuStreamCreateWithPriority on GB10 with
-          # driver 595. Pinning back to the last known-good tag until upstream
-          # ships a fix.
+          # v26.06-py3 segfaults on GB10 with driver 595. Pinning to 26.04.
+          # seed_oss architecture landed upstream in vLLM 0.7.x; verify with
+          # `vllm serve NousResearch/Hermes-4.3-36B --help-model` if the
+          # server refuses at boot.
           image: nvcr.io/nvidia/vllm:26.04-py3
           command:
             - vllm
             - serve
-            - Qwen/Qwen3.6-27B-FP8
+            - NousResearch/Hermes-4.3-36B
             - --download-dir
             - /models
             - --host
@@ -50,23 +58,19 @@ spec:
             - --port
             - "8000"
             - --served-model-name
-            - qwen3.6-27b
+            - hermes-4.3-36b
             - --gpu-memory-utilization
             - "0.85"
             - --max-model-len
-            - "65536"
+            - "32768"
             - --enable-auto-tool-choice
             - --tool-call-parser
-            - qwen3_xml
-            - --reasoning-parser
-            - qwen3
+            - hermes
             - --enable-prefix-caching
-            - --kv-cache-dtype
-            - fp8
+            - --max-num-batched-tokens
+            - "8192"
             - --max-num-seqs
             - "4"
-            - --default-chat-template-kwargs
-            - '{"enable_thinking": true}'
           env:
             - name: HF_TOKEN
               valueFrom:
@@ -87,7 +91,9 @@ spec:
             initialDelaySeconds: 30
             periodSeconds: 10
             timeoutSeconds: 5
-            failureThreshold: 180
+            # ~72 GB weights need to download from the pulsys HF cache on
+            # first cold start; give ~90 min total budget (540 * 10 s).
+            failureThreshold: 540
           livenessProbe:
             httpGet:
               path: /health
@@ -116,8 +122,7 @@ spec:
       volumes:
         - name: models
           hostPath:
-            # Sparky's dedicated `models` UserVolume — 2-3.5 TiB partition.
-            path: /var/mnt/models
+            path: /var/mnt/longhorn/vllm
             type: DirectoryOrCreate
         - name: shm
           emptyDir:
@@ -127,15 +132,16 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: qwen36-27b
+  name: hermes-4-3-36b
   namespace: vllm-system
   annotations:
     tailscale.com/expose: "true"
-    # Tailscale hostnames must be valid DNS labels — no dots allowed.
-    tailscale.com/hostname: "qwen36-27b"
+    # Dot-free Tailscale hostname; register this in Aperture as an
+    # upstream at http://hermes-4-3-36b.<tailnet>.ts.net:8000/v1
+    tailscale.com/hostname: "hermes-4-3-36b"
 spec:
   selector:
-    app: qwen36-27b
+    app: hermes-4-3-36b
   ports:
     - port: 8000
       targetPort: http

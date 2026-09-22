@@ -12,6 +12,7 @@ resources:
   - flux-system
   - frigate
   - headlamp
+  - hermes-agent
   - hockeytime
   - home-assistant
   - immich

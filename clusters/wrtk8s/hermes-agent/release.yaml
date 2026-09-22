@@ -1,0 +1,21 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: hermes-agent-operator
+  namespace: hermes-agent
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: hermes-agent-operator
+      version: "0.5.3"
+      sourceRef:
+        kind: HelmRepository
+        name: hermes-agent-operator
+        namespace: hermes-agent
+  values:
+    fullnameOverride: hermes-agent-operator
+    manager:
+      # Anonymous deployment heartbeat — opt out; this is a homelab.
+      heartbeat:
+        enabled: false

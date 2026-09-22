@@ -1,0 +1,21 @@
+# HermesAgent CR wired to Aperture as an OpenAI-compatible upstream.
+# The `custom` provider (aliases: vllm, ollama, local, llamacpp) is Hermes'
+# generic passthrough for local/OpenAI-compat servers; no key_env => keyless
+# request (Aperture on the tailnet doesn't require auth).
+apiVersion: agents.hermeum.app/v1alpha1
+kind: HermesAgent
+metadata:
+  name: hermes-agent
+  namespace: hermes-agent
+spec:
+  hermes:
+    config:
+      raw:
+        model:
+          provider: custom
+          default: hermes-4.3-36b
+          base_url: https://ai.gerbil-dragon.ts.net/v1
+    storage:
+      persistence:
+        enabled: true
+        size: 5Gi
