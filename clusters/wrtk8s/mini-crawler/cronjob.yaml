@@ -4,11 +4,10 @@ metadata:
   name: mini-crawler
   namespace: mini-crawler
 spec:
-  # 00:00, 09:00, 15:00 America/Los_Angeles. The midnight run is a
-  # keep-alive so the ntfy topic history (used by --state-backend=auto
-  # for dedup) stays populated across the >12h gap that ntfy.sh retains
-  # messages — same reason hockeytime picked this cadence.
-  schedule: "0 0,9,15 * * *"
+  # Once per day in America/Los_Angeles. Gotify never expires messages,
+  # so the dedup fetch always sees every prior post — no midnight
+  # keep-alive tick needed.
+  schedule: "0 9 * * *"
   timeZone: America/Los_Angeles
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
@@ -23,15 +22,16 @@ spec:
             - name: mini-crawler
               image: cr.jgarr.net/mini-crawler:latest
               imagePullPolicy: Always
-              env:
-                # Full URL, not just the topic slug — the crawler passes this
-                # to httpx as-is and rejects it as "missing 'http://' or
-                # 'https://' protocol" otherwise.
-                - name: NTFY_TOPIC
-                  value: https://ntfy.sh/minime-81nzcmb
-              # --urls keeps the log terse (URLs only, no table); --state-backend
-              # defaults to `auto`, which uses the ntfy topic history for dedup
-              # since NTFY_TOPIC is set — no PVC required.
+              envFrom:
+                # `gotify` Secret carries GOTIFY_URL / GOTIFY_APP_TOKEN /
+                # GOTIFY_CLIENT_TOKEN. Provisioned out-of-band today
+                # (kubectl create secret); migrate to ExternalSecret +
+                # 1Password when convenient.
+                - secretRef:
+                    name: gotify
+              # --urls keeps the log terse (URLs only, no table).
+              # State backend auto-selects `gotify` because GOTIFY_URL
+              # and GOTIFY_APP_TOKEN come from the Secret above.
               args:
                 - --urls
               resources:
