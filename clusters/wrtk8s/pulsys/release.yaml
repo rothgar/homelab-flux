@@ -60,3 +60,16 @@ spec:
         memory: 256Mi
       limits:
         memory: 2Gi
+
+    # Prefer worker nodes for pulsys — the cache workload is fine on the
+    # control plane in a pinch, but keeps mini free for etcd/scheduler
+    # headroom when a worker with iSCSI mount is available.
+    affinity:
+      nodeAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+                - key: node-role.kubernetes.io/control-plane
+                  operator: DoesNotExist
+
