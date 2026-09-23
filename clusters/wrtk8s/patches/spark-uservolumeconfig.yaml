@@ -1,20 +1,12 @@
 ---
+# Dedicated partition for LLM weight caches (HF_HOME, vLLM download-dir).
+# Mounted at /var/mnt/model by Talos.
 apiVersion: v1alpha1
 kind: UserVolumeConfig
-name: longhorn
+name: model
 volumeType: partition
 provisioning:
   diskSelector:
     match: disk.transport == "nvme"
-  maxSize: 2TiB
-  minSize: 1TiB
----
-apiVersion: v1alpha1
-kind: UserVolumeConfig
-name: plex
-volumeType: partition
-provisioning:
-  diskSelector:
-    match: disk.transport == "nvme"
-  maxSize: 100GiB
-  minSize: 50GiB
+  maxSize: 1TiB
+  minSize: 800GiB

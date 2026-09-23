@@ -9,14 +9,16 @@ name: EPHEMERAL
 provisioning:
   diskSelector:
     match: disk.transport == "nvme"
-  maxSize: 100GiB
+  maxSize: 200GiB
 ---
+# Dedicated partition for LLM weight caches (HF_HOME, vLLM download-dir).
+# Same shape as spark's — mounted at /var/mnt/model by Talos.
 apiVersion: v1alpha1
 kind: UserVolumeConfig
-name: longhorn
+name: model
 volumeType: partition
 provisioning:
   diskSelector:
     match: disk.transport == "nvme"
-  maxSize: 2TiB
-  minSize: 1TiB
+  maxSize: 1TiB
+  minSize: 800GiB

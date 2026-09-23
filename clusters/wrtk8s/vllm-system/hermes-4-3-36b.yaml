@@ -122,7 +122,7 @@ spec:
       volumes:
         - name: models
           hostPath:
-            path: /var/mnt/longhorn/vllm
+            path: /var/mnt/model
             type: DirectoryOrCreate
         - name: shm
           emptyDir:

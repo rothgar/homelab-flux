@@ -5,4 +5,4 @@ name: EPHEMERAL
 provisioning:
   diskSelector:
     match: disk.transport == "nvme"
-  maxSize: 100GiB
+  maxSize: 200GiB
