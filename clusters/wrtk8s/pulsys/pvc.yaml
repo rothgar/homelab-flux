@@ -13,4 +13,4 @@ spec:
   storageClassName: synology-iscsi
   resources:
     requests:
-      storage: 500Gi
+      storage: 100Gi
