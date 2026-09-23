@@ -1,3 +1,7 @@
+# synology-iscsi (block-level) is ~5-10x faster than nfs-synology for
+# the large-file random I/O pulsys does as a pull-through cache. Pulsys
+# runs as UID 65532 with fsGroup 65532 in podSecurityContext, so kubelet
+# chowns the iSCSI mount on attach — no chown Job needed.
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -6,7 +10,7 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: nfs-synology
+  storageClassName: synology-iscsi
   resources:
     requests:
       storage: 500Gi
