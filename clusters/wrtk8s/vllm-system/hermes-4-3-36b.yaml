@@ -27,6 +27,13 @@ spec:
     spec:
       terminationGracePeriodSeconds: 15
       runtimeClassName: nvidia
+      # Cluster DNS resolves *.jgarr.net → 47.149.56.32 (WAN wildcard),
+      # which pods can't reach. Pulsys HF cache lives on the tailnet at
+      # the pulsys-lb MetalLB IP; pin it here until CoreDNS gets a local
+      # host override for hf.jgarr.net.
+      hostAliases:
+        - ip: 10.1.1.164
+          hostnames: [hf.jgarr.net]
       tolerations:
         - key: nvidia.com/gpu
           operator: Exists

@@ -27,6 +27,11 @@ spec:
     spec:
       terminationGracePeriodSeconds: 15
       runtimeClassName: nvidia
+      # Cluster DNS resolves *.jgarr.net → WAN wildcard, unreachable
+      # from pods. Pin the pulsys HF cache to its MetalLB IP directly.
+      hostAliases:
+        - ip: 10.1.1.164
+          hostnames: [hf.jgarr.net]
       tolerations:
         - key: nvidia.com/gpu
           operator: Exists
