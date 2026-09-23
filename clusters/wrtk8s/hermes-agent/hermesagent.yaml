@@ -27,7 +27,9 @@ spec:
           base_url: http://aperture.hermes-agent.svc.cluster.local/v1
         mcp_servers:
           aperture:
-            url: http://aperture.hermes-agent.svc.cluster.local/mcp
+            # Aperture serves MCP at /v1/mcp (verified 2026-09-23:
+            # `curl -X POST … /v1/mcp -d '{"jsonrpc":"2.0",…}'` → 200).
+            url: http://aperture.hermes-agent.svc.cluster.local/v1/mcp
             enabled: true
         # Discord behaviour knobs. Token + allowed users come from the
         # workspace dotEnv Secret below.
