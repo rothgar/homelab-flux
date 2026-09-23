@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - external-secret.yaml
+  - mailwip-smtp.yaml
   - pvc.yaml
   - deployment.yaml
   - tailscale-ingress.yaml

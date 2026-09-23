@@ -1,0 +1,47 @@
+# Mailwip SMTP credentials + JSON config file for Immich.
+#
+# Immich reads notification settings from its Postgres DB, but a config
+# file at IMMICH_CONFIG_FILE overrides them on every startup. Env-var
+# substitution (${VAR}) inside the JSON pulls the password from this
+# Secret without baking it into the ConfigMap.
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: mailwip-smtp
+  namespace: immich
+spec:
+  refreshInterval: 12h
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: onepassword
+  target:
+    name: mailwip-smtp
+  data:
+    - secretKey: SMTP_PASSWORD
+      remoteRef:
+        key: mailwip-smtp/password
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: immich-mail-config
+  namespace: immich
+data:
+  config.json: |
+    {
+      "notifications": {
+        "smtp": {
+          "enabled": true,
+          "from": "Immich <noreply@jgarr.net>",
+          "replyTo": "noreply@jgarr.net",
+          "transport": {
+            "ignoreCert": false,
+            "host": "smtp.hanami.run",
+            "port": 587,
+            "username": "noreply@jgarr.net",
+            "password": "${SMTP_PASSWORD}"
+          }
+        }
+      }
+    }

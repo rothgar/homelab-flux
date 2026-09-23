@@ -46,12 +46,25 @@ spec:
                 # Route ML calls through KEDA HTTP interceptor so the ML
                 # Deployment can scale to zero. See ml-scaler.yaml.
                 IMMICH_MACHINE_LEARNING_URL: "http://immich-ml-scaled:8080"
+                # Mailwip SMTP (see mailwip-smtp.yaml). Immich substitutes
+                # ${SMTP_PASSWORD} from envFrom into the JSON on load.
+                IMMICH_CONFIG_FILE: /etc/immich/config.json
+              envFrom:
+                - secretRef:
+                    name: mailwip-smtp
       persistence:
         pictures:
           enabled: true
           existingClaim: immich-pictures
           globalMounts:
             - path: /mnt/external/pictures
+              readOnly: true
+        mail-config:
+          enabled: true
+          type: configMap
+          name: immich-mail-config
+          globalMounts:
+            - path: /etc/immich
               readOnly: true
 
     machine-learning:

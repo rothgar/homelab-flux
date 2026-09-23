@@ -50,6 +50,21 @@ spec:
             # (which can't set 0600 via chmod against Synology's default ACL).
             - name: N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS
               value: "false"
+            # Mailwip SMTP (see mailwip-smtp.yaml). 587 = STARTTLS, not TLS.
+            - name: N8N_EMAIL_MODE
+              value: smtp
+            - name: N8N_SMTP_SSL
+              value: "false"
+            - name: N8N_SMTP_HOST
+              valueFrom: { secretKeyRef: { name: mailwip-smtp, key: SMTP_HOST } }
+            - name: N8N_SMTP_PORT
+              valueFrom: { secretKeyRef: { name: mailwip-smtp, key: SMTP_PORT } }
+            - name: N8N_SMTP_USER
+              valueFrom: { secretKeyRef: { name: mailwip-smtp, key: SMTP_USERNAME } }
+            - name: N8N_SMTP_PASS
+              valueFrom: { secretKeyRef: { name: mailwip-smtp, key: SMTP_PASSWORD } }
+            - name: N8N_SMTP_SENDER
+              valueFrom: { secretKeyRef: { name: mailwip-smtp, key: SMTP_FROM } }
           ports:
             - containerPort: 5678
               name: http

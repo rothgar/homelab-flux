@@ -1,0 +1,32 @@
+# Mailwip SMTP credentials for outbound email (password resets etc).
+# 1Password item (wrtk8s vault):
+#   Title:  mailwip-smtp
+#   Field:  password  = <SMTP password generated in Mailwip web UI
+#                       under Domain → SMTP/Sending>
+# Rename `key:` below if the item is named differently.
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: mailwip-smtp
+  namespace: n8n
+spec:
+  refreshInterval: 12h
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: onepassword
+  target:
+    name: mailwip-smtp
+    template:
+      engineVersion: v2
+      data:
+        # Host/port/username are non-secret and stay in template. Password
+        # is the only real secret and comes from 1Password below.
+        SMTP_HOST: "smtp.hanami.run"
+        SMTP_PORT: "587"
+        SMTP_USERNAME: "noreply@jgarr.net"
+        SMTP_PASSWORD: "{{ .password }}"
+        SMTP_FROM: "noreply@jgarr.net"
+  data:
+    - secretKey: password
+      remoteRef:
+        key: mailwip-smtp/password

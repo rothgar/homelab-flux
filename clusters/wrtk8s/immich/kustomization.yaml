@@ -11,6 +11,7 @@ resources:
   - httproute.yaml
   - tailscale-ingress.yaml
   - external-secret.yaml
+  - mailwip-smtp.yaml
   # KEDA HTTP add-on CRD (httpscaledobjects.http.keda.sh) is installed;
   # this scaler is safe to enable.
   - ml-scaler.yaml

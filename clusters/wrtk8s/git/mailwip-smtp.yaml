@@ -1,0 +1,31 @@
+# Mailwip SMTP credentials in the onedev namespace.
+#
+# Onedev stores SMTP config in its Postgres DB — the helm chart exposes no
+# env / value knob for it. After this Secret syncs, configure the mail
+# service manually at:
+#     https://git.jgarr.net/~administration/mail-service
+# using the SMTP_* values kubectl -n onedev get secret mailwip-smtp -o yaml
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: mailwip-smtp
+  namespace: onedev
+spec:
+  refreshInterval: 12h
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: onepassword
+  target:
+    name: mailwip-smtp
+    template:
+      engineVersion: v2
+      data:
+        SMTP_HOST: "smtp.hanami.run"
+        SMTP_PORT: "587"
+        SMTP_USERNAME: "noreply@jgarr.net"
+        SMTP_PASSWORD: "{{ .password }}"
+        SMTP_FROM: "noreply@jgarr.net"
+  data:
+    - secretKey: password
+      remoteRef:
+        key: mailwip-smtp/password
