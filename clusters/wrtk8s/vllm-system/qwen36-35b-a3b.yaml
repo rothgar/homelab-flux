@@ -24,6 +24,9 @@ spec:
     metadata:
       labels:
         app: qwen36-35b-a3b
+        # Shared label used by podAntiAffinity across all vllm-system
+        # model Deployments to enforce one-model-per-GB10.
+        vllm-model: "true"
     spec:
       terminationGracePeriodSeconds: 15
       runtimeClassName: nvidia
@@ -38,6 +41,7 @@ spec:
           effect: NoSchedule
       affinity:
         nodeAffinity:
+          # Either GB10 works — both carry /var/mnt/model + a GPU.
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
               - matchExpressions:
@@ -45,6 +49,14 @@ spec:
                     operator: In
                     values:
                       - spark
+                      - sparky
+        # One vLLM model per GB10 (see label on template above).
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  vllm-model: "true"
+              topologyKey: kubernetes.io/hostname
       containers:
         - name: vllm
           # v26.06-py3 segfaults on GB10 with driver 595. Pinning to 26.04.
