@@ -31,8 +31,12 @@ spec:
             # `curl -X POST … /v1/mcp -d '{"jsonrpc":"2.0",…}'` → 200).
             url: http://aperture.hermes-agent.svc.cluster.local/v1/mcp
             enabled: true
-        # Discord behaviour knobs. Token + allowed users come from the
-        # workspace dotEnv Secret below.
+        # Platform enablement lives here. Discord's token + allowed users
+        # come from the workspace dotEnv Secret below.
+        platforms:
+          discord:
+            enabled: true
+        # Discord-specific behaviour knobs live at the top level.
         discord:
           require_mention: true
           auto_thread: true
