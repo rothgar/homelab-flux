@@ -13,8 +13,19 @@ metadata:
   namespace: hermes-agent
 spec:
   hermes:
+    # Inject the discord Secret as pod-level env vars too (not only into
+    # $HERMES_HOME/.env via workspace.dotEnv). The discord platform reads
+    # DISCORD_BOT_TOKEN via os.environ; dotEnv alone doesn't make it show
+    # up in the gateway process env.
+    envFrom:
+      - secretRef:
+          name: hermes-discord
     config:
       raw:
+        # Silence the "config predates version 12" migration warning that
+        # otherwise fires every boot; our raw config is written in the v12
+        # shape already.
+        _config_version: 12
         model:
           provider: custom
           default: hermes-4.3-36b
