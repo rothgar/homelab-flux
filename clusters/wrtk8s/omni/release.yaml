@@ -11,7 +11,7 @@ spec:
       # 2.11.0 exposes registries.factories.primary.{url,username,password}
       # for the Enterprise Image Factory; the older 2.5.x flat fields
       # (imageFactoryBaseURL/…) are deprecated equivalents.
-      version: 2.12.1
+      version: 2.12.2
       sourceRef:
         kind: HelmRepository
         name: siderolabs
