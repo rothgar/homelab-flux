@@ -8,14 +8,42 @@
 #          → matches HTTPScaledObject by Host header
 #          → buffers request, scales Deployment 0→1 if needed
 #          → forwards to whisper-webui:80 (containerPort 7860)
+# Selector-less ClusterIP Service with a manual EndpointSlice pointing at
+# the KEDA HTTP interceptor's Service ClusterIP in keda ns. The prior
+# ExternalName pattern started failing after a tailscale-operator upgrade
+# (~2026-09-14) that rejects ExternalName ingress backends as invalid.
+# The pinned IP tracks `keda-add-ons-http-interceptor-proxy.keda`; if that
+# Service is recreated, get the new ClusterIP and refresh the EndpointSlice.
 apiVersion: v1
 kind: Service
 metadata:
   name: whisper-webui-scaled
   namespace: default
 spec:
-  type: ExternalName
-  externalName: keda-add-ons-http-interceptor-proxy.keda.svc.cluster.local
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+---
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
+metadata:
+  name: whisper-webui-scaled
+  namespace: default
+  labels:
+    kubernetes.io/service-name: whisper-webui-scaled
+addressType: IPv4
+ports:
+  - name: http
+    port: 8080
+    protocol: TCP
+endpoints:
+  - addresses:
+      - 10.99.255.61  # keda-add-ons-http-interceptor-proxy.keda
+    conditions:
+      ready: true
 ---
 apiVersion: http.keda.sh/v1alpha1
 kind: HTTPScaledObject
