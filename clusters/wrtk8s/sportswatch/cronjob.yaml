@@ -1,0 +1,47 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: sportswatch
+  namespace: sportswatch
+spec:
+  # Every 10 minutes, around the clock. Unlike hockeytime/mini-crawler
+  # (daily digests), sportswatch fires time-sensitive alerts — ~30 min
+  # before game start and final scores ~1 h after the game ends — so it
+  # needs frequent runs. Dedup lives in Gotify's message history
+  # (sportsgame stamps a deterministic ID per alert and re-reads the
+  # last 200 messages each run), so overlap between runs is harmless
+  # and no volume is needed.
+  schedule: "*/10 * * * *"
+  timeZone: America/Los_Angeles
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: sportswatch
+              # Image is built from the ~/src/sportswatch repo (the
+              # script/container are named sportsgame there).
+              image: cr.jgarr.net/sportsgame:latest
+              imagePullPolicy: Always
+              envFrom:
+                # `gotify` Secret carries GOTIFY_URL / GOTIFY_APP_TOKEN /
+                # GOTIFY_CLIENT_TOKEN. Provisioned out-of-band today
+                # (kubectl create secret); migrate to ExternalSecret +
+                # 1Password when convenient.
+                - secretRef:
+                    name: gotify
+              env:
+                # Display timezone for game times in notification bodies.
+                - name: TZ
+                  value: America/Los_Angeles
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+                limits:
+                  memory: 128Mi

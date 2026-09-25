@@ -47,6 +47,7 @@ resources:
   - resolve-db
   - reloader
   - rpi-led-daemon
+  - sportswatch
   - tailscale
   - timesync
   - tts
