@@ -1,14 +1,41 @@
 # Front tts with the KEDA HTTP interceptor so the GPU pod scales to zero
 # when idle and wakes on demand. See whisper-webui/keda-scaler.yaml for
 # the same pattern.
+# Selector-less ClusterIP + manual EndpointSlice pointing at the KEDA
+# HTTP interceptor's Service ClusterIP in keda ns. The prior ExternalName
+# pattern started failing after a tailscale-operator upgrade (~2026-09-14)
+# that rejects ExternalName ingress backends as invalid. If the interceptor
+# Service is recreated, refresh the ClusterIP below.
 apiVersion: v1
 kind: Service
 metadata:
   name: tts-scaled
   namespace: tts
 spec:
-  type: ExternalName
-  externalName: keda-add-ons-http-interceptor-proxy.keda.svc.cluster.local
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+---
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
+metadata:
+  name: tts-scaled
+  namespace: tts
+  labels:
+    kubernetes.io/service-name: tts-scaled
+addressType: IPv4
+ports:
+  - name: http
+    port: 8080
+    protocol: TCP
+endpoints:
+  - addresses:
+      - 10.99.255.61  # keda-add-ons-http-interceptor-proxy.keda
+    conditions:
+      ready: true
 ---
 apiVersion: http.keda.sh/v1alpha1
 kind: HTTPScaledObject

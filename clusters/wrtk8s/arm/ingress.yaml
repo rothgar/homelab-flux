@@ -19,10 +19,10 @@ spec:
           - path: /
             pathType: Prefix
             backend:
-              # Route through KEDA HTTP interceptor so the pod can scale
-              # to zero when nothing's being ripped. See keda-scaler.yaml.
+              # ARM must stay running to detect optical-drive insertions,
+              # so no KEDA scale-to-zero — point straight at the Service.
               service:
-                name: arm-scaled
+                name: arm
                 port:
                   number: 8080
 ---
@@ -40,10 +40,10 @@ spec:
           - path: /
             pathType: Prefix
             backend:
-              # Route through KEDA HTTP interceptor so the pod can scale
-              # to zero when nothing's being ripped. See keda-scaler.yaml.
+              # ARM must stay running to detect optical-drive insertions,
+              # so no KEDA scale-to-zero — point straight at the Service.
               service:
-                name: arm-scaled
+                name: arm
                 port:
                   number: 8080
   tls:
