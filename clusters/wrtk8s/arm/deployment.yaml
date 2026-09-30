@@ -57,6 +57,15 @@ spec:
               mountPath: /home/arm/music
             - name: config
               mountPath: /etc/arm/config
+            # ARM writes arm.db + MakeMKV settings.conf under $HOME, which
+            # isn't on the PVC by default — reuse the config PVC via subPath
+            # so both survive pod restarts.
+            - name: config
+              mountPath: /home/arm/db
+              subPath: home-db
+            - name: config
+              mountPath: /home/arm/.MakeMKV
+              subPath: home-makemkv
             - name: dev
               mountPath: /dev
             - name: udev
