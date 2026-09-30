@@ -15,6 +15,9 @@ spec:
     spec:
       nodeSelector:
         arm.io/optical-drive: "true"
+      # Share PID namespace so the disc-detector sidecar can `nsenter`
+      # into the arm container to invoke the rip wrapper.
+      shareProcessNamespace: true
       initContainers:
         - name: fix-media-permissions
           image: busybox
@@ -70,6 +73,44 @@ spec:
               mountPath: /dev
             - name: udev
               mountPath: /run/udev
+        # Disc-detector sidecar: the ARM container's in-container udevd
+        # doesn't reliably fire the rip trigger on media inserts (kernel
+        # uevents don't cross the pod's network namespace). Poll the
+        # /dev/sr0 block device size instead; on 0 → non-zero, invoke
+        # the ARM rip wrapper inside the arm container's namespaces.
+        - name: disc-detector
+          image: alpine:3.20
+          securityContext:
+            privileged: true
+          command:
+            - sh
+            - -c
+            - |
+              apk add --no-cache util-linux >/dev/null 2>&1
+              prev="?"
+              while true; do
+                if [ -e /sys/block/sr0/size ]; then
+                  curr=$(cat /sys/block/sr0/size)
+                else
+                  curr="missing"
+                fi
+                if [ "$prev" = "0" ] && [ "$curr" != "0" ] && [ "$curr" != "missing" ]; then
+                  echo "$(date -Iseconds) [disc-detector] disc inserted (size=$curr sectors); triggering ARM"
+                  ARM_PID=$(pgrep -f 'sbin/my_init' | head -1)
+                  if [ -n "$ARM_PID" ]; then
+                    nsenter -t $ARM_PID -a -- /sbin/setuser arm /opt/arm/scripts/docker/docker_arm_wrapper.sh sr0 &
+                  else
+                    echo "$(date -Iseconds) [disc-detector] ERROR: no my_init PID"
+                  fi
+                elif [ "$prev" != "?" ] && [ "$prev" != "0" ] && [ "$curr" = "0" ]; then
+                  echo "$(date -Iseconds) [disc-detector] disc ejected"
+                fi
+                prev=$curr
+                sleep 15
+              done
+          volumeMounts:
+            - name: dev
+              mountPath: /dev
       volumes:
         - name: media
           persistentVolumeClaim:
