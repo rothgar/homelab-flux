@@ -6,3 +6,4 @@ resources:
   # is cluster-scoped so the existing NFD master picks it up regardless
   # of what namespace the CR lives in.
   - amdgpu-rule.yaml
+  - optical-drive-rule.yaml

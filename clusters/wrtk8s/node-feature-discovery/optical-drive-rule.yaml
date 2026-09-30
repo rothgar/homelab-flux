@@ -1,0 +1,23 @@
+# Publish `arm.io/optical-drive=true` on any node with a USB optical drive
+# (CD/DVD/Blu-ray). Matches USB Mass Storage class 08 + subclass 02
+# (SFF-8020i / ATAPI), which is what every USB optical drive advertises.
+# Consumed by the `arm` Deployment's nodeSelector; today the drive lives
+# on iota (Pioneer 08e4:017a) but the rule matches any node/vendor.
+apiVersion: nfd.k8s-sigs.io/v1alpha1
+kind: NodeFeatureRule
+metadata:
+  name: usb-optical-drive
+spec:
+  rules:
+    - name: "usb optical drive"
+      labels:
+        arm.io/optical-drive: "true"
+      matchFeatures:
+        - feature: usb.device
+          matchExpressions:
+            class:
+              op: In
+              value: ["08"]
+            subclass:
+              op: In
+              value: ["02"]
