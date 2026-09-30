@@ -15,13 +15,6 @@ spec:
     spec:
       nodeSelector:
         arm.io/optical-drive: "true"
-      # Share the host's network namespace so the container's udevd
-      # receives kernel uevents (namespace-scoped netlink) and ARM's
-      # existing udev rule fires on disc insert. Without this, media
-      # inserts are never auto-detected and rips only start via the
-      # UI's manual wakeup or at pod boot.
-      hostNetwork: true
-      dnsPolicy: ClusterFirstWithHostNet
       initContainers:
         - name: fix-media-permissions
           image: busybox
@@ -75,10 +68,8 @@ spec:
               subPath: home-makemkv
             - name: dev
               mountPath: /dev
-            # /run/udev intentionally NOT bind-mounted from host: the
-            # container runs its own udevd, and sharing /run/udev with
-            # the host caused both daemons to trample each other's
-            # state, breaking `udevadm info` for /dev/sr0.
+            - name: udev
+              mountPath: /run/udev
       volumes:
         - name: media
           persistentVolumeClaim:
@@ -92,3 +83,6 @@ spec:
         - name: dev
           hostPath:
             path: /dev
+        - name: udev
+          hostPath:
+            path: /run/udev
