@@ -79,7 +79,7 @@ spec:
         # /dev/sr0 block device size instead; on 0 → non-zero, invoke
         # the ARM rip wrapper inside the arm container's namespaces.
         - name: disc-detector
-          image: alpine:3.20
+          image: alpine:3.24
           securityContext:
             privileged: true
           command:
