@@ -77,7 +77,7 @@ spec:
       containers:
         - name: zot
           # renovate: image=ghcr.io/project-zot/zot-linux-amd64
-          image: ghcr.io/project-zot/zot-linux-amd64:v2.1.5
+          image: ghcr.io/project-zot/zot-linux-amd64:v2.1.21
           args: ["serve", "/etc/zot/config.json"]
           ports:
             - containerPort: 5000
