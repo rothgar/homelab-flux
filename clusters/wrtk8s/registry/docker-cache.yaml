@@ -1,3 +1,59 @@
+# Zot pull-through cache for docker.io.
+#
+# Replaces distribution/distribution v3.1.1, which had a bug where
+# missing-blob-but-link-exists returned HTTP 200 + 0 bytes instead of
+# refetching from upstream — caused repeated "short read: expected N
+# bytes but got 0" image pull failures across the cluster. Zot's
+# sync extension in onDemand mode handles missing blobs correctly.
+#
+# PVC storage is reused but distribution's layout is incompatible with
+# Zot's. The init container wipes the old data once (sentinel file)
+# so Zot starts clean; the ~74 GiB of previously-cached blobs re-fetch
+# on first pull after migration.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: docker-cache-zot-config
+  namespace: registry
+data:
+  config.json: |
+    {
+      "distSpecVersion": "1.1.0",
+      "storage": {
+        "rootDirectory": "/var/lib/registry"
+      },
+      "http": {
+        "address": "0.0.0.0",
+        "port": "5000",
+        "tls": {
+          "cert": "/certs/tls.crt",
+          "key": "/certs/tls.key"
+        }
+      },
+      "log": {
+        "level": "info"
+      },
+      "extensions": {
+        "sync": {
+          "enable": true,
+          "registries": [
+            {
+              "urls": ["https://registry-1.docker.io"],
+              "onDemand": true,
+              "tlsVerify": true,
+              "maxRetries": 3,
+              "retryDelay": "5m",
+              "content": [{"prefix": "**"}]
+            }
+          ]
+        },
+        "metrics": {
+          "enable": true,
+          "prometheus": {"path": "/metrics"}
+        }
+      }
+    }
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -5,6 +61,8 @@ metadata:
   namespace: registry
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: docker-cache
@@ -13,29 +71,34 @@ spec:
       labels:
         app: docker-cache
     spec:
-      containers:
-        - name: registry
-          image: registry:3
-          ports:
-            - containerPort: 5000
-            - containerPort: 5001
-              name: metrics
-          env:
-            - name: REGISTRY_PROXY_REMOTEURL
-              value: "https://registry-1.docker.io"
-            - name: REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY
-              value: /var/lib/registry
-            - name: REGISTRY_HTTP_TLS_CERTIFICATE
-              value: /certs/tls.crt
-            - name: REGISTRY_HTTP_TLS_KEY
-              value: /certs/tls.key
-            - name: REGISTRY_HTTP_DEBUG_ADDR
-              value: "0.0.0.0:5001"
-            - name: REGISTRY_HTTP_DEBUG_PROMETHEUS_ENABLED
-              value: "true"
+      initContainers:
+        - name: zot-migrate
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              if [ ! -f /var/lib/registry/.zot-migrated ]; then
+                echo "wiping distribution layout for Zot migration"
+                rm -rf /var/lib/registry/docker /var/lib/registry/scheduler-*
+                touch /var/lib/registry/.zot-migrated
+              fi
           volumeMounts:
             - name: data
               mountPath: /var/lib/registry
+      containers:
+        - name: zot
+          # renovate: image=ghcr.io/project-zot/zot-linux-amd64
+          image: ghcr.io/project-zot/zot-linux-amd64:v2.1.5
+          args: ["serve", "/etc/zot/config.json"]
+          ports:
+            - containerPort: 5000
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/registry
+            - name: config
+              mountPath: /etc/zot
+              readOnly: true
             - name: certs
               mountPath: /certs
               readOnly: true
@@ -43,6 +106,9 @@ spec:
         - name: data
           persistentVolumeClaim:
             claimName: docker-cache-data
+        - name: config
+          configMap:
+            name: docker-cache-zot-config
         - name: certs
           secret:
             secretName: registry-tls
@@ -65,5 +131,5 @@ spec:
       targetPort: 5000
       name: https
     - port: 5001
-      targetPort: 5001
+      targetPort: 5000
       name: metrics
