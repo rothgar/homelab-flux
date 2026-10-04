@@ -42,12 +42,13 @@ spec:
       runtimeClassName: nvidia
       # jgarr.net wildcard DNS resolves to the WAN IP (unreachable
       # from pods). Pin pulsys HF cache to its MetalLB IP directly.
-      # Also alias huggingface.co to pulsys since ds4's download
-      # script falls back to curl with hardcoded huggingface.co URLs
-      # when `hf` CLI isn't available or for certain files.
+      # huggingface.co is NOT aliased — this model repo isn't on the
+      # pulsys token's allowlist, so we bypass pulsys and pull direct
+      # from HF for this one. (If pulsys permissions change, re-add
+      # the alias and switch the download URL back to hf.jgarr.net.)
       hostAliases:
         - ip: 10.1.1.164
-          hostnames: [hf.jgarr.net, huggingface.co]
+          hostnames: [hf.jgarr.net]
       tolerations:
         - key: nvidia.com/gpu
           operator: Exists
@@ -114,7 +115,7 @@ spec:
               mkdir -p /models/ds4-gguf
               cd /models/ds4-gguf
               FILE=DeepSeek-V4.1-Flash-Q2.gguf
-              URL=http://hf.jgarr.net/antirez/deepseek-v4.1-flash-gguf/resolve/main/$FILE
+              URL=https://huggingface.co/antirez/deepseek-v4.1-flash-gguf/resolve/main/$FILE
               # --continue-at - resumes a partial download; the loop
               # restarts on transient drops so a 341 GiB file eventually
               # finishes even if pulsys renegotiates.
