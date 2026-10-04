@@ -121,10 +121,10 @@ spec:
               # finishes even if pulsys renegotiates.
               while true; do
                 # Model is public (gated:false) so no auth needed.
-                # pulsys-issued HF_TOKEN scopes to specific repos; sending
-                # it here would 403 for antirez/* since pulsys hasn't
-                # whitelisted this repo under that token.
+                # UA matters: HF rejects some default UA strings with
+                # 400. Mimicking huggingface_hub keeps CloudFront happy.
                 if curl -fL --retry 20 --retry-delay 30 --retry-connrefused \
+                        -A "huggingface_hub/0.26.0" \
                         -C - -o "$FILE.part" "$URL"; then
                   break
                 fi
