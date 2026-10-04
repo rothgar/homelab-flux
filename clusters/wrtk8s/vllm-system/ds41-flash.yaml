@@ -103,18 +103,30 @@ spec:
             - bash
             - -euxc
             - |
-              # Deliberately do NOT install the hf CLI. ds4's download
-              # script prefers hf download when the CLI is present, but
-              # pulsys's /api/* endpoints don't satisfy huggingface_hub
-              # (observed: "Local entry not found" with CloudFront ID).
-              # Without the CLI the script falls through to curl against
-              # /resolve/main/FILE which pulsys handles cleanly.
+              # Bypass ds4's download_model.sh entirely for this file.
+              # The script refuses `curl` for files it deems "too large"
+              # (341 GiB) and insists on the hf CLI; the CLI in turn
+              # hits pulsys /api endpoints that return bad JSON (observed:
+              # "Local entry not found" with CloudFront ID). Direct curl
+              # against pulsys's /resolve/main/FILE works and resumes.
               apt-get update -q >/dev/null
               apt-get install -y -q curl ca-certificates >/dev/null
               mkdir -p /models/ds4-gguf
-              cd /models/ds4
-              DS4_GGUF_DIR=/models/ds4-gguf \
-                ./download_model.sh ds41f-q2
+              cd /models/ds4-gguf
+              FILE=DeepSeek-V4.1-Flash-Q2.gguf
+              URL=http://hf.jgarr.net/antirez/deepseek-v4.1-flash-gguf/resolve/main/$FILE
+              # --continue-at - resumes a partial download; the loop
+              # restarts on transient drops so a 341 GiB file eventually
+              # finishes even if pulsys renegotiates.
+              while true; do
+                if curl -fL --retry 20 --retry-delay 30 --retry-connrefused \
+                        -C - -o "$FILE.part" "$URL"; then
+                  break
+                fi
+                echo "transfer dropped; retrying in 15s"
+                sleep 15
+              done
+              mv "$FILE.part" "$FILE"
               ls -lh /models/ds4-gguf/
           env:
             - name: HF_TOKEN
