@@ -120,6 +120,7 @@ spec:
               # finishes even if pulsys renegotiates.
               while true; do
                 if curl -fL --retry 20 --retry-delay 30 --retry-connrefused \
+                        -H "Authorization: Bearer $HF_TOKEN" \
                         -C - -o "$FILE.part" "$URL"; then
                   break
                 fi
