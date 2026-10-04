@@ -119,8 +119,11 @@ spec:
               # restarts on transient drops so a 341 GiB file eventually
               # finishes even if pulsys renegotiates.
               while true; do
+                # Model is public (gated:false) so no auth needed.
+                # pulsys-issued HF_TOKEN scopes to specific repos; sending
+                # it here would 403 for antirez/* since pulsys hasn't
+                # whitelisted this repo under that token.
                 if curl -fL --retry 20 --retry-delay 30 --retry-connrefused \
-                        -H "Authorization: Bearer $HF_TOKEN" \
                         -C - -o "$FILE.part" "$URL"; then
                   break
                 fi
