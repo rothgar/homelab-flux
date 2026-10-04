@@ -73,7 +73,7 @@ spec:
         # persist on the host under /var/mnt/model/ds4/ so pod restarts
         # don't repeat the ~5 min nvcc compile.
         - name: build-ds4
-          image: nvcr.io/nvidia/cuda:13.0.1-devel-ubuntu24.04
+          image: nvcr.io/nvidia/cuda:13.4.2-devel-ubuntu24.04
           command:
             - bash
             - -euxc
@@ -124,7 +124,7 @@ spec:
               mountPath: /models
       containers:
         - name: ds4-server
-          image: nvcr.io/nvidia/cuda:13.0.1-devel-ubuntu24.04
+          image: nvcr.io/nvidia/cuda:13.4.2-devel-ubuntu24.04
           command:
             - bash
             - -euxc
