@@ -109,8 +109,15 @@ spec:
               apt-get install -y -q curl ca-certificates >/dev/null
               mkdir -p /models/ds4-gguf
               cd /models/ds4
+              # HF_HUB_DISABLE_XET=1 forces `hf download` back to the
+              # standard /resolve/main/FILE HTTP path. pulsys doesn't
+              # implement the xet upload/download protocol, so with the
+              # default xet mode we get "Local entry not found" with a
+              # CloudFront ID — HF is answering via CloudFront bypassing
+              # pulsys entirely for the file bytes.
               DS4_GGUF_DIR=/models/ds4-gguf \
               HF_ENDPOINT=http://hf.jgarr.net \
+              HF_HUB_DISABLE_XET=1 \
                 ./download_model.sh ds41f-q2
               ls -lh /models/ds4-gguf/
           env:
