@@ -36,6 +36,7 @@ data:
       "extensions": {
         "sync": {
           "enable": true,
+          "credentialsFile": "/etc/zot-creds/creds.json",
           "registries": [
             {
               "urls": ["https://registry-1.docker.io"],
@@ -43,7 +44,6 @@ data:
               "tlsVerify": true,
               "maxRetries": 3,
               "retryDelay": "5m",
-              "credentialsFile": "/etc/zot-creds/creds.json",
               "content": [{"prefix": "**"}]
             }
           ]
