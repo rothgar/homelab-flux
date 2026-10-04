@@ -98,7 +98,7 @@ spec:
         # Download the Q2 GGUF via pulsys. Resumable; re-runs are
         # no-ops once the full 341 GiB file is in place.
         - name: download-model
-          image: python:3.12-slim
+          image: python:3.14-slim
           command:
             - bash
             - -euxc
