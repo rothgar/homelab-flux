@@ -16,6 +16,12 @@ spec:
         app: bambustudio
     spec:
       runtimeClassName: nvidia
+      # Pin hostname so Bambu Studio's encrypted auth blob
+      # (BambuNetworkEngine.conf) stays decryptable across pod rollouts.
+      # Without this, the ReplicaSet-hashed hostname (e.g. bambustudio-
+      # 6f78f667c7-qtwkz) changes on every image bump and invalidates
+      # the session, forcing a re-login.
+      hostname: bambustudio
       nodeSelector:
         kubernetes.io/arch: amd64
         nvidia.com/gpu: "true"
@@ -28,6 +34,28 @@ spec:
             - sh
             - -c
             - chmod 700 /config && chown 1000:1000 /config
+          securityContext:
+            runAsUser: 0
+          volumeMounts:
+            - name: config
+              mountPath: /config
+        # Stable /etc/machine-id survives pod recreations by living on
+        # the config PVC. Belt-and-suspenders with `hostname: bambustudio`
+        # above — some apps hash identity off machine-id instead of /etc/
+        # hostname. Generated once on first boot, reused forever after.
+        - name: stable-machine-id
+          image: busybox:1.38
+          command:
+            - sh
+            - -c
+            - |
+              if [ ! -s /config/.machine-id ]; then
+                head -c 16 /dev/urandom | od -An -tx1 | tr -d ' \n' > /config/.machine-id
+              fi
+              # Projected into /host-etc so main container can bind-mount it.
+              # Not applied to the main container's /etc here because we
+              # can't share writes to /etc across containers in a Pod; see
+              # the subPath mount in the bambustudio container instead.
           securityContext:
             runAsUser: 0
           volumeMounts:
@@ -84,6 +112,10 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /config
+            - name: config
+              mountPath: /etc/machine-id
+              subPath: .machine-id
+              readOnly: true
             - name: dshm
               mountPath: /dev/shm
       volumes:
