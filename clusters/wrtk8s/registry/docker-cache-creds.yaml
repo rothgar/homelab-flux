@@ -1,0 +1,38 @@
+# Docker Hub credentials for Zot sync's authenticated pulls. Anonymous
+# pulls are capped at 100/6h/IP; an authenticated free account bumps to
+# 200/6h, Pro to 5000/day. Mounted into the docker-cache pod at
+# /etc/zot-creds/creds.json and referenced from the Zot config.
+#
+# 1Password item (wrtk8s vault):
+#   Title:   docker-hub
+#   Fields:  username = <docker hub login>
+#            password = <PAT recommended>  (Settings → Personal access tokens)
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: docker-cache-creds
+  namespace: registry
+spec:
+  refreshInterval: 12h
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: onepassword
+  target:
+    name: docker-cache-creds
+    template:
+      engineVersion: v2
+      data:
+        creds.json: |
+          {
+            "registry-1.docker.io": {
+              "username": "{{ .username }}",
+              "password": "{{ .password }}"
+            }
+          }
+  data:
+    - secretKey: username
+      remoteRef:
+        key: docker-hub/username
+    - secretKey: password
+      remoteRef:
+        key: docker-hub/password
