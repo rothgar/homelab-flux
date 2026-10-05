@@ -111,8 +111,11 @@ spec:
             - qwen3_coder
             - --mamba-radix-cache-strategy
             - extra_buffer
+            # Weights alone need 0.764 of unified memory on this
+            # configuration; 0.79 was too tight to leave room for KV
+            # cache. Bump to 0.90 so KV + activations have breathing room.
             - --mem-fraction-static
-            - "0.79"
+            - "0.90"
             - --context-length
             - "262144"
             - --chunked-prefill-size
