@@ -121,14 +121,14 @@ spec:
             # doesn't need batched serving.
             - --max-running-requests
             - "1"
-            # Mamba state cache size + dtype together. bfloat16 halves
-            # per-request state memory; explicit cache size of 16 gives
-            # headroom (SGLang's auto-sizing landed at 4 which was still
-            # too small to serve any request).
-            - --mamba-ssm-dtype
-            - bfloat16
+            # SGLang auto-sized the mamba cache at 4 slots which is too
+            # small to serve a request (needs 5 per request for this
+            # model). Override to a larger explicit size. NB: NOT also
+            # setting --mamba-ssm-dtype bfloat16 because that trips an
+            # illegal-memory CUDA fault in grouped_gemma_rmsnorm during
+            # warmup — the custom kernel expects the native dtype.
             - --max-mamba-cache-size
-            - "16"
+            - "32"
             - --allow-auto-truncate
             - --enable-metrics
             - --kv-cache-dtype
