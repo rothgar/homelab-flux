@@ -88,26 +88,17 @@ spec:
             - "1"
             - --prefill-attention-backend
             - triton
-            # `--enable-unified-memory` + the page-major KV layout it
-            # auto-enables require Triton for decode attention too
-            # (upstream recipe used trtllm_mha but can't while HMM-mode
-            # is forced on; perf hit on decode is acceptable in exchange
-            # for weights fitting via the file PLE backend).
             - --decode-attention-backend
-            - triton
+            - trtllm_mha
             - --quantization
             - modelopt_fp4
             - --ple-offload-embedding
-            # `file` offloads expert weights to disk; required because
-            # `pinned` eats the whole GB10 unified pool and OOMs on
-            # weight load. The GPU device-feature probe for file-backend
-            # needs the pod to expose all NVIDIA capabilities + privileged
-            # (see securityContext below), otherwise it refuses with
-            # "device reports it does not [support host page tables]".
+            # file PLE backend's HMM probe refuses in our containerized
+            # env even with privileged + hostIPC + full caps. Fall back
+            # to `pinned` and compensate for the OOM pressure with a
+            # much lower --mem-fraction-static below.
             - --ple-offload-backend
-            - file
-            - --ple-offload-dir
-            - /ple
+            - pinned
             - --language-only
             - --reasoning-parser
             - qwen3
@@ -117,12 +108,11 @@ spec:
             - qwen3_coder
             - --mamba-radix-cache-strategy
             - extra_buffer
+            # 0.79 OOMs with pinned PLE on a 128 GB GB10 (180B NVFP4 +
+            # pinned expert mirror + draft weights + buffers). 0.55
+            # keeps planned allocation under ~95 GB.
             - --mem-fraction-static
-            - "0.79"
-            # Explicitly ask SGLang to enable unified-memory APIs.
-            # Without this the file PLE backend probe refuses even on
-            # a GB10 ("device reports it does not [support HMM]").
-            - --enable-unified-memory
+            - "0.55"
             - --context-length
             - "262144"
             - --chunked-prefill-size
