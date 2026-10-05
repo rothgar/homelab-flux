@@ -136,6 +136,11 @@ spec:
             # auto-sizer has enough headroom.
             - --allow-auto-truncate
             - --enable-metrics
+            # The grouped_gemma_rmsnorm JIT kernel hits an illegal CUDA
+            # memory access during CUDA-graph capture on GB10 (sm_121)
+            # regardless of memory budget. Disable graph capture — eager
+            # mode runs the same math without the pre-captured graphs.
+            - --disable-cuda-graph
             - --kv-cache-dtype
             - auto
             - --speculative-algorithm
