@@ -104,34 +104,28 @@ spec:
             - bash
             - -euxc
             - |
-              # Bypass ds4's download_model.sh entirely for this file.
-              # The script refuses `curl` for files it deems "too large"
-              # (341 GiB) and insists on the hf CLI; the CLI in turn
-              # hits pulsys /api endpoints that return bad JSON (observed:
-              # "Local entry not found" with CloudFront ID). Direct curl
-              # against pulsys's /resolve/main/FILE works and resumes.
-              apt-get update -q >/dev/null
-              apt-get install -y -q curl ca-certificates >/dev/null
+              # DeepSeek-V4.1-Flash-Q2.gguf is xet-backed on HF; plain
+              # curl -L against /resolve/main/FILE 302s to a xet CDN URL
+              # that then 400s (xet needs a protocol handshake, not a
+              # raw GET). Use the hf CLI directly against huggingface.co
+              # — bypasses both pulsys (token-scope limits antirez repo)
+              # and the ds4 script.
+              pip install -q --no-cache-dir --root-user-action=ignore \
+                "huggingface_hub[cli]" hf_xet
               mkdir -p /models/ds4-gguf
-              cd /models/ds4-gguf
               FILE=DeepSeek-V4.1-Flash-Q2.gguf
-              URL=https://huggingface.co/antirez/deepseek-v4.1-flash-gguf/resolve/main/$FILE
-              # --continue-at - resumes a partial download; the loop
-              # restarts on transient drops so a 341 GiB file eventually
-              # finishes even if pulsys renegotiates.
+              REPO=antirez/deepseek-v4.1-flash-gguf
+              # hf download resumes partial transfers automatically. The
+              # loop handles transient network drops over the ~45 min
+              # pull from the US-east HF mirror at 100-200 MB/s.
               while true; do
-                # Model is public (gated:false) so no auth needed.
-                # UA matters: HF rejects some default UA strings with
-                # 400. Mimicking huggingface_hub keeps CloudFront happy.
-                if curl -fL --retry 20 --retry-delay 30 --retry-connrefused \
-                        -A "huggingface_hub/0.26.0" \
-                        -C - -o "$FILE.part" "$URL"; then
+                if hf download "$REPO" "$FILE" \
+                     --local-dir /models/ds4-gguf; then
                   break
                 fi
-                echo "transfer dropped; retrying in 15s"
-                sleep 15
+                echo "transfer dropped; retrying in 30s"
+                sleep 30
               done
-              mv "$FILE.part" "$FILE"
               ls -lh /models/ds4-gguf/
           env:
             - name: HF_TOKEN
