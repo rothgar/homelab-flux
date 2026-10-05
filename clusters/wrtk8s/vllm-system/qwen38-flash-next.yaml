@@ -117,11 +117,18 @@ spec:
             - "262144"
             - --chunked-prefill-size
             - "2048"
-            # mamba state cache is sized ~proportional to this; at 4 the
-            # cache ends up too small to even serve 1 request. 1 req at
-            # a time is fine for an inference server fronting opencode.
+            # 1 req at a time; this model fronts opencode primarily and
+            # doesn't need batched serving.
             - --max-running-requests
             - "1"
+            # Mamba state cache size + dtype together. bfloat16 halves
+            # per-request state memory; explicit cache size of 16 gives
+            # headroom (SGLang's auto-sizing landed at 4 which was still
+            # too small to serve any request).
+            - --mamba-ssm-dtype
+            - bfloat16
+            - --max-mamba-cache-size
+            - "16"
             - --allow-auto-truncate
             - --enable-metrics
             - --kv-cache-dtype
