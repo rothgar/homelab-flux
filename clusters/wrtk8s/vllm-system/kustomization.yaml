@@ -2,16 +2,8 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - namespace.yaml
-  - qwen38-flash-next.yaml
+  - qwen36-35b-a3b.yaml
   - hermes-4-3-36b.yaml
   - ds41-flash.yaml
   - podmonitor.yaml
   - external-secret.yaml
-
-configMapGenerator:
-  - name: sglang-qwen38-patches
-    namespace: vllm-system
-    files:
-      - sglang-patches/batch_result_processor.py
-      - sglang-patches/mamba_radix_cache.py
-      - sglang-patches/tokenizer_manager.py
