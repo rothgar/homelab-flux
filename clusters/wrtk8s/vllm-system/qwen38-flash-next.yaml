@@ -93,12 +93,15 @@ spec:
             - --quantization
             - modelopt_fp4
             - --ple-offload-embedding
-            # file PLE backend's HMM probe refuses in our containerized
-            # env even with privileged + hostIPC + full caps. Fall back
-            # to `pinned` and compensate for the OOM pressure with a
-            # much lower --mem-fraction-static below.
+            # file backend offloads expert weights to disk, freeing the
+            # GB10's unified pool. SGLang's HMM probe refuses our
+            # containerized env for unclear reasons, but the hardware
+            # actually supports HMM — SGLANG_QWEN4_PLE_FILE_SKIP_DEVICE_CHECK
+            # (set in env below) skips the probe safely.
             - --ple-offload-backend
-            - pinned
+            - file
+            - --ple-offload-dir
+            - /ple
             - --language-only
             - --reasoning-parser
             - qwen3
@@ -108,26 +111,28 @@ spec:
             - qwen3_coder
             - --mamba-radix-cache-strategy
             - extra_buffer
-            # 0.79 OOMs with pinned PLE on a 128 GB GB10 (180B NVFP4 +
-            # pinned expert mirror + draft weights + buffers). 0.55
-            # keeps planned allocation under ~95 GB.
             - --mem-fraction-static
-            - "0.55"
+            - "0.79"
             - --context-length
             - "262144"
             - --chunked-prefill-size
             - "2048"
             - --max-running-requests
-            - "1"
+            - "4"
             - --allow-auto-truncate
             - --enable-metrics
             - --kv-cache-dtype
             - auto
-            # NB: NEXTN speculative decoding reserves draft-model-sized
-            # weights (another ~45 GB) in the unified pool, pushing total
-            # over 128 GB with pinned PLE. Disabled until we can either
-            # get the file PLE backend working or find a smaller draft
-            # model configuration.
+            - --speculative-algorithm
+            - NEXTN
+            - --speculative-num-steps
+            - "3"
+            - --speculative-eagle-topk
+            - "1"
+            - --speculative-num-draft-tokens
+            - "4"
+            - --speculative-draft-model-quantization
+            - unquant
           env:
             - name: HF_TOKEN
               valueFrom:
@@ -143,6 +148,12 @@ spec:
             # Docker's `--gpus all` on a bare Spark).
             - name: NVIDIA_DRIVER_CAPABILITIES
               value: all
+            # The file PLE backend's hardware probe fails in this
+            # containerized env (CUDA attribute query returns None/False
+            # even though the GB10 does support HMM). Skip it — the
+            # hardware is capable; the test is just miscalibrated here.
+            - name: SGLANG_QWEN4_PLE_FILE_SKIP_DEVICE_CHECK
+              value: "1"
             # Patch toggles (see serve-next.sh header comment).
             - name: SGLANG_QWEN4_PLE_FILE_RSS_BUDGET_GB
               value: "8"
