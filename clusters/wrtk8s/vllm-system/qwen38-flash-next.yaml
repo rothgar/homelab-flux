@@ -88,8 +88,13 @@ spec:
             - "1"
             - --prefill-attention-backend
             - triton
+            # `--enable-unified-memory` + the page-major KV layout it
+            # auto-enables require Triton for decode attention too
+            # (upstream recipe used trtllm_mha but can't while HMM-mode
+            # is forced on; perf hit on decode is acceptable in exchange
+            # for weights fitting via the file PLE backend).
             - --decode-attention-backend
-            - trtllm_mha
+            - triton
             - --quantization
             - modelopt_fp4
             - --ple-offload-embedding
