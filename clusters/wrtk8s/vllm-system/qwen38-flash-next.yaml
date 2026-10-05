@@ -116,22 +116,24 @@ spec:
             # cache. Bump to 0.90 so KV + activations have breathing room.
             - --mem-fraction-static
             - "0.90"
+            # 262144 was eating so much per-request KV that no memory
+            # was left for the mamba state cache (SGLang auto-sized it to
+            # 3-4 slots, needs 5 to serve one request). Overriding
+            # --max-mamba-cache-size manually caused a CUDA illegal-memory
+            # fault in grouped_gemma_rmsnorm during warmup. 65536 ctx
+            # leaves ~4x the KV headroom so auto-sizing lands at ≥5.
             - --context-length
-            - "262144"
+            - "65536"
             - --chunked-prefill-size
             - "2048"
             # 1 req at a time; this model fronts opencode primarily and
             # doesn't need batched serving.
             - --max-running-requests
             - "1"
-            # SGLang auto-sized the mamba cache at 4 slots which is too
-            # small to serve a request (needs 5 per request for this
-            # model). Override to a larger explicit size. NB: NOT also
-            # setting --mamba-ssm-dtype bfloat16 because that trips an
-            # illegal-memory CUDA fault in grouped_gemma_rmsnorm during
-            # warmup — the custom kernel expects the native dtype.
-            - --max-mamba-cache-size
-            - "32"
+            # Let SGLang auto-size the mamba cache; forcing it higher
+            # than the memory budget trips an illegal-memory CUDA fault
+            # in grouped_gemma_rmsnorm during warmup. With ctx=65536 the
+            # auto-sizer has enough headroom.
             - --allow-auto-truncate
             - --enable-metrics
             - --kv-cache-dtype
