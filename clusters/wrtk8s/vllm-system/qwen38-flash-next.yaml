@@ -87,10 +87,13 @@ spec:
             - --quantization
             - modelopt_fp4
             - --ple-offload-embedding
+            # upstream's recipe calls for `file`, but SGLang's device
+            # probe inside this pod reports the GPU doesn't expose
+            # pageable-host-memory through host page tables and refuses
+            # the file backend. Fall back to `pinned` (uses pinned host
+            # RAM — a bit less flexible but functional on this hardware).
             - --ple-offload-backend
-            - file
-            - --ple-offload-dir
-            - /ple
+            - pinned
             - --language-only
             - --reasoning-parser
             - qwen3
@@ -185,8 +188,6 @@ spec:
             - name: models
               mountPath: /root/.cache
               subPath: cache
-            - name: ple
-              mountPath: /ple
             - name: shm
               mountPath: /dev/shm
             # Three in-container file paths overridden by the patch
@@ -207,10 +208,6 @@ spec:
         - name: models
           hostPath:
             path: /var/mnt/model
-            type: DirectoryOrCreate
-        - name: ple
-          hostPath:
-            path: /var/mnt/model/qwen38-ple-next
             type: DirectoryOrCreate
         - name: shm
           emptyDir:
