@@ -148,7 +148,7 @@ spec:
                 --cuda \
                 -m /models/ds4-gguf/DeepSeek-V4.1-Flash-Q2.gguf \
                 --ssd-streaming \
-                --ctx 32768 \
+                --ctx 131072 \
                 --host 0.0.0.0 \
                 --port 8000
           ports:
