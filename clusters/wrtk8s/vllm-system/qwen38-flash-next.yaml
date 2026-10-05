@@ -114,6 +114,10 @@ spec:
             - extra_buffer
             - --mem-fraction-static
             - "0.79"
+            # Explicitly ask SGLang to enable unified-memory APIs.
+            # Without this the file PLE backend probe refuses even on
+            # a GB10 ("device reports it does not [support HMM]").
+            - --enable-unified-memory
             - --context-length
             - "262144"
             - --chunked-prefill-size
