@@ -39,6 +39,12 @@ spec:
     spec:
       terminationGracePeriodSeconds: 30
       runtimeClassName: nvidia
+      # Upstream's `docker run --ipc host` is the k8s equivalent of
+      # hostIPC: true. CUDA's unified-memory / HMM path (used by SGLang's
+      # file PLE backend to prove the GPU exposes pageable host memory
+      # through host page tables) needs the host IPC namespace to see
+      # the CUDA driver's shared-memory region.
+      hostIPC: true
       hostAliases:
         - ip: 10.1.1.164
           hostnames: [hf.jgarr.net]
