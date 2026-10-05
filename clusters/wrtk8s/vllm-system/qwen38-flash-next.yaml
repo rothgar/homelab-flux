@@ -87,13 +87,16 @@ spec:
             - --quantization
             - modelopt_fp4
             - --ple-offload-embedding
-            # upstream's recipe calls for `file`, but SGLang's device
-            # probe inside this pod reports the GPU doesn't expose
-            # pageable-host-memory through host page tables and refuses
-            # the file backend. Fall back to `pinned` (uses pinned host
-            # RAM — a bit less flexible but functional on this hardware).
+            # `file` offloads expert weights to disk; required because
+            # `pinned` eats the whole GB10 unified pool and OOMs on
+            # weight load. The GPU device-feature probe for file-backend
+            # needs the pod to expose all NVIDIA capabilities + privileged
+            # (see securityContext below), otherwise it refuses with
+            # "device reports it does not [support host page tables]".
             - --ple-offload-backend
-            - pinned
+            - file
+            - --ple-offload-dir
+            - /ple
             - --language-only
             - --reasoning-parser
             - qwen3
@@ -135,6 +138,11 @@ spec:
               value: /models/huggingface
             - name: HF_ENDPOINT
               value: http://hf.jgarr.net
+            # Expose full NVIDIA capabilities inside the container so the
+            # SGLang CUDA device-feature probe sees HMM support (same as
+            # Docker's `--gpus all` on a bare Spark).
+            - name: NVIDIA_DRIVER_CAPABILITIES
+              value: all
             # Patch toggles (see serve-next.sh header comment).
             - name: SGLANG_QWEN4_PLE_FILE_RSS_BUDGET_GB
               value: "8"
@@ -152,6 +160,11 @@ spec:
               value: "1"
             - name: SGLANG_ORPHAN_ABORT
               value: "1"
+          # Full driver caps + privileged so the SGLang device-feature
+          # probe can see HMM / pageable-host-memory support on the GB10.
+          # Without this the file PLE backend refuses to start.
+          securityContext:
+            privileged: true
           ports:
             - containerPort: 30000
               name: http
@@ -188,6 +201,8 @@ spec:
             - name: models
               mountPath: /root/.cache
               subPath: cache
+            - name: ple
+              mountPath: /ple
             - name: shm
               mountPath: /dev/shm
             # Three in-container file paths overridden by the patch
@@ -208,6 +223,10 @@ spec:
         - name: models
           hostPath:
             path: /var/mnt/model
+            type: DirectoryOrCreate
+        - name: ple
+          hostPath:
+            path: /var/mnt/model/qwen38-ple-next
             type: DirectoryOrCreate
         - name: shm
           emptyDir:
