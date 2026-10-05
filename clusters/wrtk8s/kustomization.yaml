@@ -28,10 +28,8 @@ resources:
   - metrics-server
   - minecraft
   - mini-crawler
-  - mistral-system
   - miniflux
   - n8n
-  - tenstorrent-system
   - monitoring
   - mqtt
 

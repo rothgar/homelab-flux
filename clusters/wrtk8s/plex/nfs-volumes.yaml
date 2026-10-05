@@ -277,38 +277,3 @@ spec:
   resources:
     requests:
       storage: 1Ti
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: plex-data
-spec:
-  capacity:
-    storage: 500Gi
-  accessModes:
-    - ReadWriteMany
-  mountOptions:
-    - nfsvers=4.1
-    - rsize=1048576
-    - wsize=1048576
-    - hard
-    - noatime
-    - nodiratime
-  nfs:
-    server: 10.1.1.4
-    path: /volume1/Plex/AppData
-  persistentVolumeReclaimPolicy: Retain
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: plex-data
-  namespace: plex
-spec:
-  accessModes:
-    - ReadWriteMany
-  storageClassName: ""
-  volumeName: plex-data
-  resources:
-    requests:
-      storage: 500Gi
