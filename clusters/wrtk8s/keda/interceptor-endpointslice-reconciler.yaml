@@ -1,0 +1,129 @@
+# KEDA HTTP interceptor EndpointSlice reconciler.
+#
+# Problem: EndpointSlices can only list real pod IPs — pointing one at a
+# Service ClusterIP (as we had for whisper-webui-scaled → the interceptor
+# Service IP) is silently broken in kube-proxy. The ingress backend
+# whisper-webui-scaled therefore has to list the actual KEDA interceptor
+# pod IPs instead. Those pod IPs change on every interceptor pod recreate
+# (image bump, node drain, OOM, etc.), so we need a periodic reconciler
+# that syncs them.
+#
+# Scope: today only whisper-webui-scaled (default ns) depends on this.
+# When another scale-to-zero workload comes along, add its EndpointSlice
+# name to TARGET_ENDPOINTSLICES in the CronJob env below.
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: keda-ep-reconciler
+  namespace: keda
+---
+# Read interceptor pods in keda ns.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: keda-ep-reconciler
+  namespace: keda
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: keda-ep-reconciler
+  namespace: keda
+subjects:
+  - kind: ServiceAccount
+    name: keda-ep-reconciler
+    namespace: keda
+roleRef:
+  kind: Role
+  name: keda-ep-reconciler
+  apiGroup: rbac.authorization.k8s.io
+---
+# Write EndpointSlices in default ns (where the scaled Services live).
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: keda-ep-reconciler-default
+  namespace: default
+rules:
+  - apiGroups: ["discovery.k8s.io"]
+    resources: ["endpointslices"]
+    verbs: ["get", "patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: keda-ep-reconciler-default
+  namespace: default
+subjects:
+  - kind: ServiceAccount
+    name: keda-ep-reconciler
+    namespace: keda
+roleRef:
+  kind: Role
+  name: keda-ep-reconciler-default
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: keda-ep-reconciler
+  namespace: keda
+spec:
+  schedule: "*/15 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: keda-ep-reconciler
+          restartPolicy: OnFailure
+          containers:
+            - name: reconcile
+              image: bitnami/kubectl:1.33.4
+              env:
+                # Space-separated list of "<namespace>/<endpointslice>".
+                - name: TARGETS
+                  value: "default/whisper-webui-scaled"
+                - name: INTERCEPTOR_NS
+                  value: "keda"
+                - name: INTERCEPTOR_SELECTOR
+                  value: "app.kubernetes.io/component=interceptor,app.kubernetes.io/name=http-add-on"
+                - name: INTERCEPTOR_PORT
+                  value: "8080"
+              command:
+                - bash
+                - -euo
+                - pipefail
+                - -c
+                - |
+                  set -x
+                  mapfile -t IPS < <(kubectl -n "$INTERCEPTOR_NS" get pods \
+                    -l "$INTERCEPTOR_SELECTOR" \
+                    -o jsonpath='{range .items[?(@.status.phase=="Running")]}{.status.podIP}{"\n"}{end}' \
+                    | sort -u | grep -v '^$')
+                  if [ "${#IPS[@]}" -eq 0 ]; then
+                    echo "no interceptor pods ready; aborting"
+                    exit 1
+                  fi
+                  # Build the endpoints: array as a JSON merge patch.
+                  endpoints_json=$(printf '{"addresses":["%s"],"conditions":{"ready":true}},' "${IPS[@]}" | sed 's/,$//')
+                  patch=$(printf '{"endpoints":[%s]}' "$endpoints_json")
+
+                  for t in $TARGETS; do
+                    ns=${t%/*}
+                    name=${t#*/}
+                    echo "patching $ns/$name with ${#IPS[@]} endpoint(s): ${IPS[*]}"
+                    kubectl -n "$ns" patch endpointslice "$name" \
+                      --type=merge \
+                      -p "$patch"
+                  done
+          # Interceptor pods are long-lived; this is pure maintenance work.
+          # Tolerate a slow start if the API server is briefly unreachable.
+          backoffLimit: 3
