@@ -55,6 +55,10 @@ spec:
   # preserves the client's original Host, which is the FQDN below.
   hosts:
     - whisper.gerbil-dragon.ts.net
+    # `whisper` tailnet node went offline for 22+ days, so the tailscale
+    # operator re-registered the proxy under `whisper-1`. Keep both so
+    # the ingress works whichever name the operator currently owns.
+    - whisper-1.gerbil-dragon.ts.net
     - whisper-webui-scaled
     - whisper-webui-scaled:8080
   scaleTargetRef:
