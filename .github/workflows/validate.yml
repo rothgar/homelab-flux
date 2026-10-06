@@ -1,0 +1,20 @@
+name: validate
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  kustomize:
+    name: kustomize render
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-kubectl@v4
+      - name: Render clusters/wrtk8s
+        # Any kustomize-level error (bad field, missing resource, duplicate
+        # names, invalid YAML) will fail the render and the PR check.
+        run: kubectl kustomize clusters/wrtk8s > /dev/null
