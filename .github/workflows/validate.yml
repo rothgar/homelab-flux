@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: azure/setup-kubectl@v4
+      - uses: azure/setup-kubectl@v5
       - name: Render clusters/wrtk8s
         # Any kustomize-level error (bad field, missing resource, duplicate
         # names, invalid YAML) will fail the render and the PR check.
