@@ -89,12 +89,15 @@ spec:
               value: all
             - name: PIXELFLUX_WAYLAND
               value: "false"
-            # Hardware video encoding for the Selkies WebRTC stream (NVENC).
-            # Without this Selkies uses x264enc on CPU, which dominates latency.
-            # Note: Zink (GL → Vulkan) was tried for the 3D viewport but crashes
-            # Bambu's wxWidgets init — viewport stays on software Mesa.
+            # Hardware video encoding for the Selkies WebRTC stream.
+            # ls173 removed explicit `nvh264enc` — pixelflux auto-selects
+            # NVENC when a render node advertises it (startup logs show
+            # `pixelflux: Render node 1 encodes H264, H265 on nvenc`), so
+            # we just name the codec and let pixelflux pick the backend.
+            # Note: Zink (GL → Vulkan) was tried for the 3D viewport but
+            # crashes Bambu's wxWidgets init — viewport stays on software Mesa.
             - name: SELKIES_ENCODER
-              value: nvh264enc
+              value: h264enc
             # Cap framerate + bitrate to keep the WebSocket video path from
             # backpressuring over tailnet. Defaults (60 fps, no bitrate cap)
             # were producing ~15-30 Mbps at 1940x1182 which overwhelmed the
