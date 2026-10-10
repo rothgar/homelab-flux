@@ -75,7 +75,7 @@ spec:
               mountPath: /dev/shm
       containers:
         - name: bambustudio
-          image: lscr.io/linuxserver/bambustudio:v02.08.04.57-ls173
+          image: lscr.io/linuxserver/bambustudio:v02.08.04.57-ls174
           env:
             - name: PUID
               value: "1000"
