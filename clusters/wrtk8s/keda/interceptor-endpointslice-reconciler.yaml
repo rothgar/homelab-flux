@@ -86,7 +86,10 @@ spec:
           restartPolicy: OnFailure
           containers:
             - name: reconcile
-              image: bitnami/kubectl:1.33.4
+              # bitnami/kubectl:1.33.4 — Bitnami retired their public Docker
+              # Hub images in Aug 2025. rancher/kubectl is distroless (no
+              # shell), so we need alpine/k8s which ships ash+kubectl.
+              image: alpine/k8s:1.33.4
               env:
                 # Space-separated list of "<namespace>/<endpointslice>".
                 - name: TARGETS
@@ -98,28 +101,33 @@ spec:
                 - name: INTERCEPTOR_PORT
                   value: "8080"
               command:
-                - bash
-                - -euo
-                - pipefail
+                - /bin/sh
+                - -eu
                 - -c
                 - |
                   set -x
-                  mapfile -t IPS < <(kubectl -n "$INTERCEPTOR_NS" get pods \
+                  IPS=$(kubectl -n "$INTERCEPTOR_NS" get pods \
                     -l "$INTERCEPTOR_SELECTOR" \
                     -o jsonpath='{range .items[?(@.status.phase=="Running")]}{.status.podIP}{"\n"}{end}' \
                     | sort -u | grep -v '^$')
-                  if [ "${#IPS[@]}" -eq 0 ]; then
+                  if [ -z "$IPS" ]; then
                     echo "no interceptor pods ready; aborting"
                     exit 1
                   fi
                   # Build the endpoints: array as a JSON merge patch.
-                  endpoints_json=$(printf '{"addresses":["%s"],"conditions":{"ready":true}},' "${IPS[@]}" | sed 's/,$//')
-                  patch=$(printf '{"endpoints":[%s]}' "$endpoints_json")
+                  endpoints=""
+                  sep=""
+                  for ip in $IPS; do
+                    endpoints="${endpoints}${sep}{\"addresses\":[\"${ip}\"],\"conditions\":{\"ready\":true}}"
+                    sep=","
+                  done
+                  patch="{\"endpoints\":[${endpoints}]}"
+                  count=$(printf '%s\n' "$IPS" | wc -l | tr -d ' ')
 
                   for t in $TARGETS; do
                     ns=${t%/*}
                     name=${t#*/}
-                    echo "patching $ns/$name with ${#IPS[@]} endpoint(s): ${IPS[*]}"
+                    echo "patching $ns/$name with $count endpoint(s): $IPS"
                     kubectl -n "$ns" patch endpointslice "$name" \
                       --type=merge \
                       -p "$patch"
