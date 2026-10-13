@@ -89,7 +89,7 @@ spec:
               # bitnami/kubectl:1.33.4 — Bitnami retired their public Docker
               # Hub images in Aug 2025. rancher/kubectl is distroless (no
               # shell), so we need alpine/k8s which ships ash+kubectl.
-              image: alpine/k8s:1.33.4
+              image: alpine/k8s:1.37.1
               env:
                 # Space-separated list of "<namespace>/<endpointslice>".
                 - name: TARGETS
