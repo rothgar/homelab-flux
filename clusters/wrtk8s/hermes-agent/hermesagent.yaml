@@ -28,7 +28,7 @@ spec:
         _config_version: 12
         model:
           provider: custom
-          default: hermes-4.3-36b
+          default: hermes3:8b
           # Reach aperture through the Tailscale operator egress proxy
           # (see aperture-egress.yaml). The proxy joins the tailnet as
           # tag:k8s, which aperture's ACL grants map to `role:admin,

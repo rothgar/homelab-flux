@@ -36,6 +36,7 @@ data:
       "extensions": {
         "sync": {
           "enable": true,
+          "credentialsFile": "/etc/zot-creds/creds.json",
           "registries": [
             {
               "urls": ["https://registry-1.docker.io"],
@@ -43,7 +44,6 @@ data:
               "tlsVerify": true,
               "maxRetries": 3,
               "retryDelay": "5m",
-              "credentialsFile": "/etc/zot-creds/creds.json",
               "content": [{"prefix": "**"}]
             }
           ]
@@ -72,7 +72,7 @@ spec:
     spec:
       initContainers:
         - name: zot-migrate
-          image: busybox:1.36
+          image: busybox:1.38
           command:
             - sh
             - -c
@@ -88,7 +88,7 @@ spec:
       containers:
         - name: zot
           # renovate: image=ghcr.io/project-zot/zot
-          image: ghcr.io/project-zot/zot:v2.1.21
+          image: ghcr.io/project-zot/zot:v2.1.22
           args: ["serve", "/etc/zot/config.json"]
           ports:
             - containerPort: 5000

@@ -4,9 +4,13 @@ metadata:
   name: gotify-data
   namespace: gotify
 spec:
-  storageClassName: synology-iscsi
+  # NFS instead of iSCSI: RWO iSCSI reservations don't release when the
+  # holder node dies — a crashed GB10 left gotify stuck "FailedAttachVolume
+  # already exclusively attached" indefinitely. NFS has no node-level
+  # reservation and the pod floats freely.
+  storageClassName: nfs-synology-open
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   resources:
     requests:
       storage: 5Gi

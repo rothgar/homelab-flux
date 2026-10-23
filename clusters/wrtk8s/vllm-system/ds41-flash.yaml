@@ -42,12 +42,13 @@ spec:
       runtimeClassName: nvidia
       # jgarr.net wildcard DNS resolves to the WAN IP (unreachable
       # from pods). Pin pulsys HF cache to its MetalLB IP directly.
-      # Also alias huggingface.co to pulsys since ds4's download
-      # script falls back to curl with hardcoded huggingface.co URLs
-      # when `hf` CLI isn't available or for certain files.
+      # huggingface.co is NOT aliased — this model repo isn't on the
+      # pulsys token's allowlist, so we bypass pulsys and pull direct
+      # from HF for this one. (If pulsys permissions change, re-add
+      # the alias and switch the download URL back to hf.jgarr.net.)
       hostAliases:
         - ip: 10.1.1.164
-          hostnames: [hf.jgarr.net, huggingface.co]
+          hostnames: [hf.jgarr.net]
       tolerations:
         - key: nvidia.com/gpu
           operator: Exists
@@ -98,20 +99,33 @@ spec:
         # Download the Q2 GGUF via pulsys. Resumable; re-runs are
         # no-ops once the full 341 GiB file is in place.
         - name: download-model
-          image: python:3.12-slim
+          image: python:3.14-slim
           command:
             - bash
             - -euxc
             - |
+              # DeepSeek-V4.1-Flash-Q2.gguf is xet-backed on HF; plain
+              # curl -L against /resolve/main/FILE 302s to a xet CDN URL
+              # that then 400s (xet needs a protocol handshake, not a
+              # raw GET). Use the hf CLI directly against huggingface.co
+              # — bypasses both pulsys (token-scope limits antirez repo)
+              # and the ds4 script.
               pip install -q --no-cache-dir --root-user-action=ignore \
                 "huggingface_hub[cli]" hf_xet
-              apt-get update -q >/dev/null
-              apt-get install -y -q curl ca-certificates >/dev/null
               mkdir -p /models/ds4-gguf
-              cd /models/ds4
-              DS4_GGUF_DIR=/models/ds4-gguf \
-              HF_ENDPOINT=http://hf.jgarr.net \
-                ./download_model.sh ds41f-q2
+              FILE=DeepSeek-V4.1-Flash-Q2.gguf
+              REPO=antirez/deepseek-v4.1-flash-gguf
+              # hf download resumes partial transfers automatically. The
+              # loop handles transient network drops over the ~45 min
+              # pull from the US-east HF mirror at 100-200 MB/s.
+              while true; do
+                if hf download "$REPO" "$FILE" \
+                     --local-dir /models/ds4-gguf; then
+                  break
+                fi
+                echo "transfer dropped; retrying in 30s"
+                sleep 30
+              done
               ls -lh /models/ds4-gguf/
           env:
             - name: HF_TOKEN
@@ -134,7 +148,7 @@ spec:
                 --cuda \
                 -m /models/ds4-gguf/DeepSeek-V4.1-Flash-Q2.gguf \
                 --ssd-streaming \
-                --ctx 32768 \
+                --ctx 131072 \
                 --host 0.0.0.0 \
                 --port 8000
           ports:

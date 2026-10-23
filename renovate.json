@@ -39,7 +39,9 @@
       "matchUpdateTypes": ["minor", "patch", "digest"],
       "automerge": true,
       "platformAutomerge": true,
-      "description": "Auto-merge minor/patch bumps for stateless leaf apps. Major bumps still require review. Needs GitHub Settings → General → 'Allow auto-merge' enabled at repo level."
+      "automergeSchedule": ["after 2:00am and before 6:00am"],
+      "timezone": "America/Los_Angeles",
+      "description": "Auto-merge minor/patch bumps for stateless leaf apps. Major bumps still require review. Confined to 02:00–06:00 PT so a rollout that goes sideways doesn't land during active use. Needs GitHub Settings → General → 'Allow auto-merge' + branch protection with the kustomize render check as a required gate."
     },
     {
       "matchDatasources": ["helm"],
@@ -47,7 +49,9 @@
       "matchUpdateTypes": ["minor", "patch"],
       "automerge": true,
       "platformAutomerge": true,
-      "description": "Auto-merge onedev helm chart minor/patch bumps."
+      "automergeSchedule": ["after 2:00am and before 6:00am"],
+      "timezone": "America/Los_Angeles",
+      "description": "Auto-merge onedev helm chart minor/patch bumps in the 02:00–06:00 PT window."
     },
     {
       "matchDepNames": ["lscr.io/linuxserver/plex"],

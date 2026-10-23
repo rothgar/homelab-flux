@@ -59,7 +59,7 @@ spec:
     spec:
       initContainers:
         - name: zot-migrate
-          image: busybox:1.36
+          image: busybox:1.38
           command:
             - sh
             - -c
@@ -75,7 +75,7 @@ spec:
       containers:
         - name: zot
           # renovate: image=ghcr.io/project-zot/zot
-          image: ghcr.io/project-zot/zot:v2.1.21
+          image: ghcr.io/project-zot/zot:v2.1.22
           args: ["serve", "/etc/zot/config.json"]
           ports:
             - containerPort: 5000

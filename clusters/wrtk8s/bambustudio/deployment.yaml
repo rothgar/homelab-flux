@@ -16,6 +16,12 @@ spec:
         app: bambustudio
     spec:
       runtimeClassName: nvidia
+      # Pin hostname so Bambu Studio's encrypted auth blob
+      # (BambuNetworkEngine.conf) stays decryptable across pod rollouts.
+      # Without this, the ReplicaSet-hashed hostname (e.g. bambustudio-
+      # 6f78f667c7-qtwkz) changes on every image bump and invalidates
+      # the session, forcing a re-login.
+      hostname: bambustudio
       nodeSelector:
         kubernetes.io/arch: amd64
         nvidia.com/gpu: "true"
@@ -28,6 +34,28 @@ spec:
             - sh
             - -c
             - chmod 700 /config && chown 1000:1000 /config
+          securityContext:
+            runAsUser: 0
+          volumeMounts:
+            - name: config
+              mountPath: /config
+        # Stable /etc/machine-id survives pod recreations by living on
+        # the config PVC. Belt-and-suspenders with `hostname: bambustudio`
+        # above — some apps hash identity off machine-id instead of /etc/
+        # hostname. Generated once on first boot, reused forever after.
+        - name: stable-machine-id
+          image: busybox:1.38
+          command:
+            - sh
+            - -c
+            - |
+              if [ ! -s /config/.machine-id ]; then
+                head -c 16 /dev/urandom | od -An -tx1 | tr -d ' \n' > /config/.machine-id
+              fi
+              # Projected into /host-etc so main container can bind-mount it.
+              # Not applied to the main container's /etc here because we
+              # can't share writes to /etc across containers in a Pod; see
+              # the subPath mount in the bambustudio container instead.
           securityContext:
             runAsUser: 0
           volumeMounts:
@@ -47,7 +75,7 @@ spec:
               mountPath: /dev/shm
       containers:
         - name: bambustudio
-          image: lscr.io/linuxserver/bambustudio:v02.08.04.57-ls172
+          image: lscr.io/linuxserver/bambustudio:v02.08.04.57-ls174
           env:
             - name: PUID
               value: "1000"
@@ -61,12 +89,15 @@ spec:
               value: all
             - name: PIXELFLUX_WAYLAND
               value: "false"
-            # Hardware video encoding for the Selkies WebRTC stream (NVENC).
-            # Without this Selkies uses x264enc on CPU, which dominates latency.
-            # Note: Zink (GL → Vulkan) was tried for the 3D viewport but crashes
-            # Bambu's wxWidgets init — viewport stays on software Mesa.
+            # Hardware video encoding for the Selkies WebRTC stream.
+            # ls173 removed explicit `nvh264enc` — pixelflux auto-selects
+            # NVENC when a render node advertises it (startup logs show
+            # `pixelflux: Render node 1 encodes H264, H265 on nvenc`), so
+            # we just name the codec and let pixelflux pick the backend.
+            # Note: Zink (GL → Vulkan) was tried for the 3D viewport but
+            # crashes Bambu's wxWidgets init — viewport stays on software Mesa.
             - name: SELKIES_ENCODER
-              value: nvh264enc
+              value: h264enc
             # Cap framerate + bitrate to keep the WebSocket video path from
             # backpressuring over tailnet. Defaults (60 fps, no bitrate cap)
             # were producing ~15-30 Mbps at 1940x1182 which overwhelmed the
@@ -84,6 +115,10 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /config
+            - name: config
+              mountPath: /etc/machine-id
+              subPath: .machine-id
+              readOnly: true
             - name: dshm
               mountPath: /dev/shm
       volumes:
