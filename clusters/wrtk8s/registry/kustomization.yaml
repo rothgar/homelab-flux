@@ -8,6 +8,7 @@ resources:
   - deployment.yaml
   - tailscale-service.yaml
   - docker-cache.yaml
+  - docker-cache-creds.yaml
   - k8s-cache.yaml
   - gcr-cache.yaml
   - ghcr-cache.yaml

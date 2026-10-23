@@ -14,7 +14,10 @@ metadata:
   name: hermes-4-3-36b
   namespace: vllm-system
 spec:
-  replicas: 1
+  # Scaled to 0 to free a GB10 slot for ds41-flash (vllm-model
+  # anti-affinity enforces one-per-node). Scale back to 1 if ds41-flash
+  # is removed or if we add a third GB10.
+  replicas: 0
   strategy:
     type: Recreate
   selector:

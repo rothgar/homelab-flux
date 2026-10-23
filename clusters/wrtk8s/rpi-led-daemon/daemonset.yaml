@@ -27,10 +27,20 @@ spec:
       containers:
         - name: led
           image: python:3.14-slim
-          command: ["python3", "-u", "/scripts/led-daemon.py"]
+          # pip install gpiod at startup — small (~0.5 MiB wheel), ~2 s.
+          # /dev needs to be bind-mounted from the host so /dev/gpiochip*
+          # is visible for libgpiod.
+          command:
+            - sh
+            - -c
+            - |
+              pip install --quiet --no-cache-dir --root-user-action=ignore gpiod
+              exec python3 -u /scripts/led-daemon.py
           env:
-            - name: LED_NAME
-              value: ACT
+            - name: GPIO_LINE_ACT
+              value: "21"
+            - name: GPIO_LINE_PWR
+              value: "26"
             - name: NET_IFACE
               value: end0
             - name: PWM_DUTY
@@ -44,6 +54,8 @@ spec:
           volumeMounts:
             - name: sys
               mountPath: /sys
+            - name: dev
+              mountPath: /dev
             - name: scripts
               mountPath: /scripts
               readOnly: true
@@ -53,11 +65,14 @@ spec:
               memory: 32Mi
             limits:
               cpu: 100m
-              memory: 64Mi
+              memory: 128Mi
       volumes:
         - name: sys
           hostPath:
             path: /sys
+        - name: dev
+          hostPath:
+            path: /dev
         - name: scripts
           configMap:
             name: rpi-led-daemon-script
