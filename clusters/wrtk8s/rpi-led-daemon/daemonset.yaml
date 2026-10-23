@@ -24,6 +24,7 @@ spec:
       priorityClassName: system-node-critical
       tolerations:
         - operator: Exists
+      automountServiceAccountToken: false
       containers:
         - name: led
           image: python:3.14-slim

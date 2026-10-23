@@ -13,6 +13,7 @@ spec:
       labels:
         app: paperless-redis
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: redis
           image: redis:8-alpine

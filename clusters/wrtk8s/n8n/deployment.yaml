@@ -21,6 +21,7 @@ spec:
         runAsUser: 1000
         runAsGroup: 1000
         fsGroup: 1000
+      automountServiceAccountToken: false
       containers:
         - name: n8n
           image: docker.n8n.io/n8nio/n8n:2.44.3

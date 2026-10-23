@@ -20,6 +20,7 @@ spec:
       labels:
         app: valkey
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: valkey
           image: valkey/valkey:9.2-alpine

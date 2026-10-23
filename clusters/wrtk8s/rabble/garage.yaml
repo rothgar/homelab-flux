@@ -54,6 +54,7 @@ spec:
     spec:
       nodeSelector:
         kubernetes.io/arch: amd64
+      automountServiceAccountToken: false
       containers:
         - name: garage
           image: dxflrs/garage:v2.4.1

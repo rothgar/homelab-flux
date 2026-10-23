@@ -136,6 +136,7 @@ spec:
           volumeMounts:
             - name: models
               mountPath: /models
+      automountServiceAccountToken: false
       containers:
         - name: ds4-server
           image: nvcr.io/nvidia/cuda:13.0.1-devel-ubuntu24.04

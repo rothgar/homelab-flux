@@ -18,6 +18,7 @@ spec:
       template:
         spec:
           restartPolicy: Never
+          automountServiceAccountToken: false
           containers:
             - name: hockeytime
               image: cr.jgarr.net/hockeytime:latest

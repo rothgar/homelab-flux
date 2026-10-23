@@ -26,6 +26,7 @@ spec:
       labels:
         app: romm-db
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: mariadb
           image: mariadb:12

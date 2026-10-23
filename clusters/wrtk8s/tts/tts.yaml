@@ -13,6 +13,7 @@ spec:
       labels:
         app: tts
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: tts
           image: ghcr.io/matatonic/openedai-speech:0.18.2

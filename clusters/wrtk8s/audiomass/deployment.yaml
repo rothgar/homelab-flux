@@ -13,6 +13,7 @@ spec:
       labels:
         app: audiomass
     spec:
+      automountServiceAccountToken: false
       containers:
         # AudioMass is a pure client-side JS app; the image is just nginx
         # with `src/` baked in from the rothgar/AudioMass fork. The GHA in

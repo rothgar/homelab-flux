@@ -13,6 +13,7 @@ spec:
       labels:
         app: miniflux
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: miniflux
           image: ghcr.io/miniflux/miniflux:2.3.4

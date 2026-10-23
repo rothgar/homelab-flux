@@ -13,6 +13,7 @@ spec:
       labels:
         app: registry
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: registry
           image: registry:3

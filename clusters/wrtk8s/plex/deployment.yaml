@@ -57,6 +57,7 @@ spec:
               mountPath: /config/Library/Application Support
             - name: backup
               mountPath: /backup
+      automountServiceAccountToken: false
       containers:
         - name: plex
           image: lscr.io/linuxserver/plex:1.43.5.11029-6bf8af3f0-ls329

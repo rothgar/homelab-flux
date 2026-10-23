@@ -13,6 +13,7 @@ spec:
       labels:
         app: mosquitto
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: mosquitto
           image: eclipse-mosquitto:2

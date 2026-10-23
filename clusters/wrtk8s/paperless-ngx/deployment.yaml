@@ -25,6 +25,7 @@ spec:
         runAsUser: 65534
         runAsGroup: 65534
         fsGroup: 65534
+      automountServiceAccountToken: false
       containers:
         - name: paperless-ngx
           image: ghcr.io/paperless-ngx/paperless-ngx:3.3.2

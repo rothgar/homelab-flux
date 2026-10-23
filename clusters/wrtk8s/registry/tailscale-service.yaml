@@ -52,6 +52,7 @@ spec:
       annotations:
         reloader.stakater.com/auto: "true"
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: nginx
           image: nginx:1.31-alpine

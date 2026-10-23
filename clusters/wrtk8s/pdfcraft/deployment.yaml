@@ -13,6 +13,7 @@ spec:
       labels:
         app: pdfcraft
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: pdfcraft
           image: ghcr.io/pdfcrafttool/pdfcraft:latest

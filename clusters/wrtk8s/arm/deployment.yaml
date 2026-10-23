@@ -29,6 +29,7 @@ spec:
               mountPath: /media
             - name: music
               mountPath: /music
+      automountServiceAccountToken: false
       containers:
         - name: arm
           image: automaticrippingmachine/automatic-ripping-machine:2.24.4

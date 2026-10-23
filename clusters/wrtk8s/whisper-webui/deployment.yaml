@@ -28,6 +28,7 @@ spec:
                   - key: nvidia.com/gpu.compute.major
                     operator: Gt
                     values: ["6"]
+      automountServiceAccountToken: false
       containers:
         - name: whisper-webui
           image: ghcr.io/rothgar/whisper-webui:v0.0.0-d2bdcf7

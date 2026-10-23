@@ -65,6 +65,7 @@ spec:
       labels:
         app: romm
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: romm
           image: rommapp/romm:5.4.0

@@ -20,6 +20,7 @@ spec:
         runAsUser: 101
         runAsGroup: 101
         fsGroup: 101
+      automountServiceAccountToken: false
       containers:
         - name: timesync
           image: ghcr.io/rothgar/timesync:latest

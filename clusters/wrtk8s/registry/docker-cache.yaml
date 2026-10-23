@@ -85,6 +85,7 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /var/lib/registry
+      automountServiceAccountToken: false
       containers:
         - name: zot
           # renovate: image=ghcr.io/project-zot/zot

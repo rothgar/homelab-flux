@@ -18,6 +18,7 @@ spec:
       template:
         spec:
           restartPolicy: Never
+          automountServiceAccountToken: false
           containers:
             - name: mini-crawler
               image: cr.jgarr.net/mini-crawler:latest

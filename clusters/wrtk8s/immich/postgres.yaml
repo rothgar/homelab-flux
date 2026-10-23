@@ -39,6 +39,7 @@ spec:
     spec:
       nodeSelector:
         kubernetes.io/hostname: mini
+      automountServiceAccountToken: false
       containers:
         - name: postgres
           # Immich's bundled Postgres image. Ships pg16 + vchord + pgvector +

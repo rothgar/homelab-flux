@@ -37,6 +37,7 @@ spec:
               mountPath: /Downloads
       securityContext:
         fsGroup: 1001
+      automountServiceAccountToken: false
       containers:
         - name: reaparr
           image: reaparr/reaparr:0.40.0

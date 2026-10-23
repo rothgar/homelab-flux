@@ -22,6 +22,7 @@ spec:
           effect: NoExecute
         - operator: Exists
           effect: NoSchedule
+      automountServiceAccountToken: false
       containers:
         - name: coral-edgetpu-device-plugin
           image: ghcr.io/squat/generic-device-plugin:0.2.0

@@ -92,6 +92,7 @@ spec:
       labels:
         app: snmp-exporter
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: snmp-exporter
           image: prom/snmp-exporter:v0.30.1

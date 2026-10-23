@@ -15,6 +15,7 @@ spec:
       labels:
         app: gotify
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: gotify
           # renovate: image=ghcr.io/gotify/server

@@ -36,6 +36,7 @@ spec:
       labels:
         app: livekit-egress
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: egress
           image: livekit/egress:latest

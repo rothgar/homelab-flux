@@ -22,6 +22,7 @@ spec:
       template:
         spec:
           restartPolicy: Never
+          automountServiceAccountToken: false
           containers:
             - name: sportswatch
               # Image is built from the ~/src/sportswatch repo via `make push`.

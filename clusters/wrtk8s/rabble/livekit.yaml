@@ -19,6 +19,7 @@ spec:
       # crash the LiveKit server because it tries to parse them as command-line
       # flags.
       enableServiceLinks: false
+      automountServiceAccountToken: false
       containers:
         - name: livekit
           image: livekit/livekit-server:v1.13.8

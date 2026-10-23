@@ -15,6 +15,7 @@ spec:
     spec:
       nodeSelector:
         kubernetes.io/arch: amd64
+      automountServiceAccountToken: false
       containers:
         - name: postgres
           image: postgres:13
