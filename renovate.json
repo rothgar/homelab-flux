@@ -26,6 +26,7 @@
     {
       "matchDepNames": [
         "ghcr.io/alexta69/metube",
+        "ghcr.io/mealie-recipes/mealie",
         "ghcr.io/miniflux/miniflux",
         "ghcr.io/paperless-ngx/paperless-ngx",
         "ghcr.io/pdfcrafttool/pdfcraft",
@@ -45,13 +46,13 @@
     },
     {
       "matchDatasources": ["helm"],
-      "matchDepNames": ["onedev"],
+      "matchDepNames": ["onedev", "mecak8s"],
       "matchUpdateTypes": ["minor", "patch"],
       "automerge": true,
       "platformAutomerge": true,
       "automergeSchedule": ["after 2:00am and before 6:00am"],
       "timezone": "America/Los_Angeles",
-      "description": "Auto-merge onedev helm chart minor/patch bumps in the 02:00–06:00 PT window."
+      "description": "Auto-merge trusted helm chart minor/patch bumps in the 02:00–06:00 PT window."
     },
     {
       "matchDepNames": ["lscr.io/linuxserver/plex"],
