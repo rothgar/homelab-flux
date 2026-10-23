@@ -13,6 +13,10 @@ spec:
       labels:
         app: omni-cd
     spec:
+      automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: omni-cd
           image: ghcr.io/ktijssen/omni-cd:v0.6.3

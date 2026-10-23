@@ -13,6 +13,10 @@ spec:
       labels:
         app: talos-remote-config
     spec:
+      automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: talos-remote-config
           image: ghcr.io/siderolabs/talos-remote-config:latest

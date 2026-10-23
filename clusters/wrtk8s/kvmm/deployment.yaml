@@ -21,6 +21,7 @@ spec:
       securityContext:
         seccompProfile:
           type: RuntimeDefault
+      automountServiceAccountToken: false
       containers:
         - name: kvmm
           image: ghcr.io/rothgar/kvmm:0.2.4
