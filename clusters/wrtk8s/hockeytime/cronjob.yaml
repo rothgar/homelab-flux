@@ -19,6 +19,9 @@ spec:
         spec:
           restartPolicy: Never
           automountServiceAccountToken: false
+          securityContext:
+            seccompProfile:
+              type: RuntimeDefault
           containers:
             - name: hockeytime
               image: cr.jgarr.net/hockeytime:latest

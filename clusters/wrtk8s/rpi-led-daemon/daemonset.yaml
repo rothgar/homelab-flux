@@ -25,6 +25,9 @@ spec:
       tolerations:
         - operator: Exists
       automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: led
           image: python:3.14-slim

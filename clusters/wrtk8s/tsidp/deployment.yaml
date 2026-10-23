@@ -35,6 +35,8 @@ spec:
       # container's default root runtime, unblocking the permission-denied
       # write to /data/tailscaled.log.conf on first boot.
       securityContext:
+        seccompProfile:
+          type: RuntimeDefault
         fsGroup: 0
       affinity:
         nodeAffinity:

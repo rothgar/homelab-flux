@@ -26,6 +26,8 @@ spec:
       nodeSelector:
         feature.node.kubernetes.io/amdgpu-present: "true"
       securityContext:
+        seccompProfile:
+          type: RuntimeDefault
         # 44 = video (Debian/Ubuntu convention, matches /dev/dri owner),
         # 109 = render (needed for the renderD128 node itself). The
         # linuxserver.io Plex image runs as PUID/PGID 1027/100, neither

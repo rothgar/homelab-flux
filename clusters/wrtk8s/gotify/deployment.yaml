@@ -16,6 +16,9 @@ spec:
         app: gotify
     spec:
       automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: gotify
           # renovate: image=ghcr.io/gotify/server

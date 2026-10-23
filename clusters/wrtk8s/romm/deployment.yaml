@@ -66,6 +66,9 @@ spec:
         app: romm
     spec:
       automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: romm
           image: rommapp/romm:5.4.0

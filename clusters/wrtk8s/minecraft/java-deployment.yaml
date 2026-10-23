@@ -21,6 +21,8 @@ spec:
       # needs to be owned by that gid before the container starts. Same
       # pattern that fixed the Synology-NFS permission on youtarr-db.
       securityContext:
+        seccompProfile:
+          type: RuntimeDefault
         runAsUser: 1000
         runAsGroup: 1000
         fsGroup: 1000

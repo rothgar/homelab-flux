@@ -29,6 +29,9 @@ spec:
                     operator: Gt
                     values: ["6"]
       automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: whisper-webui
           image: ghcr.io/rothgar/whisper-webui:v0.0.0-d2bdcf7

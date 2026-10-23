@@ -93,6 +93,9 @@ spec:
         app: snmp-exporter
     spec:
       automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: snmp-exporter
           image: prom/snmp-exporter:v0.30.1

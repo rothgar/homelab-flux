@@ -19,6 +19,9 @@ spec:
         spec:
           restartPolicy: Never
           automountServiceAccountToken: false
+          securityContext:
+            seccompProfile:
+              type: RuntimeDefault
           containers:
             - name: mini-crawler
               image: cr.jgarr.net/mini-crawler:latest

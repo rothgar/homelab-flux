@@ -14,6 +14,9 @@ spec:
         app: miniflux
     spec:
       automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: miniflux
           image: ghcr.io/miniflux/miniflux:2.3.4

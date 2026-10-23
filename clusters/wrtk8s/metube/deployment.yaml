@@ -22,6 +22,8 @@ spec:
       # the mount on mount. MeTube's own PUID/PGID env vars are set below
       # for its internal drop-privileges step. Same pattern as paperless.
       securityContext:
+        seccompProfile:
+          type: RuntimeDefault
         runAsUser: 65534
         runAsGroup: 65534
         fsGroup: 65534

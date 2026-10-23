@@ -20,6 +20,9 @@ spec:
       # flags.
       enableServiceLinks: false
       automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: livekit
           image: livekit/livekit-server:v1.13.8

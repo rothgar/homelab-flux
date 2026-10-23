@@ -36,6 +36,8 @@ spec:
             - name: downloads
               mountPath: /Downloads
       securityContext:
+        seccompProfile:
+          type: RuntimeDefault
         fsGroup: 1001
       automountServiceAccountToken: false
       containers:

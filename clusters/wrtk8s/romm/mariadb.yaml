@@ -27,6 +27,9 @@ spec:
         app: romm-db
     spec:
       automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: mariadb
           image: mariadb:12

@@ -16,6 +16,8 @@ spec:
         app: timesync
     spec:
       securityContext:
+        seccompProfile:
+          type: RuntimeDefault
         runAsNonRoot: true
         runAsUser: 101
         runAsGroup: 101

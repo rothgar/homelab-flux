@@ -21,6 +21,9 @@ spec:
         app: valkey
     spec:
       automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: valkey
           image: valkey/valkey:9.2-alpine

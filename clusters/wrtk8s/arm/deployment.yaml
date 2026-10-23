@@ -30,6 +30,9 @@ spec:
             - name: music
               mountPath: /music
       automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: arm
           image: automaticrippingmachine/automatic-ripping-machine:2.24.4

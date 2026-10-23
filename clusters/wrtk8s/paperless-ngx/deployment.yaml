@@ -22,6 +22,8 @@ spec:
       # so writes hit the root_squash → nobody code path that Synology allows
       # on the 777 export.
       securityContext:
+        seccompProfile:
+          type: RuntimeDefault
         runAsUser: 65534
         runAsGroup: 65534
         fsGroup: 65534

@@ -74,6 +74,9 @@ spec:
             - name: dshm
               mountPath: /dev/shm
       automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: bambustudio
           image: lscr.io/linuxserver/bambustudio:v02.08.04.57-ls174

@@ -14,6 +14,9 @@ spec:
         app: tts
     spec:
       automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: tts
           image: ghcr.io/matatonic/openedai-speech:0.18.2

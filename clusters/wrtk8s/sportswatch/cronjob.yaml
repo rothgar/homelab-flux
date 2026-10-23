@@ -23,6 +23,9 @@ spec:
         spec:
           restartPolicy: Never
           automountServiceAccountToken: false
+          securityContext:
+            seccompProfile:
+              type: RuntimeDefault
           containers:
             - name: sportswatch
               # Image is built from the ~/src/sportswatch repo via `make push`.

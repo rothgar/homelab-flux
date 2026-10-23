@@ -20,6 +20,9 @@ spec:
         app: playit
     spec:
       automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: playit
           image: ghcr.io/playit-cloud/playit-agent:1.0

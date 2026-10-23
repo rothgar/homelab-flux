@@ -30,6 +30,9 @@ spec:
             - name: data
               mountPath: /app/data
       automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: mealie
           image: ghcr.io/mealie-recipes/mealie:v3.29.0

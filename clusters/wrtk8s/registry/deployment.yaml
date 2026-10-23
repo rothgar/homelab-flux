@@ -14,6 +14,9 @@ spec:
         app: registry
     spec:
       automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: registry
           image: registry:3

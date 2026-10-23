@@ -74,6 +74,9 @@ spec:
         app: shelly-json-exporter
     spec:
       automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: exporter
           image: quay.io/prometheuscommunity/json-exporter:v0.8.0

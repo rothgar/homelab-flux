@@ -14,6 +14,9 @@ spec:
         app: pdfcraft
     spec:
       automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: pdfcraft
           image: ghcr.io/pdfcrafttool/pdfcraft:latest

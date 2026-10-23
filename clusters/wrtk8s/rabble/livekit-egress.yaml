@@ -37,6 +37,9 @@ spec:
         app: livekit-egress
     spec:
       automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: egress
           image: livekit/egress:latest
