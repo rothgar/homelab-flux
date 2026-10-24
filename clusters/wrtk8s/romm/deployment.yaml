@@ -71,7 +71,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: romm
-          image: rommapp/romm:5.4.0
+          image: rommapp/romm:5.4.1
           ports:
             - containerPort: 8080
           envFrom:
