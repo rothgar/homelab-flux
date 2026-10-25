@@ -3,6 +3,13 @@ kind: Ingress
 metadata:
   name: frigate-tailscale
   namespace: frigate
+  annotations:
+    # Funnel exposes the ingress to the public internet via Tailscale's
+    # edge. Requires: (1) Funnel enabled for the tailnet in the admin
+    # console under DNS → Funnel, (2) the operator proxy node's ACL
+    # grant for `funnel` capability on this hostname. Without both,
+    # Tailscale will serve this ingress on the tailnet only (no error).
+    tailscale.com/funnel: "true"
 spec:
   ingressClassName: tailscale
   rules:

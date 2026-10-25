@@ -17,7 +17,7 @@ stringData:
         host: "mosquitto.mqtt.svc.cluster.local"
         port: 1883
       auth:
-        enabled: false
+        enabled: true
       detectors:
         coral:
           type: edgetpu
