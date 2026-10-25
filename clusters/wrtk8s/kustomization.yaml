@@ -22,7 +22,6 @@ resources:
   - kepler
   - kubelet-csr-approver
   - kvmm
-  - litellm
   - mealie
   - mecatl
   - metallb
