@@ -29,5 +29,8 @@ spec:
             backend:
               service:
                 name: frigate
-                port:
-                  number: 80
+                # Port 80 is Frigate's trusted-proxy mode (auth bypassed —
+                # assumes an upstream handled it). Port 8971 is the
+                # user-facing authenticated UI. For public exposure we
+                # route to 8971 so Frigate's own login screen gates access.
+                number: 8971

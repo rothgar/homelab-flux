@@ -21,8 +21,10 @@ spec:
             backend:
               service:
                 name: frigate
+                # Port 8971 (auth-required) rather than 80 (trusted-proxy
+                # anonymous admin). See ingress.yaml comment.
                 port:
-                  number: 80
+                  number: 8971
   tls:
     - hosts:
         - frigate
