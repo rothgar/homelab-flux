@@ -1,15 +1,16 @@
+# Tailnet-only path to Frigate. Funnel is NOT used here — public
+# exposure goes through Cloudflare Tunnel (see clusters/wrtk8s/
+# cloudflared/) which handles the HTTPS backend to port 8971 cleanly.
+#
+# Port 80 is Frigate's trusted-proxy mode (anonymous admin). Here that's
+# acceptable because reaching this hostname at all requires being on the
+# tailnet — device identity IS the auth gate. If you add Funnel later,
+# switch the public path to Cloudflare Tunnel, not this ingress.
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: frigate-tailscale
   namespace: frigate
-  annotations:
-    # Funnel exposes the ingress to the public internet via Tailscale's
-    # edge. Requires: (1) Funnel enabled for the tailnet in the admin
-    # console under DNS → Funnel, (2) the operator proxy node's ACL
-    # grant for `funnel` capability on this hostname. Without both,
-    # Tailscale will serve this ingress on the tailnet only (no error).
-    tailscale.com/funnel: "true"
 spec:
   ingressClassName: tailscale
   rules:
@@ -21,10 +22,8 @@ spec:
             backend:
               service:
                 name: frigate
-                # Port 8971 (auth-required) rather than 80 (trusted-proxy
-                # anonymous admin). See ingress.yaml comment.
                 port:
-                  number: 8971
+                  number: 80
   tls:
     - hosts:
         - frigate
