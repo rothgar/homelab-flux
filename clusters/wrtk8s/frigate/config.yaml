@@ -59,7 +59,7 @@ stringData:
       cameras:
         front_door:
           ffmpeg:
-            hwaccel_args: preset-vaapi
+            hwaccel_args: preset-intel-qsv-h264
             inputs:
               - path: rtsp://127.0.0.1:8554/front_door
                 input_args: preset-rtsp-restream
@@ -71,7 +71,7 @@ stringData:
                   - detect
         rear_door:
           ffmpeg:
-            hwaccel_args: preset-vaapi
+            hwaccel_args: preset-intel-qsv-h264
             inputs:
               - path: rtsp://127.0.0.1:8554/rear_door
                 input_args: preset-rtsp-restream
@@ -83,7 +83,7 @@ stringData:
                   - detect
         backyard:
           ffmpeg:
-            hwaccel_args: preset-vaapi
+            hwaccel_args: preset-intel-qsv-h264
             inputs:
               - path: rtsp://127.0.0.1:8554/backyard
                 input_args: preset-rtsp-restream
