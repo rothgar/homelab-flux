@@ -30,7 +30,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: led
-          image: python:3.14-slim
+          image: python:3.15-slim
           # pip install gpiod at startup — small (~0.5 MiB wheel), ~2 s.
           # /dev needs to be bind-mounted from the host so /dev/gpiochip*
           # is visible for libgpiod.
