@@ -3,7 +3,6 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - qwen36-35b-a3b.yaml
-  - hermes-4-3-36b.yaml
   - ds41-flash.yaml
   - podmonitor.yaml
   - external-secret.yaml
