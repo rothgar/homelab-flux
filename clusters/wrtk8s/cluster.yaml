@@ -47,7 +47,6 @@ patches:
   - file: patches/mini.yaml
   - file: patches/k10temp.yaml
   - file: patches/nvidia.yaml
-  - file: patches/gpu-labels.yaml
   - file: patches/kubelet.yaml
 ---
 kind: Machine
@@ -128,7 +127,6 @@ patches:
   - file: patches/spark-uservolumeconfig.yaml
   - file: patches/spark-nvidia-modules.yaml
   - file: patches/gb10-nvidia.yaml
-  - file: patches/gpu-labels.yaml
   - file: patches/kubelet.yaml
 ---
 kind: Machine
@@ -146,5 +144,4 @@ patches:
   - file: patches/sparky.yaml
   - file: patches/spark-nvidia-modules.yaml
   - file: patches/gb10-nvidia.yaml
-  - file: patches/gpu-labels.yaml
   - file: patches/kubelet.yaml

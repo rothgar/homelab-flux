@@ -1,20 +1,28 @@
-# Talos v1.14 moved `.machine.nodeLabels` (and other kubelet-node knobs)
-# into the typed `KubeNodeConfig` document. Combining labels + nodeIP.
-# validSubnets in one doc because two separate `KubeNodeConfig` docs
-# across patch files did NOT deep-merge on dgx 2026-08-31; same hazard
-# applies here.
+# ⚠ PARKED — not referenced by any Machine block in cluster.yaml.
 #
-# nodeIP.validSubnets pins kubelet's advertised NodeInternalIP to the
-# LAN subnet. Required once the CX-7 patches (cx7-spark.yaml / cx7-
-# sparky.yaml) add 192.168.100.0/30 addresses to the GB10s' enp1s0f0np0 —
-# otherwise kubelet picks the /30 as its NodeInternalIP, breaking
-# api-server → kubelet routes.
+# Previously set `nvidia.com/gpu=true` + nodeIP.validSubnets. In the
+# Omni 1.12.4 era:
+#   - Labels are redundant: nvidia-gpu-operator's GPU Feature Discovery
+#     (gfd) container already labels GPU nodes with nvidia.com/gpu=true,
+#     nvidia.com/gpu.product=*, etc. directly against the k8s API.
+#   - Any `machine.nodeLabels` in a patch (nested-map OR typed-doc with
+#     `labels:` field OR typed-doc that desugars to empty labels)
+#     collides with Omni's own `.machine.nodeLabels` emission on CP
+#     machines and fails config apply with "already set in v1alpha1
+#     config". See [[omni-1-12-cp-untaint-double-emit]] for the sibling
+#     hazard.
+#   - Even a KubeNodeConfig doc with ONLY nodeIP (no labels field)
+#     silently emits an empty `.machine.nodeLabels` that triggers the
+#     same collision. Omni 1.12.4 strict-detects this.
+#
+# If CX-7 patches (cx7-spark.yaml / cx7-sparky.yaml) are ever re-wired,
+# add `nodeIP.validSubnets` to kubelet via a different mechanism — e.g.
+# a plain v1alpha1 nested-map `.machine.kubelet.nodeIP.validSubnets`
+# (noting this contradicts [[feedback-talos-typed-docs]] but is the
+# only path that doesn't trip the labels desugar collision).
 ---
 apiVersion: v1alpha1
 kind: KubeNodeConfig
-labels:
-  nvidia.com/gpu: "true"
-  nvidia.com/gpu.present: "true"
 nodeIP:
   validSubnets:
     - 10.1.0.0/16
