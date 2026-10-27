@@ -1,0 +1,49 @@
+# ─────────────────────────────────────────────────────────────────────
+# ⚠ NOT WIRED INTO cluster.yaml ⚠
+# First attempt (2026-10-26) bricked spark's primary Realtek within ~2
+# minutes of apply. Required USB rescue to recover. Omni's SideroLink
+# went connected: false — the broken state wasn't limited to the mlx
+# port even though this patch only touches enp1s0f0np0. Root cause TBD.
+# Keep the file for a future revised attempt; do NOT re-add to spark's
+# patches: list until the failure mode is understood.
+# ─────────────────────────────────────────────────────────────────────
+#
+# CX-7 MTU 9000 + static /30 + IPv6 disable for spark's mlx5_0 port.
+#
+# Pattern ported from dgx cluster — see cx7-mtu-jarvis.yaml in that repo
+# for the full rationale. Short version:
+#
+#   * The ConnectX-7 max MTU is 4096, and RDMA active_mtu is set to the
+#     largest power-of-2 ≤ netdev MTU. netdev 1500 → active_mtu 1024;
+#     netdev 9000 → active_mtu 4096. 4× per-packet payload meaningfully
+#     lifts single-QP RDMA and NCCL busbw.
+#   * Static /30 point-to-point IPv4 replaces the "declared but
+#     unaddressed" state default DHCP leaves the port in.
+#   * Per-interface IPv6 kill blocks SLAAC/RA storm (the dgx cluster was
+#     bricked twice by this before IPv6 was disabled on the mlx5 side).
+#
+# Scoped to ONE port only — spark has two cables up (enp1s0f0np0 and
+# enP2p1s0f0np0 both carrier=1), but NCCL 2.30.7 refused dual-rail per
+# dgx-dual-rail-nccl-noop. Keep enP2p1s0f0np0 unconfigured for a future
+# dual-rail attempt once NCCL grows better multi-HCA support.
+#
+# Address plan (wrtk8s GB10 fabric):
+#   spark   enp1s0f0np0: 192.168.100.1/30   ← this file
+#   sparky  enp1s0f0np0: 192.168.100.2/30   ← cx7-sparky.yaml
+# /30 = 4 IPs, 2 usable. Only wire sparky's patch after this one has run
+# healthy for 5+ min.
+
+---
+apiVersion: v1alpha1
+kind: LinkConfig
+name: enp1s0f0np0
+mtu: 9000
+addresses:
+  - address: 192.168.100.1/30
+---
+apiVersion: v1alpha1
+kind: SysctlConfig
+params:
+  net/ipv6/conf/enp1s0f0np0/disable_ipv6: "1"
+  net/ipv6/conf/enp1s0f0np0/accept_ra: "0"
+  net/ipv6/conf/enp1s0f0np0/autoconf: "0"

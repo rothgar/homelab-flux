@@ -1,3 +1,20 @@
-machine:
-  nodeLabels:
-    nvidia.com/gpu: "true"
+# Talos v1.14 moved `.machine.nodeLabels` (and other kubelet-node knobs)
+# into the typed `KubeNodeConfig` document. Combining labels + nodeIP.
+# validSubnets in one doc because two separate `KubeNodeConfig` docs
+# across patch files did NOT deep-merge on dgx 2026-08-31; same hazard
+# applies here.
+#
+# nodeIP.validSubnets pins kubelet's advertised NodeInternalIP to the
+# LAN subnet. Required once the CX-7 patches (cx7-spark.yaml / cx7-
+# sparky.yaml) add 192.168.100.0/30 addresses to the GB10s' enp1s0f0np0 —
+# otherwise kubelet picks the /30 as its NodeInternalIP, breaking
+# api-server → kubelet routes.
+---
+apiVersion: v1alpha1
+kind: KubeNodeConfig
+labels:
+  nvidia.com/gpu: "true"
+  nvidia.com/gpu.present: "true"
+nodeIP:
+  validSubnets:
+    - 10.1.0.0/16

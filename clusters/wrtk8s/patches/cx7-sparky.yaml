@@ -1,0 +1,19 @@
+# ⚠ NOT WIRED — see cx7-spark.yaml header. First attempt bricked spark.
+# Peer of cx7-spark.yaml. Only wire this into sparky's Machine block
+# AFTER spark has been running cx7-spark.yaml for 5+ minutes without
+# flapping — see cx7-spark.yaml for the rationale.
+
+---
+apiVersion: v1alpha1
+kind: LinkConfig
+name: enp1s0f0np0
+mtu: 9000
+addresses:
+  - address: 192.168.100.2/30
+---
+apiVersion: v1alpha1
+kind: SysctlConfig
+params:
+  net/ipv6/conf/enp1s0f0np0/disable_ipv6: "1"
+  net/ipv6/conf/enp1s0f0np0/accept_ra: "0"
+  net/ipv6/conf/enp1s0f0np0/autoconf: "0"
