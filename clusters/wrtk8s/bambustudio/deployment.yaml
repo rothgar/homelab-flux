@@ -79,7 +79,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: bambustudio
-          image: lscr.io/linuxserver/bambustudio:v02.08.04.57-ls174
+          image: lscr.io/linuxserver/bambustudio:v02.08.04.57-ls175
           env:
             - name: PUID
               value: "1000"
