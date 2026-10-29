@@ -1,0 +1,174 @@
+# nvidia/Qwen3.6-35B-A3B-NVFP4 on one GB10 (~18 GB of NVFP4 weights, so plenty of KV cache at 262144 context).
+# Ported from the dgx cluster (dgx-example manifests/qwen36-35b-nvfp4.yaml), whose config came from the sparkrun arena
+# recipe; reworked to match qwen36-35b-a3b here: device-plugin GPU, one model per GB10, the pulsys HF cache, the
+# hf-token secret and a Tailscale-exposed Service.
+#
+# Scaled to 0: the same model as qwen36-35b-a3b in NVFP4, kept as the example the dgx cluster ran. To try it, scale
+# qwen36-35b-a3b (or ds41-flash) to 0 so a GB10 is free.
+#
+# The server goes in `args`, not `command`, so the image's entrypoint still runs: with vllm as PID 1, nvcr vllm images
+# from 26.06 on segfault in cuStreamCreateWithPriority on GB10 with driver 595.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qwen36-35b-nvfp4
+  namespace: vllm-system
+spec:
+  replicas: 0
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: qwen36-35b-nvfp4
+  template:
+    metadata:
+      labels:
+        app: qwen36-35b-nvfp4
+        vllm-model: "true"
+    spec:
+      terminationGracePeriodSeconds: 15
+      runtimeClassName: nvidia
+      hostAliases:
+        - ip: 10.1.1.164
+          hostnames: [hf.jgarr.net]
+      tolerations:
+        - key: nvidia.com/gpu
+          operator: Exists
+          effect: NoSchedule
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - spark
+                      - sparky
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  vllm-model: "true"
+              topologyKey: kubernetes.io/hostname
+      automountServiceAccountToken: false
+      containers:
+        - name: vllm
+          image: nvcr.io/nvidia/vllm:26.07-py3
+          # the sparkrun recipe's `--speculative-config mtp` and `--enable-flashinfer-autotune` hung the first start
+          # on the dgx cluster (60+ min, no logs), and plain safetensors loading (--load-format auto) replaces
+          # fastsafetensors; --enforce-eager skips the torch.compile pass that tripped vLLM's engine-init timeout
+          args:
+            - vllm
+            - serve
+            - nvidia/Qwen3.6-35B-A3B-NVFP4
+            - --host
+            - "0.0.0.0"
+            - --port
+            - "8000"
+            - --served-model-name
+            - qwen3.6-35b-a3b-nvfp4
+            - --tensor-parallel-size
+            - "1"
+            - --trust-remote-code
+            - --kv-cache-dtype
+            - fp8
+            - --moe-backend
+            - marlin
+            - --gpu-memory-utilization
+            - "0.65"
+            - --max-model-len
+            - "262144"
+            - --max-num-seqs
+            - "4"
+            - --max-num-batched-tokens
+            - "32768"
+            - --enable-chunked-prefill
+            - --enable-prefix-caching
+            - --load-format
+            - auto
+            - --reasoning-parser
+            - qwen3
+            - --tool-call-parser
+            - qwen3_xml
+            - --enable-auto-tool-choice
+            - --enforce-eager
+          env:
+            - name: HF_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: hf-token
+                  key: token
+            - name: HF_HOME
+              value: /models/huggingface
+            - name: HF_ENDPOINT
+              value: http://hf.jgarr.net
+            - name: DO_NOT_TRACK
+              value: "1"
+            # from the sparkrun recipe
+            - name: VLLM_MARLIN_USE_ATOMIC_ADD
+              value: "1"
+            - name: VLLM_ENGINE_INIT_TIMEOUT_S
+              value: "3600"
+          ports:
+            - containerPort: 8000
+              name: http
+          startupProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 360
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          securityContext:
+            capabilities:
+              add:
+                - IPC_LOCK
+          resources:
+            limits:
+              nvidia.com/gpu: 1
+          volumeMounts:
+            - name: models
+              mountPath: /models
+            - name: shm
+              mountPath: /dev/shm
+      volumes:
+        - name: models
+          hostPath:
+            path: /var/mnt/model
+            type: DirectoryOrCreate
+        - name: shm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 16Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: qwen36-35b-nvfp4
+  namespace: vllm-system
+  annotations:
+    tailscale.com/expose: "true"
+    tailscale.com/hostname: "qwen36-35b-nvfp4"
+spec:
+  selector:
+    app: qwen36-35b-nvfp4
+  ports:
+    - port: 8000
+      targetPort: http
+  type: LoadBalancer

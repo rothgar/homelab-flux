@@ -4,5 +4,8 @@ resources:
   - namespace.yaml
   - qwen36-35b-a3b.yaml
   - ds41-flash.yaml
+  - qwen36-35b-nvfp4.yaml
+  - resourceclaimtemplates.yaml
+  - lws-kustomization.yaml
   - podmonitor.yaml
   - external-secret.yaml

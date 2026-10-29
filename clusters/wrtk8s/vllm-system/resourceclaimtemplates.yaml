@@ -1,0 +1,44 @@
+# DRA claims for the GB10 GPU (gpu.nvidia.com, from nvidia-system/dra-release.yaml) and the ConnectX-7 ports
+# (rdma.dra.net, from dranet/). Ported from dgx-example manifests/resourceclaimtemplates.yaml.
+#
+# These allocate the GPU through DRA, alongside the time-sliced nvidia.com/gpu the device plugin hands out on the same
+# Sparks (gpuResourcesEnabledOverride in the DRA release). The two don't see each other's allocations, so scale the
+# device-plugin models on a Spark (qwen36-35b-a3b, ds41-flash) to 0 before scheduling a claim there.
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaimTemplate
+metadata:
+  name: gpu
+  namespace: vllm-system
+spec:
+  spec:
+    devices:
+      requests:
+        - name: gpu
+          exactly:
+            deviceClassName: gpu.nvidia.com
+---
+# GPU + 2 RDMA ports, for one rank of a two-Spark LeaderWorkerSet. Only the pci0000 card (mlx5_0 / mlx5_1) is claimed:
+# on the dgx cluster NCCL 2.30.7 never used a second rail even when given both cards, so in-pod device naming stays
+# deterministic (mlx5_0 = enp1s0f0np0, mlx5_1 = enp1s0f1np1).
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaimTemplate
+metadata:
+  name: gpu-rdma
+  namespace: vllm-system
+spec:
+  spec:
+    devices:
+      requests:
+        - name: gpu
+          exactly:
+            deviceClassName: gpu.nvidia.com
+        - name: rdma
+          exactly:
+            deviceClassName: rdma.dra.net
+            count: 2
+            selectors:
+              - cel:
+                  # pcieRoot lives in the resource.kubernetes.io attribute domain, not dra.net, so match on the PCI
+                  # domain of the address. The .?/orValue guard matters: non-PCI devices (veth, cni0, ...) have no
+                  # pciAddress, and a bare index is a CEL runtime error that fails the claim at scheduling time.
+                  expression: device.attributes["dra.net"].?pciAddress.orValue("").startsWith("0000:")

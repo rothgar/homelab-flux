@@ -1,0 +1,12 @@
+# ⚠ NOT WIRED INTO cluster.yaml — wire it together with the ConnectX-7 link work (cx7-spark.yaml / cx7-sparky.yaml).
+#
+# RDMA userspace modules for NCCL over the ConnectX-7 ports, from the dgx cluster's gb10-nvidia.yaml (which loaded
+# them alongside the nvidia modules): rdma_ucm for the RDMA connection manager's /dev/infiniband/rdma_cm, ib_umad for
+# /dev/infiniband/umad*. The two-Spark LeaderWorkerSets in vllm-system/lws need these once their gpu-rdma claims are
+# scheduled. Kept in its own file so gb10-nvidia.yaml, which both Sparks run, doesn't change until then. Check the
+# merged module list (`talosctl -n spark get machineconfig -o yaml`) after wiring: both files set machine.kernel.modules.
+machine:
+  kernel:
+    modules:
+      - name: rdma_ucm
+      - name: ib_umad

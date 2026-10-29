@@ -1,0 +1,29 @@
+# kubernetes-sigs/dranet: exposes the DGX Sparks' ConnectX-7 ports to pods through DRA, so the two ranks of a
+# LeaderWorkerSet can run NCCL over RDMA on the direct QSFP cable. dranet.yaml is the upstream v1.2.0 install.yaml,
+# unmodified (https://raw.githubusercontent.com/kubernetes-sigs/dranet/v1.2.0/install.yaml); the changes for this
+# cluster are below.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - dranet.yaml
+  - deviceclass.yaml
+images:
+  # upstream points at the moving :stable tag
+  - name: registry.k8s.io/networking/dranet
+    newTag: v1.2.0
+patches:
+  # only the Sparks have ConnectX-7 NICs; keep the privileged hostNetwork DaemonSet off the other nodes
+  - target:
+      kind: DaemonSet
+      name: dranet
+    patch: |
+      - op: add
+        path: /spec/template/spec/affinity
+        value:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+                - matchExpressions:
+                    - key: kubernetes.io/hostname
+                      operator: In
+                      values: [spark, sparky]

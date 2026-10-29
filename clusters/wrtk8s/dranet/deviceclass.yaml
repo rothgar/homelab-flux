@@ -1,0 +1,10 @@
+# DeviceClass for RDMA-capable interfaces exposed by dranet: matches each ConnectX-7 port reporting rdma=true on the
+# DGX Sparks. dranet doesn't ship a DeviceClass itself. Used by the gpu-rdma ResourceClaimTemplate in vllm-system.
+apiVersion: resource.k8s.io/v1
+kind: DeviceClass
+metadata:
+  name: rdma.dra.net
+spec:
+  selectors:
+    - cel:
+        expression: device.driver == "dra.net" && device.attributes["dra.net"].rdma == true
