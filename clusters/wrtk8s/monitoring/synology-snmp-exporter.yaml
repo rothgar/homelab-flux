@@ -98,7 +98,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: snmp-exporter
-          image: prom/snmp-exporter:v0.30.1
+          image: prom/snmp-exporter:v0.31.0
           args:
             - --config.file=/etc/snmp_exporter/snmp.yml
             - --config.file=/etc/snmp_exporter/auths.yml
