@@ -8,25 +8,11 @@ spec:
   chart:
     spec:
       chart: omni
-      # 2.11.0 exposes registries.factories.primary.{url,username,password}
-      # for the Enterprise Image Factory; the older 2.5.x flat fields
-      # (imageFactoryBaseURL/…) are deprecated equivalents.
       version: 2.13.0
       sourceRef:
         kind: HelmRepository
         name: siderolabs
         namespace: omni
-  valuesFrom:
-    # Enterprise factory creds sourced from 1Password via ESO
-    # (see external-secret.yaml + [[eso-onepassword]] memory).
-    - kind: Secret
-      name: omni-factory-creds
-      valuesKey: username
-      targetPath: config.registries.factories.primary.username
-    - kind: Secret
-      name: omni-factory-creds
-      valuesKey: password
-      targetPath: config.registries.factories.primary.password
   values:
     # Omni requires a support contract for production use (BSL license);
     # this install is for managing OTHER clusters/machines — wrtk8s itself
@@ -62,14 +48,6 @@ spec:
       registries:
         factories:
           primary:
-            # Enterprise Image Factory (FIPS/SBOM/VEX). Points machines
-            # at authenticated builds instead of the public factory.talos.dev.
-            url: https://factory.siderolabs.com
-            # username/password come from valuesFrom above (1Password → ESO).
-          secondary:
-            # Public factory as fallback — no auth needed. Useful when
-            # a schematic isn't published under the Enterprise variant or
-            # for machines managed under a non-Enterprise-entitled path.
             url: https://factory.talos.dev
 
     etcdEncryptionKey:
