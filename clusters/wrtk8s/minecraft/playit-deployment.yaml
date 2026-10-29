@@ -25,7 +25,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: playit
-          image: ghcr.io/playit-cloud/playit-agent:1.0
+          image: ghcr.io/playit-cloud/playit-agent:1.2
           env:
             - name: SECRET_KEY
               valueFrom:
