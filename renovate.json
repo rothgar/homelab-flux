@@ -64,6 +64,15 @@
       "description": "Auto-merge plex, but only in the 04:00–05:00 PT window — Plex tags churn frequently and a restart mid-day is disruptive to active streams."
     },
     {
+      "matchManagers": ["flux"],
+      "matchDepNames": ["omni"],
+      "automerge": true,
+      "platformAutomerge": true,
+      "ignoreUnstable": true,
+      "minimumReleaseAge": "0",
+      "description": "Auto-merge stable Omni chart releases immediately. The siderolabs/charts/omni chart version tracks the Omni server release; land stable tags as soon as the kustomize render check passes, with no schedule window. Pre-releases (rc/beta/alpha) are ignored."
+    },
+    {
       "matchDepNames": ["nvcr.io/nvidia/vllm"],
       "allowedVersions": "/^(2[0-5]\\.\\d+|26\\.0[0-4])-py\\d+$/",
       "description": "Pin nvcr.io/nvidia/vllm — 26.06 segfaults in cuStreamCreateWithPriority on GB10 with driver 595. Docker versioning can't parse the -py3 suffix, so allowedVersions is a regex allowing 20.xx-py* through 26.04-py*."
