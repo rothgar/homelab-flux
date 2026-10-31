@@ -11,9 +11,12 @@ data:
   PUBLIC_URL: https://rabble.jgarr.net
   DATABASE_URL: postgresql://bluesky:bluesky@rabble-db-rw.rabble.svc.cluster.local.:5432/bluesky_spaces?schema=public
   LIVEKIT_URL: ws://livekit.rabble.svc.cluster.local.:7880
-  # Public LiveKit URL exposed to browser clients (WSS signaling plane, TLS
-  # terminated by the rabble-livekit HTTPRoute on the Traefik Gateway). The SDK appends
-  # /rtc/v1/... to this base.
+  # Public LiveKit URL exposed to browser clients (WSS signaling plane). Both
+  # rabble.jgarr.net and rabble-livekit.jgarr.net are Cloudflare Tunnel public
+  # hostnames (Zero Trust dashboard) pointing at rabble-app:80 and
+  # livekit:7880 in-cluster; Bluesky OAuth needs the app's client metadata
+  # fetchable from the public internet, which the LAN-only Traefik LB cannot
+  # provide. The SDK appends /rtc/v1/... to this base.
   LIVEKIT_PUBLIC_URL: wss://rabble-livekit.jgarr.net
   RECORDING_BUCKET: rabble-recordings
   S3_ENDPOINT: http://garage:3900

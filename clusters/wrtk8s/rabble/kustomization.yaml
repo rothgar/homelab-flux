@@ -11,4 +11,3 @@ resources:
   - livekit-egress.yaml
   - garage.yaml
   - tailscale-ingress.yaml
-  - httproute.yaml
