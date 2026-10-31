@@ -49,7 +49,7 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: rabble-migrate
-          image: cr.jgarr.net/rabble:latest
+          image: cr.jgarr.net/rabble:d57c89e
           imagePullPolicy: Always
           # prisma migrate deploy (NOT db push). Deploys only new migration
           # files against the schema_migrations table.

@@ -7,18 +7,18 @@ data:
   NODE_ENV: production
   PORT: "3000"
   HOSTNAME: 0.0.0.0
-  NEXT_PUBLIC_APP_URL: https://rabble.gerbil-dragon.ts.net
-  PUBLIC_URL: https://rabble.gerbil-dragon.ts.net
+  NEXT_PUBLIC_APP_URL: https://rabble.jgarr.net
+  PUBLIC_URL: https://rabble.jgarr.net
   DATABASE_URL: postgresql://bluesky:bluesky@rabble-db-rw.rabble.svc.cluster.local.:5432/bluesky_spaces?schema=public
   LIVEKIT_URL: ws://livekit.rabble.svc.cluster.local.:7880
   # Public LiveKit URL exposed to browser clients (WSS signaling plane, TLS
-  # terminated by the rabble-livekit Tailscale Ingress). The SDK appends
+  # terminated by the rabble-livekit HTTPRoute on the Traefik Gateway). The SDK appends
   # /rtc/v1/... to this base.
-  LIVEKIT_PUBLIC_URL: wss://rabble-livekit.gerbil-dragon.ts.net
+  LIVEKIT_PUBLIC_URL: wss://rabble-livekit.jgarr.net
   RECORDING_BUCKET: rabble-recordings
   S3_ENDPOINT: http://garage:3900
   S3_REGION: us-east-1
-  LOGO_URL: https://rabble.gerbil-dragon.ts.net/logo.png
+  LOGO_URL: https://rabble.jgarr.net/logo.png
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -48,7 +48,7 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: rabble
-          image: cr.jgarr.net/rabble:latest
+          image: cr.jgarr.net/rabble:d57c89e
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
