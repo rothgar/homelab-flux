@@ -1,7 +1,10 @@
+# One-shot `prisma migrate deploy`. Job specs are immutable, so the name
+# carries the image tag: bump BOTH the name suffix and the image on every
+# deploy. Flux (prune: true) removes the previous Job when the name changes.
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: rabble-migrate
+  name: rabble-migrate-d57c89e
   namespace: rabble
   labels:
     app: rabble-migrate
