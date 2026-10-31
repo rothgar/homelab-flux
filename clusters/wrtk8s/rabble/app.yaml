@@ -48,7 +48,7 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: rabble
-          image: cr.jgarr.net/rabble:d57c89e
+          image: cr.jgarr.net/rabble:3065255
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
