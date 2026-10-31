@@ -4,7 +4,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: rabble-migrate-3065255
+  name: rabble-migrate-76557a8
   namespace: rabble
   labels:
     app: rabble-migrate
@@ -52,7 +52,7 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: rabble-migrate
-          image: cr.jgarr.net/rabble:3065255
+          image: cr.jgarr.net/rabble:76557a8
           imagePullPolicy: Always
           # prisma migrate deploy (NOT db push). Deploys only new migration
           # files against the schema_migrations table.
