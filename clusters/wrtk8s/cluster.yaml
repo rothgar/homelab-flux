@@ -1,7 +1,7 @@
 kind: Cluster
 name: wrtk8s
 kubernetes:
-  version: v1.37.1
+  version: v1.37.2
 talos:
   version: v1.14.5
 features:
@@ -124,6 +124,9 @@ kernelArgs:
   # DGX Spark kexec is broken (secondary CPUs come down via PSCI, new kernel
   # never lands). Force firmware reboot instead.
   - kexec_load_disabled=1
+  # The CX-7 functions and their root ports come up at MaxPayload 128 though all
+  # support 512; pcie_bus_safe raises each to the largest size the path allows.
+  - pci=pcie_bus_safe
 patches:
   - file: patches/spark.yaml
   - file: patches/spark-volumeconfig.yaml
@@ -143,6 +146,7 @@ kernelArgs:
   - nfs.nfs4_disable_idmapping=1
   - arm64.nobti
   - kexec_load_disabled=1
+  - pci=pcie_bus_safe
 patches:
   - file: patches/sparky.yaml
   - file: patches/spark-nvidia-modules.yaml
