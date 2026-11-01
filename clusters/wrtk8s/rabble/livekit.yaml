@@ -122,6 +122,12 @@ data:
       skip_external_ip_validation: true
       # Keep the node IP candidate for LAN clients.
       advertise_internal_ip: true
+    # Presence events for show metrics (signed with the API key below, which
+    # must be one of the --keys).
+    webhook:
+      api_key: devkey
+      urls:
+        - http://rabble-app.rabble.svc.cluster.local/api/livekit/webhook
 ---
 apiVersion: v1
 kind: Service
