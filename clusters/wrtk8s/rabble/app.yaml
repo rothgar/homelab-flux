@@ -51,7 +51,7 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: rabble
-          image: cr.jgarr.net/rabble:76557a8
+          image: cr.jgarr.net/rabble:82ffe9f
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
@@ -64,6 +64,16 @@ spec:
             - secretRef:
                 name: rabble-app-secrets
                 optional: false
+            # Cloudflare TURN credentials (CLOUDFLARE_TURN_KEY_ID and
+            # CLOUDFLARE_TURN_API_TOKEN) so listeners outside the LAN can
+            # relay media. Created by hand, never committed:
+            #   kubectl -n rabble create secret generic rabble-turn \
+            #     --from-literal=CLOUDFLARE_TURN_KEY_ID=... \
+            #     --from-literal=CLOUDFLARE_TURN_API_TOKEN=...
+            # Without it the app still works for LAN listeners.
+            - secretRef:
+                name: rabble-turn
+                optional: true
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
