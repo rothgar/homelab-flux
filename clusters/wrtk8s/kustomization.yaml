@@ -42,7 +42,6 @@ resources:
   - omni
   - omni-cd
   - paperless-ngx
-  - rabble
   - reaparr
   - registry
   - resolve-db
