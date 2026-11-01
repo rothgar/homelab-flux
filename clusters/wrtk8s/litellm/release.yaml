@@ -1,0 +1,76 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: litellm
+  namespace: litellm
+spec:
+  interval: 10m
+  chart:
+    spec:
+      chart: litellm-helm
+      # TODO: verify chart version on first reconcile (ghcr.io/berriai/litellm-helm).
+      # Berriai's OCI chart tags track upstream LiteLLM releases; bump via Renovate
+      # once a HelmRelease exists for it to key off.
+      version: 0.1.714
+      sourceRef:
+        kind: HelmRepository
+        name: berriai
+        namespace: litellm
+  install:
+    createNamespace: false
+  values:
+    image:
+      repository: ghcr.io/berriai/litellm
+      # Non-stable rolling tag is deliberate during evaluation; pin to a
+      # vX.Y.Z-stable tag once this replaces Aperture.
+      tag: main-stable
+      pullPolicy: IfNotPresent
+    replicaCount: 1
+    service:
+      type: ClusterIP
+      port: 4000
+    masterkeySecretName: litellm-keys
+    masterkeySecretKey: masterkey
+    environmentSecrets:
+      - litellm-keys
+    envVars:
+      LITELLM_SALT_KEY_SECRET_NAME: litellm-keys
+      LITELLM_SALT_KEY_SECRET_KEY: salt
+    db:
+      deployStandalone: false
+      useExisting: true
+      endpoint: litellm-db-rw.litellm.svc.cluster.local
+      database: litellm
+      url: postgresql://$(DATABASE_USERNAME):$(DATABASE_PASSWORD)@$(DATABASE_HOST)/$(DATABASE_NAME)
+      secret:
+        name: litellm-db-credentials
+        usernameKey: username
+        passwordKey: password
+    proxy_config:
+      # model_name is what clients request; the `model:` suffix below is
+      # what LiteLLM forwards verbatim to the upstream — must match the
+      # `id` string the backend advertises on /v1/models, not the k8s
+      # Service name. ds4 reports `deepseek-v4.1-flash`; vLLM reports
+      # the lowercased Qwen HF repo id with a `.` (not `-`) in the version.
+      model_list:
+        - model_name: ds41-flash
+          litellm_params:
+            model: openai/deepseek-v4.1-flash
+            api_base: http://ds41-flash.vllm-system.svc.cluster.local:8000/v1
+            api_key: none
+        - model_name: qwen36-35b-a3b
+          litellm_params:
+            model: openai/qwen3.6-35b-a3b
+            api_base: http://qwen36-35b-a3b.vllm-system.svc.cluster.local:8000/v1
+            api_key: none
+      litellm_settings:
+        drop_params: true
+        telemetry: false
+      general_settings:
+        store_model_in_db: true
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        memory: 1Gi
