@@ -20,15 +20,10 @@ spec:
       # flags.
       enableServiceLinks: false
       automountServiceAccountToken: false
-      # Media runs on the node's own network namespace so the SFU's host ICE
-      # candidate is the node IP (reachable from the LAN) and its STUN lookups
-      # leave from the same port it serves media on. Pinned to one node so the
-      # address is stable; if you ever forward UDP 7882 / TCP 7881 on the
-      # router, point them at this node.
-      hostNetwork: true
-      dnsPolicy: ClusterFirstWithHostNet
-      nodeSelector:
-        kubernetes.io/hostname: sparky
+      # Not hostNetwork: the namespace enforces PodSecurity "baseline". LiveKit
+      # can therefore advertise only one address (see livekit-config), so it
+      # advertises the STUN-discovered WAN IP and every listener, LAN
+      # included, relays through Cloudflare TURN.
       securityContext:
         seccompProfile:
           type: RuntimeDefault
@@ -46,9 +41,9 @@ spec:
             - "7882"
             - "--keys"
             - "devkey: devsecret0123456789abcdef0123456789abcdef"
-            # The node IP (downward-API hostIP). With use_external_ip set in
-            # the config file LiveKit also discovers the WAN address via STUN
-            # and advertises both.
+            # Fallback only: with use_external_ip set in the config file the
+            # STUN-discovered WAN address is advertised instead; the node IP
+            # is used if STUN fails at startup (LAN-only operation).
             - "--node-ip"
             - "$(NODE_IP)"
             - "--dev"
@@ -61,13 +56,15 @@ spec:
             - name: livekit-config
               mountPath: /etc/livekit
               readOnly: true
-          # Reachability, in order of preference:
-          #   * LAN clients: direct to <node IP>:7882 (host candidate).
-          #   * Everyone else: the WAN address is advertised too, but nothing
-          #     is forwarded on the router, so the client relays through
-          #     Cloudflare TURN. The app mints per-join TURN credentials when
-          #     the `rabble-turn` Secret exists (see app.yaml); the SFU dials
-          #     the relay outbound, which the home NAT allows.
+          # Reachability:
+          #   * The WAN address is advertised but nothing is forwarded on the
+          #     router, so clients relay through Cloudflare TURN. The app mints
+          #     per-join TURN credentials from the `rabble-turn` Secret (see
+          #     app.yaml); the SFU dials the relay outbound, which the home
+          #     NAT allows, and the relay only accepts the SFU's packets
+          #     because the WAN IP is in the candidate list.
+          #   * Forwarding UDP 7882 / TCP 7881 on the router to the MetalLB IP
+          #     10.1.1.168 would let most clients skip the relay.
           #   * The public WSS signaling plane goes through the Cloudflare
           #     Tunnel public hostname rabble-livekit.jgarr.net.
           ports:
@@ -111,17 +108,17 @@ data:
     rtc:
       tcp_port: 7881
       udp_port: 7882
-      # Discover the WAN address via STUN and advertise it as a host
-      # candidate alongside the node IP, so a TURN relay has a public
-      # address to send to (the client only grants the relay permission for
-      # addresses it was told about).
+      # Discover the WAN address via STUN and advertise it as the host
+      # candidate, so a TURN relay has a public address to send to (the
+      # client only grants the relay permission for addresses it was told
+      # about). Only one address can be advertised without hostNetwork.
       use_external_ip: true
       # Validation sends a probe to the discovered address and expects it
       # back, which needs a router port forward or NAT hairpin. Neither is
       # set up, so trust the STUN result.
       skip_external_ip_validation: true
-      # Keep the node IP candidate for LAN clients.
-      advertise_internal_ip: true
+      # The pod IP is useless to any client; don't advertise it.
+      advertise_internal_ip: false
     # Presence events for show metrics (signed with the API key below, which
     # must be one of the --keys).
     webhook:
