@@ -60,7 +60,7 @@ spec:
       volumes:
         - name: config
           persistentVolumeClaim:
-            claimName: reaparr-config-nfs
+            claimName: reaparr-config
         - name: downloads
           persistentVolumeClaim:
             claimName: reaparr-downloads-nfs
