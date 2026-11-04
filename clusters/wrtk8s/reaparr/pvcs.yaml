@@ -1,3 +1,22 @@
+# Config on iSCSI: SQLite over NFS is unusable (locking + WAL semantics
+# don't survive the network filesystem; queries that should be <100ms
+# took 30-120s and Quartz hit "database is locked" repeatedly).
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: reaparr-config
+  namespace: reaparr
+spec:
+  storageClassName: synology-iscsi
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+# Deprecated — data has been rsynced to reaparr-config (iscsi). Kept so
+# a rollback is one deployment.yaml edit, not a restore. Delete after
+# the new volume has been stable for a week.
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
