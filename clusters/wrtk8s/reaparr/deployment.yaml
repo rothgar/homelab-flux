@@ -48,8 +48,6 @@ spec:
           env:
             - name: TZ
               value: "America/Los_Angeles"
-            - name: ResetCredentials
-              value: "true"
           volumeMounts:
             - name: config
               mountPath: /Config
@@ -62,7 +60,7 @@ spec:
       volumes:
         - name: config
           persistentVolumeClaim:
-            claimName: reaparr-config-nfs
+            claimName: reaparr-config
         - name: downloads
           persistentVolumeClaim:
             claimName: reaparr-downloads-nfs
