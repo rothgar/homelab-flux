@@ -48,8 +48,6 @@ spec:
           env:
             - name: TZ
               value: "America/Los_Angeles"
-            - name: ResetCredentials
-              value: "true"
           volumeMounts:
             - name: config
               mountPath: /Config
