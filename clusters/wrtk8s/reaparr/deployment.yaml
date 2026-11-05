@@ -49,9 +49,11 @@ spec:
             - name: TZ
               value: "America/Los_Angeles"
             # Header auth via the Tailscale ingress: the proxy sets this
-            # header to the caller's verified tailnet login. Only honoured
-            # when HeaderAuthentication.Enabled is true in ReaparrSettings.json
-            # and the request comes from a trusted proxy (pod CIDR 10.244.0.0/16).
+            # header to the caller's verified tailnet login. Configured in
+            # ReaparrSettings.json (not in git):
+            #   NetworkSettings.AllowedProxyIps = 10.244.0.0/16 (pod CIDR, so the
+            #     ingress's X-Forwarded-For is used as the client address)
+            #   HeaderAuthentication.TrustedProxies = 100.64.0.0/10 (tailnet)
             - name: AUTH_HEADER_TOKEN
               value: "Tailscale-User-Login"
           volumeMounts:
