@@ -48,6 +48,12 @@ spec:
           env:
             - name: TZ
               value: "America/Los_Angeles"
+            # Header auth via the Tailscale ingress: the proxy sets this
+            # header to the caller's verified tailnet login. Only honoured
+            # when HeaderAuthentication.Enabled is true in ReaparrSettings.json
+            # and the request comes from a trusted proxy (pod CIDR 10.244.0.0/16).
+            - name: AUTH_HEADER_TOKEN
+              value: "Tailscale-User-Login"
           volumeMounts:
             - name: config
               mountPath: /Config
