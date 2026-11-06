@@ -80,6 +80,12 @@ spec:
       containers:
         - name: bambustudio
           image: lscr.io/linuxserver/bambustudio:v02.09.01.70-ls177
+          # ls177 regression: /opt/bambustudio/ ships as drwx------ root,
+          # so abc (uid 1000) can't traverse into it to exec AppRun —
+          # right-click → Bambu Studio fails with "Permission denied".
+          # Chmod before handing off to s6-overlay's /init.
+          command: ["/bin/sh", "-c"]
+          args: ["chmod -R a+rX /opt/bambustudio && exec /init"]
           env:
             - name: PUID
               value: "1000"
