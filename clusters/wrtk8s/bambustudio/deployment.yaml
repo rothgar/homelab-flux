@@ -24,7 +24,7 @@ spec:
       hostname: bambustudio
       nodeSelector:
         kubernetes.io/arch: amd64
-        nvidia.com/gpu: "true"
+        nvidia.com/gpu.present: "true"
       initContainers:
         # NFS mounts /config mode 777. Bambu Studio's bundled libs refuse to
         # use a world-writable HOME and exit silently — tighten perms first.
