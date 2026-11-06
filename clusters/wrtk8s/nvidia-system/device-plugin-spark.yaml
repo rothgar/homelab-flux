@@ -23,8 +23,13 @@ spec:
         namespace: nvidia-system
   values:
     runtimeClassName: nvidia
+    # gpu-operator's GPU Feature Discovery labels GPU nodes with
+    # `nvidia.com/gpu.present=true` (per node_feature_discovery). The
+    # bare `nvidia.com/gpu=true` referenced in the parked patches/gpu-
+    # labels.yaml was never actually emitted and left this DaemonSet
+    # running on 0 nodes.
     nodeSelector:
-      nvidia.com/gpu: "true"
+      nvidia.com/gpu.present: "true"
     config:
       map:
         default: |-
