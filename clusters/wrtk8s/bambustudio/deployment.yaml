@@ -79,7 +79,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: bambustudio
-          image: lscr.io/linuxserver/bambustudio:v02.09.01.70-ls177
+          image: lscr.io/linuxserver/bambustudio:v02.09.01.70-ls178
           # ls177 regression: /opt/bambustudio/ ships as drwx------ root,
           # so abc (uid 1000) can't traverse into it to exec AppRun —
           # right-click → Bambu Studio fails with "Permission denied".
