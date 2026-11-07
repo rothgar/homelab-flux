@@ -47,7 +47,7 @@ spec:
             # eugr spark-vllm (arm64, built for GB10) serves the distributed NVFP4 MoE path correctly; the official
             # vllm/vllm-openai:v0.24.0 loads this model but hangs in multi-node generation (sample_tokens RPC times
             # out, EngineDeadError, 500s). Digest-pinned.
-            image: mirror.gcr.io/eugr/spark-vllm:latest@sha256:e58fc97951c6c53822d743d4db2531b749c0ce8dd3a4cd8022b33d1b7495b562
+            image: mirror.gcr.io/eugr/spark-vllm:latest@sha256:5e59cb7efe08a99b023925a185c971c5a31868d8261b755c33d9911c3b9389aa
             command:
               - bash
               - -c
@@ -169,7 +169,7 @@ spec:
             resourceClaimTemplateName: gpu-rdma
         containers:
           - name: vllm
-            image: mirror.gcr.io/eugr/spark-vllm:latest@sha256:e58fc97951c6c53822d743d4db2531b749c0ce8dd3a4cd8022b33d1b7495b562
+            image: mirror.gcr.io/eugr/spark-vllm:latest@sha256:5e59cb7efe08a99b023925a185c971c5a31868d8261b755c33d9911c3b9389aa
             command:
               - bash
               - -c
