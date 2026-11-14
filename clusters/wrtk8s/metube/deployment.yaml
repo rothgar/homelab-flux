@@ -30,7 +30,7 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: metube
-          image: ghcr.io/alexta69/metube:2026.11.10
+          image: ghcr.io/alexta69/metube:2026.11.14
           ports:
             - containerPort: 8081
               name: http
