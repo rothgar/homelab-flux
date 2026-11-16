@@ -8,9 +8,11 @@
 #   be in the pinned nvcr vllm image's registry yet.
 # - Native max_position_embeddings is 262144. Matching qwen36-35b-a3b at
 #   131072 keeps KV cache well inside memory for the common long-context path.
-# - MTP head exists (mtp_num_hidden_layers: 1). Recipe shows method:mtp with
-#   3 draft tokens for other variants; enabled here to lift GB10 decode off
-#   the ~8.5 tok/s baseline measured without it.
+# - MTP tried with 3 draft tokens: avg acceptance rate only 25-38% (vs 73%
+#   on qwen36-A3B). Net no faster, with much longer Eagle/Mamba JIT warmup.
+#   Reverted; the dense 27B is bandwidth-limited on GB10 regardless.
+# - Default reasoning_effort lowered from model's "xhigh" default so a
+#   chat completion doesn't burn ~1k reasoning tokens before every answer.
 # - FP8 is auto-detected from quantization_config in the HF repo — no
 #   explicit `--quantization fp8` flag needed.
 #
@@ -101,8 +103,8 @@ spec:
             - --enable-prefix-caching
             - --max-num-seqs
             - "8"
-            - --speculative-config
-            - '{"method": "mtp", "num_speculative_tokens": 3}'
+            - --default-chat-template-kwargs
+            - '{"reasoning_effort": "low"}'
           env:
             - name: HF_TOKEN
               valueFrom:
