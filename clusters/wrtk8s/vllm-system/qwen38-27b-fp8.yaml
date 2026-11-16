@@ -8,9 +8,9 @@
 #   be in the pinned nvcr vllm image's registry yet.
 # - Native max_position_embeddings is 262144. Matching qwen36-35b-a3b at
 #   131072 keeps KV cache well inside memory for the common long-context path.
-# - MTP head exists (mtp_num_hidden_layers: 1) but the model card does not
-#   ship a recommended speculative-decoding recipe; skip --speculative-config
-#   until there's a published one that lines up with vLLM's mtp impl.
+# - MTP head exists (mtp_num_hidden_layers: 1). Recipe shows method:mtp with
+#   3 draft tokens for other variants; enabled here to lift GB10 decode off
+#   the ~8.5 tok/s baseline measured without it.
 # - FP8 is auto-detected from quantization_config in the HF repo — no
 #   explicit `--quantization fp8` flag needed.
 #
@@ -101,6 +101,8 @@ spec:
             - --enable-prefix-caching
             - --max-num-seqs
             - "8"
+            - --speculative-config
+            - '{"method": "mtp", "num_speculative_tokens": 3}'
           env:
             - name: HF_TOKEN
               valueFrom:
