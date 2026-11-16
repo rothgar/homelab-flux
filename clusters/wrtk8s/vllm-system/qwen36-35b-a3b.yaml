@@ -63,12 +63,18 @@ spec:
           type: RuntimeDefault
       containers:
         - name: vllm
-          # v26.06-py3 segfaults on GB10 with driver 595. Pinning to 26.04.
-          image: nvcr.io/nvidia/vllm:26.04-py3
-          command:
+          # 26.09-py3, pinned by digest: what the qb2-vs-spark bench measured MTP with on this GB10.
+          # The server goes in `args`, not `command`, so the image's entrypoint still runs: with vllm as PID 1, nvcr
+          # vllm images from 26.06 on segfault in cuStreamCreateWithPriority on GB10 with driver 595.
+          image: nvcr.io/nvidia/vllm@sha256:557747337846eecf34486866f3d992383c6f8af869fdb0e365b5093fcaee02c2
+          args:
             - vllm
             - serve
             - Qwen/Qwen3.6-35B-A3B
+            # Pinned to the snapshot whose weights are on disk; refs/main moved upstream to a revision we never
+            # downloaded, so an unpinned start would pull ~67 GB again.
+            - --revision
+            - 995ad96eacd98c81ed38be0c5b274b04031597b0
             - --download-dir
             - /models
             - --host
@@ -77,8 +83,10 @@ spec:
             - "8000"
             - --served-model-name
             - qwen3.6-35b-a3b
+            # vLLM 0.29 refuses to start if this exceeds free memory at startup; on the 128 GB unified pool
+            # 0.9 (109 GiB) is above what's free (~107 GiB) after page cache. 0.8 leaves ample KV with MTP.
             - --gpu-memory-utilization
-            - "0.9"
+            - "0.8"
             # Qwen3.6-35B-A3B's native context is 262144; 65536 was forcing
             # opencode to compact conversations that easily fit end-to-end.
             # KV cache at 65536 × 4 seqs was under 2% used, so 131072 × 2
@@ -104,6 +112,10 @@ spec:
             - "2"
             - --default-chat-template-kwargs
             - '{"enable_thinking": true}'
+            # Multi-token prediction: Qwen3.6 ships an MTP head, used here as a 2-token drafter. On the bench
+            # (same image, same GB10) it gave ~1.56x single-user decode on real prompts, ~73% draft acceptance.
+            - --speculative-config
+            - '{"method": "mtp", "num_speculative_tokens": 2}'
           env:
             - name: HF_TOKEN
               valueFrom:
@@ -112,8 +124,10 @@ spec:
                   key: token
             - name: HF_HOME
               value: /models/huggingface
-            - name: HF_ENDPOINT
-              value: http://hf.jgarr.net
+            # Not using the pulsys mirror (HF_ENDPOINT=http://hf.jgarr.net): it returns 401 "unsupported
+            # credential (expected Bearer pulsys_...)" for the current hf-token secret, which crashlooped the pod.
+            # Restore it once the secret holds a pulsys token again. (HF_HUB_OFFLINE doesn't work here: offline
+            # vLLM resolves the model to the config-only snapshot under HF_HOME, not the weights in --download-dir.)
           ports:
             - containerPort: 8000
               name: http
