@@ -11,8 +11,9 @@
 # - MTP tried with 3 draft tokens: avg acceptance rate only 25-38% (vs 73%
 #   on qwen36-A3B). Net no faster, with much longer Eagle/Mamba JIT warmup.
 #   Reverted; the dense 27B is bandwidth-limited on GB10 regardless.
-# - Default reasoning_effort lowered from model's "xhigh" default so a
-#   chat completion doesn't burn ~1k reasoning tokens before every answer.
+# - reasoning_effort via chat_template_kwargs was tried but never triggered
+#   the thinking phase — content_tokens only, 0 reasoning_tokens on all
+#   levels. Left to the client to override per-request if needed.
 # - FP8 is auto-detected from quantization_config in the HF repo — no
 #   explicit `--quantization fp8` flag needed.
 #
@@ -103,8 +104,6 @@ spec:
             - --enable-prefix-caching
             - --max-num-seqs
             - "8"
-            - --default-chat-template-kwargs
-            - '{"reasoning_effort": "low"}'
           env:
             - name: HF_TOKEN
               valueFrom:
