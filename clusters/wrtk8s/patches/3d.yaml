@@ -28,11 +28,8 @@ provisioning:
   grow: true
 ---
 apiVersion: v1alpha1
-kind: NodeLabelsConfig
-nodeLabels:
+kind: KubeNodeConfig
+labels:
   games-on-whales.io/gaming: "true"
----
-apiVersion: v1alpha1
-kind: NodeTaintsConfig
-nodeTaints:
+taints:
   dedicated: "gaming:PreferNoSchedule"
