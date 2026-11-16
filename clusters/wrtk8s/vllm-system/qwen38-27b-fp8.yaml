@@ -109,9 +109,10 @@ spec:
                   key: token
             - name: HF_HOME
               value: /models/huggingface
-            # Required by the official recipe's dgx_spark_gb10 config.
-            - name: VLLM_USE_RUST_FRONTEND
-              value: "1"
+            # Recipe sets VLLM_USE_RUST_FRONTEND=1 but its minijinja renderer
+            # chokes on `{% generation %}` in Qwen3.8's chat template. Python
+            # frontend handles it. The hybrid-attention kernel perf win comes
+            # from the image, not the frontend.
           ports:
             - containerPort: 8000
               name: http
