@@ -1,0 +1,42 @@
+# arm64 runner scale set. Workflows opt in with `runs-on: wrtk8s-arm64`.
+# Lands on spark/sparky/pi5-1 etc. — the actions-runner image is multi-
+# arch so the same tag resolves to arm64 under the arch nodeSelector.
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: wrtk8s-arm64
+  namespace: github-runners
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: gha-runner-scale-set
+      version: "0.12.1"
+      sourceRef:
+        kind: HelmRepository
+        name: actions-runner-controller
+        namespace: github-runners
+  install:
+    remediation:
+      retries: 3
+  values:
+    runnerScaleSetName: wrtk8s-arm64
+    githubConfigUrl: https://github.com/rothgar
+    githubConfigSecret: github-pat
+    minRunners: 0
+    maxRunners: 3
+    containerMode:
+      type: dind
+    template:
+      spec:
+        priorityClassName: github-runners-low
+        nodeSelector:
+          kubernetes.io/arch: arm64
+        containers:
+          - name: runner
+            image: ghcr.io/actions/actions-runner:latest
+            command: ["/home/runner/run.sh"]
+            resources:
+              requests:
+                cpu: 100m
+                memory: 256Mi

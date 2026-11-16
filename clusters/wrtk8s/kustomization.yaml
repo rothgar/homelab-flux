@@ -60,6 +60,7 @@ resources:
   - audiomass
   - bambustudio
   - git
+  - github-runners
   - gotify
   - pdfcraft
   - plex
