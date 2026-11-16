@@ -71,9 +71,9 @@ spec:
           # hybrid-attention model needs. Previous nvcr 26.09 pin fell back
           # to Triton/eager kernels and hit ~8 tok/s decode.
           image: vllm/vllm-openai:qwen38
+          # vllm/vllm-openai images have ENTRYPOINT ["vllm","serve"], so
+          # args starts at the model positional — no leading `vllm serve`.
           args:
-            - vllm
-            - serve
             - Qwen/Qwen3.8-27B-FP8
             - --download-dir
             - /models
