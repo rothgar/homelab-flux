@@ -53,5 +53,15 @@ spec:
               resources:
                 - name: nvidia.com/gpu
                   replicas: 2
+        # 3d is the Wolf gaming node — no time-slicing so a Moonlight
+        # session gets the whole RTX 3060 without fighting with other
+        # pods for a slice.
+        "3d": |-
+          version: v1
+          sharing:
+            timeSlicing:
+              resources:
+                - name: nvidia.com/gpu
+                  replicas: 1
     gfd:
       enabled: true

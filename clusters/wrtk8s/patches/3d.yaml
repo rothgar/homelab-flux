@@ -1,29 +1,38 @@
 apiVersion: v1alpha1
-kind: HostnameConfig
 auto: "off"
 hostname: 3d
+kind: HostnameConfig
 ---
-machine:
-  nodeLabels:
-    nvidia.com/gpu.deploy.operands: "false"
-  kernel:
-    modules:
-      - name: loop
-      - name: vfio
-      - name: vfio_iommu_type1
-      - name: vfio_pci
-        parameters:
-          - "ids=10de:1b81,10de:10f0"
+# Shrink Talos's default EPHEMERAL a lot — this is a single-NVMe box and
+# the `home` UserVolume below wants the rest for the Steam library +
+# Resolve media.
+apiVersion: v1alpha1
+kind: VolumeConfig
+name: EPHEMERAL
+provisioning:
+  diskSelector:
+    match: disk.transport == "nvme"
+  maxSize: 50GiB
+  grow: false
+---
+# Dedicated partition backing Wolf's /home: Steam library, Resolve
+# projects + media, user dotfiles. Fills the rest of nvme0n1.
+apiVersion: v1alpha1
+kind: UserVolumeConfig
+name: home
+volumeType: partition
+provisioning:
+  diskSelector:
+    match: disk.transport == "nvme"
+  minSize: 500GiB
+  grow: true
 ---
 apiVersion: v1alpha1
-kind: BridgeConfig
-name: br0
-links:
-  - enp37s0
-stp:
-  enabled: true
-up: true
+kind: NodeLabelsConfig
+nodeLabels:
+  games-on-whales.io/gaming: "true"
 ---
 apiVersion: v1alpha1
-kind: DHCPv4Config
-name: br0
+kind: NodeTaintsConfig
+nodeTaints:
+  dedicated: "gaming:PreferNoSchedule"

@@ -34,6 +34,7 @@ machines:
   - 62663165-6138-3361-6134-656562386600
   - d68614b6-bfde-11d3-8000-4cbb472dcf87 # spark (arm64, DGX Spark GB10)
   - 4c5615cc-1dd2-11b2-8000-4cbb47001716 # sparky (arm64, DGX Spark GB10)
+  - c828b893-c76a-4b1c-a7c6-345a6053adf6 # 3d (amd64, RTX 3060, Wolf game-streaming)
 ---
 kind: Machine
 systemExtensions:
@@ -151,4 +152,22 @@ patches:
   - file: patches/sparky.yaml
   - file: patches/spark-nvidia-modules.yaml
   - file: patches/gb10-nvidia.yaml
+  - file: patches/kubelet.yaml
+---
+# 3d: RTX 3060 (Ampere, sm_86) — production driver variant, same as mini/spark.
+# Dedicated gaming node for Wolf (containerized Moonlight server). The `home`
+# UserVolume (in patches/3d.yaml) backs a local PV that Wolf mounts at /home so
+# Steam libraries and Resolve media stay on the local NVMe.
+kind: Machine
+systemExtensions:
+  - siderolabs/nonfree-kmod-nvidia-production
+  - siderolabs/nvidia-container-toolkit-production
+  - siderolabs/iscsi-tools
+name: c828b893-c76a-4b1c-a7c6-345a6053adf6 # 3d
+kernelArgs:
+  - talos.dashboard.disabled=1
+  - nfs.nfs4_disable_idmapping=1
+patches:
+  - file: patches/3d.yaml
+  - file: patches/spark-nvidia-modules.yaml
   - file: patches/kubelet.yaml
