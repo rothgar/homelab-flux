@@ -26,7 +26,10 @@ metadata:
   name: ds41-flash
   namespace: vllm-system
 spec:
-  replicas: 1
+  # Scaled to 0 to free its GB10 for qwen38-27b-fp8; the 341 GiB GGUF
+  # stays on local NVMe, so re-enabling just requires replicas: 1 and
+  # scaling one of the other vllm-model Deployments down.
+  replicas: 0
   strategy:
     type: Recreate
   selector:
