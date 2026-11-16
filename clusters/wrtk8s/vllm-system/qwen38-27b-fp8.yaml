@@ -25,7 +25,10 @@ metadata:
   name: qwen38-27b-fp8
   namespace: vllm-system
 spec:
-  replicas: 1
+  # Scaled to 0 — qwen38-27b-nvfp4 is the preferred qwen3.8 variant on
+  # GB10 (halved weight size doubles decode on the bandwidth-bound dense
+  # arch). Kept in-repo so switching back is just a scale flip.
+  replicas: 0
   strategy:
     type: Recreate
   selector:
