@@ -209,7 +209,7 @@ spec:
             # path on the next /launch. Turn these off once the issue is
             # localized.
             - { name: RUST_BACKTRACE, value: "full" }
-            - { name: RUST_LOG, value: "debug" }
+            - { name: RUST_LOG, value: "info" }
             - { name: WOLF_LOG_LEVEL, value: "DEBUG" }
             - { name: GST_DEBUG, value: "waylanddisplaysrc:5,wolf_wayland_source:5,2" }
           volumeMounts:
