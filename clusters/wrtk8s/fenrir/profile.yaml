@@ -23,3 +23,5 @@ spec:
     # This Claude Code workstation (client cert fingerprint 2d2d…). First
     # paired 2026-11-17.
     - name: c6e28ec19461649c1ed5b50be3ce912fb85747ed9ebb17bd87783de5f24ee700
+    # Android phone, paired 2026-11-17 via proxy pin page.
+    - name: d3d837acb25d92dd099a96de9dc8b5c367e032e36997316bdf816c4ec3d047be
