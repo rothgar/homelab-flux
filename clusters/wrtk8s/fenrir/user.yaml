@@ -1,21 +1,15 @@
 # Logan's user — the User CR tells Fenrir's direwolf-operator which
-# resources to allocate for the session pod. Pinned to 3d via the
-# gaming node label since that's the only node with the 3060 and the
-# uinput extensions. GPU + uinput are requested on the wolf sidecar
-# per the games-on-whales/fenrir examples/nvidia_devices/user.yaml.
+# resources to allocate for the session pod. Scheduling to 3d is
+# implicit: only 3d has nvidia.com/gpu AND squat.ai/uinput (we scoped
+# the generic-device-plugin DS to the gaming node), so the scheduler
+# has one feasible node. The User CRD doesn't expose nodeSelector or
+# tolerations fields, hence the implicit pin.
 apiVersion: direwolf.games-on-whales.github.io/v1alpha1
 kind: User
 metadata:
   name: logan
   namespace: direwolf
 spec:
-  nodeSelector:
-    games-on-whales.io/gaming: "true"
-  tolerations:
-    - key: dedicated
-      operator: Equal
-      value: gaming
-      effect: PreferNoSchedule
   resources:
     requests:
       nvidia.com/gpu: "1"
