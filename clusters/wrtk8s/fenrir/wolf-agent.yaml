@@ -143,6 +143,10 @@ spec:
           configMap:
             name: direwolf-certs
             defaultMode: 0600
+        - name: egl-glvnd-nvidia
+          configMap:
+            name: egl-glvnd-nvidia
+            defaultMode: 0444
       containers:
         - name: wolf-agent
           image: cr.jgarr.net/fenrir/wolf-agent:dev
@@ -193,6 +197,10 @@ spec:
             - { name: wolf-cfg,    mountPath: /etc/wolf/cfg/config.toml, subPath: config.toml, readOnly: false }
             - { name: direwolf-certs, mountPath: /etc/wolf/cfg/server.crt, subPath: server.crt, readOnly: true }
             - { name: direwolf-certs, mountPath: /etc/wolf/cfg/server.key, subPath: server.key, readOnly: true }
+            # libglvnd EGL ICD dispatch file — tells libEGL to use nvidia's
+            # driver. Missing from the nvidia DRA injection; without this
+            # wolf's wayland compositor falls back to Mesa DRI2 and panics.
+            - { name: egl-glvnd-nvidia, mountPath: /usr/share/glvnd/egl_vendor.d/10_nvidia.json, subPath: 10_nvidia.json, readOnly: true }
           resources:
             requests:
               cpu: "1"

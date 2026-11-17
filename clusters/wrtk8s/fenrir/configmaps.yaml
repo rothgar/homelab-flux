@@ -1,4 +1,24 @@
 ---
+# The libglvnd ICD descriptor telling the EGL dispatcher to use nvidia's
+# driver. The classic nvidia-container-toolkit auto-injects this when
+# NVIDIA_DRIVER_CAPABILITIES includes `graphics`, but the gpu.nvidia.com
+# DRA driver does not, so the file is missing from the wolf container
+# and libEGL falls back to Mesa DRI2 → eglInitialize(NOT_INITIALIZED)
+# → wayland-display-core panics with "Failed to create EGLDisplay".
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: egl-glvnd-nvidia
+  namespace: direwolf-dev
+data:
+  10_nvidia.json: |
+    {
+        "file_format_version" : "1.0.0",
+        "ICD" : {
+            "library_path" : "libEGL_nvidia.so.0"
+        }
+    }
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
