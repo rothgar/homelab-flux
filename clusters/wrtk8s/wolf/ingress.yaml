@@ -9,7 +9,11 @@ metadata:
 spec:
   ingressClassName: tailscale
   rules:
-    - host: wolf
+    # NOTE: MagicDNS short name must NOT be `wolf` — Wolf advertises
+    # itself as `wolf` to Moonlight, and if that short name resolves to
+    # a tailnet IP, Moonlight's pair handshake routes to the ingress
+    # instead of the LAN hostNetwork, breaking the state machine.
+    - host: wolf-ui
       http:
         paths:
           - path: /
@@ -21,4 +25,4 @@ spec:
                   number: 47989
   tls:
     - hosts:
-        - wolf
+        - wolf-ui
