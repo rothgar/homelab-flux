@@ -7,7 +7,9 @@ metadata:
   name: testball
   namespace: direwolf
 spec:
-  # appAssetWebP: removed (was ~250KB base64 WebP icon)
+  # Minimal valid WebP (26 bytes). CRD requires appAssetWebP; upstream
+  # shipped a 250KB base64 icon that bloated every CR applied via kustomize.
+  appAssetWebP: UklGRhoAAABXRUJQVlA4IA4AAAAQAAGAiYCAgICAgIAA
   id: 3
   isHDRSupported: false
   title: Test Ball
