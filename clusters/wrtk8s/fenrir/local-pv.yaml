@@ -44,3 +44,16 @@ spec:
   resources:
     requests:
       storage: 800Gi
+---
+# The direwolf-operator hardcodes "openebs-hostpath" as the default
+# storage class for the per-user PVC it creates (string is literally
+# embedded in the operator binary, no env-var override). Rather than
+# install OpenEBS or patch upstream, alias the name to our existing
+# local-path provisioner so the operator's PVC provisions correctly.
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: openebs-hostpath
+provisioner: cluster.local/local-path-provisioner
+volumeBindingMode: WaitForFirstConsumer
+reclaimPolicy: Delete
