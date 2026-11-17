@@ -33,3 +33,9 @@ labels:
   games-on-whales.io/gaming: "true"
 taints:
   dedicated: "gaming:PreferNoSchedule"
+---
+# Wolf injects virtual gamepad/keyboard events into session containers
+# via /dev/uinput; the module isn't autoloaded on Talos.
+apiVersion: v1alpha1
+kind: KernelModuleConfig
+name: uinput
