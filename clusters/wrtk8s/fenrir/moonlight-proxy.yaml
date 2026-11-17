@@ -43,6 +43,9 @@ spec:
         component: moonlight-proxy
     spec:
       serviceAccountName: direwolf-moonlight-proxy
+      # amd64 only until multi-arch builds are in place (see operator.yaml).
+      nodeSelector:
+        kubernetes.io/arch: amd64
       containers:
         - name: moonlight-proxy
           image: cr.jgarr.net/fenrir/moonlight-proxy:dev

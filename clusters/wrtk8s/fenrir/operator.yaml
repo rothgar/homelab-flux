@@ -23,6 +23,12 @@ spec:
         component: operator
     spec:
       serviceAccountName: direwolf-operator
+      # Our cr.jgarr.net/fenrir/* images are built on this amd64 box; the
+      # scheduler happily lands this on arm64 (spark/sparky/pi*) without
+      # a nodeSelector and the container exits with "exec format error".
+      # Pin to amd64 until multi-arch builds are in place.
+      nodeSelector:
+        kubernetes.io/arch: amd64
       containers:
         - name: operator
           image: cr.jgarr.net/fenrir/operator:dev
