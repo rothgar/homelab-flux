@@ -84,7 +84,7 @@ metadata:
 data:
   config.toml: |
     config_version = 7
-    hostname = 'Wolf-node-standalone'
+    hostname = '3d'
     uuid = ''
 
     [gstreamer.audio]
