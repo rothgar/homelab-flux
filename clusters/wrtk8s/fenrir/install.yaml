@@ -1,0 +1,302 @@
+# A YAML containing everything you need to install direwolf
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: direwolf
+  namespace: direwolf
+  labels:
+    app: direwolf
+    component: moonlight-proxy
+  annotations:
+    "lbipam.cilium.io/sharing-key": "direwolf"
+    "metallb.universe.tf/allow-shared-ip": "direwolf"
+spec:
+  type: LoadBalancer
+  selector:
+    app: direwolf
+    component: moonlight-proxy
+  ports:
+    - name: http
+      protocol: TCP
+      port: 47984
+    - name: https
+      protocol: TCP
+      port: 47989
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: direwolf-moonlight-proxy
+  namespace: direwolf
+  labels:
+    app: direwolf
+    component: moonlight-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: direwolf
+      component: moonlight-proxy
+  template:
+    metadata:
+      labels:
+        app: direwolf
+        component: moonlight-proxy
+    spec:
+      serviceAccountName: direwolf-moonlight-proxy
+      containers:
+        - name: moonlight-proxy
+          image: ghcr.io/games-on-whales/moonlight-proxy:main
+          imagePullPolicy: IfNotPresent
+          args:
+          - --tls-cert=/etc/certs/server.crt
+          - --tls-key=/etc/certs/server.key
+          ports:
+          - containerPort: 47984
+          - containerPort: 47989
+          env:
+          # Useful for debugging pairing to skip constant PIN screens.
+          # Requires modified moonlight client.
+          # - name: HARDCODED_PIN
+          #   value: "1111"
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+          volumeMounts:
+          - name: certs
+            mountPath: /etc/certs
+            readOnly: true
+      volumes:
+      - name: certs
+        configMap:
+          name: direwolf-certs
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: direwolf-operator
+  namespace: direwolf
+  labels:
+    app: direwolf
+    component: operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: direwolf
+      component: operator
+  template:
+    metadata:
+      labels:
+        app: direwolf
+        component: operator
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - direwolf
+                - key: component
+                  operator: In
+                  values:
+                  - operator
+              topologyKey: "kubernetes.io/hostname"
+      serviceAccountName: direwolf-operator
+      containers:
+        - name: operator
+          image: ghcr.io/games-on-whales/operator:main
+          imagePullPolicy: IfNotPresent
+          env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          ## To specify which image you want to use for wolf and wolf-agent 
+          # - name: WOLF_IMAGE
+          #   value: ghcr.io/games-on-whales/wolf:session
+          # - name: AGENT_IMAGE
+          #   value: ghcr.io/games-on-whales/fenrir/wolf-agent:main
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: direwolf-operator
+  namespace: direwolf
+  labels:
+    app: direwolf
+    component: operator
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: direwolf-operator
+  namespace: direwolf
+  labels:
+    app: direwolf
+    component: operator
+rules:
+- apiGroups: ["coordination.k8s.io"]
+  resources: ["leases"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["direwolf.games-on-whales.github.io"]
+  resources: ["*"]
+  verbs: ["*"]
+- apiGroups: ["apps"]
+  resources: ["deployments"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: [""]
+  resources: ["services", "persistentvolumeclaims", "configmaps"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: direwolf-operator
+  namespace: direwolf
+  labels:
+    app: direwolf
+    component: operator
+subjects:
+- kind: ServiceAccount
+  name: direwolf-operator
+  namespace: direwolf
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: direwolf-operator
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: direwolf-moonlight-proxy
+  namespace: direwolf
+  labels:
+    app: direwolf
+    component: direwolf-moonlight-proxy
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: direwolf-moonlight-proxy
+  namespace: direwolf
+  labels:
+    app: direwolf
+    component: direwolf-moonlight-proxy
+rules:
+- apiGroups: ["direwolf.games-on-whales.github.io"]
+  resources: ["*"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["direwolf.games-on-whales.github.io"]
+  resources: ["pairings", "sessions"]
+  verbs: ["create", "delete", "patch", "update", "get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: direwolf-moonlight-proxy
+  namespace: direwolf
+  labels:
+    app: direwolf
+    component: direwolf-moonlight-proxy
+subjects:
+- kind: ServiceAccount
+  name: direwolf-moonlight-proxy
+  namespace: direwolf
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: direwolf-moonlight-proxy
+---
+# Throwaway "ephemeral" cert and key for persistence. Up to user about whether
+# to mount a PVC to store the generated one in the app or to use legit CertManager
+# cert or similar.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: direwolf-certs
+  namespace: direwolf
+data:
+  server.crt: |
+    -----BEGIN CERTIFICATE-----
+    MIIDXTCCAkWgAwIBAgIUUkerfFRKn4BoBRkIqWq4jnTjOK0wDQYJKoZIhvcNAQEL
+    BQAwLTEXMBUGA1UECgwORXBoZW1lcmFsIEluYy4xEjAQBgNVBAMMCWxvY2FsaG9z
+    dDAeFw0yNjExMTcyMDA3NTBaFw0zNjExMTQyMDA3NTBaMC0xFzAVBgNVBAoMDkVw
+    aGVtZXJhbCBJbmMuMRIwEAYDVQQDDAlsb2NhbGhvc3QwggEiMA0GCSqGSIb3DQEB
+    AQUAA4IBDwAwggEKAoIBAQC30gdBoSlPXhvhrltG/eYuE+LvbZ17uZeckOlgGmIP
+    25SUX+RTvehET7jsg4/ftXzvkwXo0aETHnRp3/YmZ6EYNWYQxmcj7/l2cZE/KghA
+    z/xWISEYQOvdiKHcYoFaerlwZwpN8ByT2lE41dcGSCXfP70tnjtk/cpfyEET1Fs3
+    FgNAUAqwPZTQ7DFvAFuH/1OEPL45Gnluywjdtgwxl/3JG1m8fBwi2+onbdMiKBKO
+    YkdmaNdeLZ6xFPvRlJmceTK4CFzXcCEKQnf8/EdOSxDz3eh/mcc4UhiB4SJfARN9
+    flWq8B7yN5dgCZUeDrZQjBoT6KN2g3oU4SxfhkEQTQqhAgMBAAGjdTBzMB0GA1Ud
+    DgQWBBTpqdfYGb9hPZOsBzcFCTj4gHktWDAfBgNVHSMEGDAWgBTpqdfYGb9hPZOs
+    BzcFCTj4gHktWDAPBgNVHRMBAf8EBTADAQH/MCAGA1UdEQQZMBeCCWxvY2FsaG9z
+    dIcEfwAAAYcEAAAAADANBgkqhkiG9w0BAQsFAAOCAQEArTlIXGC+kzAtE5n7kvrh
+    +zilfVHERQM+86UO+sBbga5dj4aBD9lNbGAfe+KtdBuhF4mkfQpInOQZWO4OEaxw
+    JaZwqQHHQbpaciJMHwj8JyabW8GNKtbM9L3OPb0XrJECm1vhZlpyCzrcHeRY2et/
+    xBDJVcLL9jvRZzU319y4CMCaFttD6FjHEOo9xYpjySyI/jDyAsUa2cLJsDgbXi42
+    JUohMomtk6XDjwfltMf13NpxBchQ49fa9ufa7u1y9FAI7dDhktD1I5oFsAzf81+L
+    FzX4TW2zAfonRgya+XciSRW0IDT5ZfmopzahPzyG6hSJEXQBSWZUBsX/F8v0HvdG
+    RA==
+    -----END CERTIFICATE-----
+
+  server.key: |
+    -----BEGIN RSA PRIVATE KEY-----
+    MIIEpAIBAAKCAQEAt9IHQaEpT14b4a5bRv3mLhPi722de7mXnJDpYBpiD9uUlF/k
+    U73oRE+47IOP37V875MF6NGhEx50ad/2JmehGDVmEMZnI+/5dnGRPyoIQM/8ViEh
+    GEDr3Yih3GKBWnq5cGcKTfAck9pRONXXBkgl3z+9LZ47ZP3KX8hBE9RbNxYDQFAK
+    sD2U0OwxbwBbh/9ThDy+ORp5bssI3bYMMZf9yRtZvHwcItvqJ23TIigSjmJHZmjX
+    Xi2esRT70ZSZnHkyuAhc13AhCkJ3/PxHTksQ893of5nHOFIYgeEiXwETfX5VqvAe
+    8jeXYAmVHg62UIwaE+ijdoN6FOEsX4ZBEE0KoQIDAQABAoIBAAFVOrpKeoFupz3a
+    xqMEOUIyBxIePb2gqSvO2Exhhv7Cfghl5ukgpK5zINe6zzHyD7v85hzyNGYH6vqJ
+    QwoNmngE5U6yyGgIFLgu+mMTSu0T/QQCxT0XAm09F4X6aZT2Z4GvYGS6Iu22ozv9
+    GMXJ3RfXD0GyJsNBYysDr+brVVzkwi/b1n+YvtlRI9+cMK1RDifmv/CgbC9hqnd4
+    N7506Q7N1x8At7BlrnZNGfWY+ZyU+IUwooOTFADqR5MbUAkg12zlFVF6uXDLVkBF
+    nCg40sXF7Yl1SG8Lci8t4OriMksB6eRs7hGtlvqkBEFwgeMkP51awdJvvwkocvt3
+    +/mSyXkCgYEA7GdPnXdrtgODPSBI3N/RXK34Ehq2ZkJPQZ4GOSFHtCcY4wZfXt2i
+    57OuLBWlbXpWoRFHXVo9GFXHGv4DMIwldWN+DqKig5uKTYzyJenXkH5/usqTl5y8
+    BIkyjqHswPjz4iAYGZBjKomlleiBAgbDy7jM09vCMN3pFChi1ywkwMkCgYEAxw7b
+    hbowpGNSCcLB2DX8gAnN+ee093gkbiudjjSo1z9Ll1HGA6f0MzoBzFqWtMcFoPCY
+    NznaeiitHG05LT80pD98d63ByxqByYySInPa1uFLbTaHTSdSBotcY025Y+bjk/2u
+    V7eH7VAHlhSC4CbbHdThucOT+8MQa/jv+NQ+/xkCgYEA3Rkqnw2H0a2rWsoNG3bB
+    KrsSnmwZV76Avc/75ga4N0exwPK+08zahXXJWjXMiH24899jLW4uYcon85jKhucs
+    SYQJ68oz0H7ydOFzv/3avKty7tJ0A4J1XpCqljffZAPypPR7Vb1y4d/m3DOeJLUK
+    /kgSWbrY/jctvMqg1rnUjfECgYBjxHeUI8ija8A/ciSTyCMgzUk2OsLB0a54pVWX
+    Y59IGso5MlwLkw9a6XTjRngIbUPN8ShpbY6p8V8qQzgIDIjG1ab9mNHriQKJ0PGh
+    YO3LCyoxt8XCjrWW4BxTDS6g+qUPlHLgNfVjpNvYhbk+vVrPLdZgs7ykz5SYeTFV
+    RpO4aQKBgQDkOVrYGDO6Kw0oH3uNDzqNqp4u2PSg3pke9t+5TC0MwqPQROXh0wTp
+    S5pisrLHm+miRLQVApQcHKt5aPFewJJYVINjo9SxPFYZTSpep87t0pTQSUkQ7Ri1
+    xyPd7piqbrtmkBtTGRGuX63nA/XwW53t6KdWxDQkre4d3l0VCh8KQg==
+    -----END RSA PRIVATE KEY-----

@@ -56,7 +56,7 @@ resources:
   - tsidp
   - vllm-system
   - whisper-webui
-  - wolf
+  - fenrir
   - arm
   - audiomass
   - bambustudio

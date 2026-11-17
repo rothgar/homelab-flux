@@ -1,0 +1,52 @@
+# Logan's user — the User CR tells Fenrir's direwolf-operator which
+# resources to allocate for the session pod. Pinned to 3d via the
+# gaming node label since that's the only node with the 3060 and the
+# uinput extensions. GPU + uinput are requested on the wolf sidecar
+# per the games-on-whales/fenrir examples/nvidia_devices/user.yaml.
+apiVersion: direwolf.games-on-whales.github.io/v1alpha1
+kind: User
+metadata:
+  name: logan
+  namespace: direwolf
+spec:
+  nodeSelector:
+    games-on-whales.io/gaming: "true"
+  tolerations:
+    - key: dedicated
+      operator: Equal
+      value: gaming
+      effect: PreferNoSchedule
+  resources:
+    requests:
+      nvidia.com/gpu: "1"
+      cpu: 4000m
+      memory: 8G
+    limits:
+      nvidia.com/gpu: "1"
+      cpu: 4000m
+      memory: 8G
+  volumes:
+    - name: home
+      persistentVolumeClaim:
+        claimName: logan-home
+  sidecarPolicies:
+    wolf:
+      env:
+        - name: NVIDIA_DRIVER_CAPABILITIES
+          value: all
+        - name: NVIDIA_VISIBLE_DEVICES
+          value: all
+      resources:
+        requests:
+          nvidia.com/gpu: "1"
+          squat.ai/uinput: "1"
+          cpu: 1000m
+          memory: 2G
+        limits:
+          nvidia.com/gpu: "1"
+          squat.ai/uinput: "1"
+          cpu: 1000m
+          memory: 2G
+      volumeMounts:
+        - name: home
+          mountPath: /home

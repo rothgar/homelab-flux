@@ -1,0 +1,62 @@
+# squat.ai generic-device-plugin — exposes /dev/uinput as the resource
+# `squat.ai/uinput` that Fenrir's User CR requests for its wolf sidecar.
+# The /dev/dri block is kept for GPU render-node passthrough.
+# Scoped to the dedicated gaming node so we don't advertise the uinput
+# resource on every worker.
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: generic-device-plugin-gaming
+  namespace: kube-system
+  labels:
+    app.kubernetes.io/name: generic-device-plugin-gaming
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: generic-device-plugin-gaming
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: generic-device-plugin-gaming
+    spec:
+      priorityClassName: system-node-critical
+      nodeSelector:
+        games-on-whales.io/gaming: "true"
+      containers:
+        - name: generic-device-plugin-gaming
+          image: ghcr.io/squat/generic-device-plugin:latest
+          args:
+            - --device
+            - |
+              name: uinput
+              groups:
+                - count: 10
+                  paths:
+                    - path: /dev/uinput
+            - --device
+            - |
+              name: dri
+              groups:
+                - count: 10
+                  paths:
+                    - path: /dev/dri/renderD128
+          resources:
+            requests:
+              cpu: 50m
+              memory: 10Mi
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: device-plugin
+              mountPath: /var/lib/kubelet/device-plugins
+            - name: dev
+              mountPath: /dev
+      volumes:
+        - name: device-plugin
+          hostPath:
+            path: /var/lib/kubelet/device-plugins
+        - name: dev
+          hostPath:
+            path: /dev
+  updateStrategy:
+    type: RollingUpdate

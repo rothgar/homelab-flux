@@ -1,0 +1,23 @@
+# Fenrir (games-on-whales/fenrir) — the Kubernetes-native variant of
+# Wolf. Spawns session pods via the K8s API instead of Docker, which is
+# the architectural fix for Talos (no Docker socket available).
+# Deployed on 3d, reusing the same uinput/uhid/joydev extensions and
+# local /home PVC we provisioned for the earlier wolf/ attempt.
+#
+# Upstream main is pinned at ec6c640596aca12a1942dacb034790bcc96eb863
+# (2026-07-14). CRDs + install.yaml vendored so Flux can apply offline.
+# Install.yaml's embedded self-signed cert was regenerated with a 10-yr
+# expiry (upstream shipped one that expired in 2025).
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - namespace.yaml
+  - crds/apps.yaml
+  - crds/pairings.yaml
+  - crds/sessions.yaml
+  - crds/users.yaml
+  - install.yaml
+  - generic-device-plugin.yaml
+  - local-pv.yaml
+  - user.yaml
+  - testball.yaml

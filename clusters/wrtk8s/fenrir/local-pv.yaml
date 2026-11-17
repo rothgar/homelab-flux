@@ -1,6 +1,6 @@
-# Static local PV backed by 3d's `home` UserVolume (see patches/3d.yaml).
-# No dynamic provisioner — the PV is hand-written and only ever binds to
-# wolf-home on 3d.
+# Static local PV backed by 3d's `home` UserVolume (see patches/3d.yaml),
+# migrated from the wolf/ bundle. Same StorageClass and PV — only the PVC
+# consumer changed (direwolf/logan-home instead of wolf/wolf-home).
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
@@ -30,3 +30,17 @@ spec:
             - key: kubernetes.io/hostname
               operator: In
               values: ["3d"]
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: logan-home
+  namespace: direwolf
+spec:
+  storageClassName: local-3d
+  volumeName: 3d-home
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 800Gi
