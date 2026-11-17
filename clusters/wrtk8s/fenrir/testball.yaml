@@ -20,7 +20,11 @@ spec:
         name: app-data
       spec:
         accessModes: [ReadWriteOnce]
-        storageClassName: local-path
+        # Synology iSCSI — avoids the Talos /var/mnt/local-path dance and
+        # survives 3d reboots or re-schedules without node-local cleanup.
+        # Latency is fine for testball scratch; real app libraries (Steam,
+        # Resolve media) still go on the local-3d PV via the home UserVolume.
+        storageClassName: synology-iscsi
         resources:
           requests:
             storage: 1Gi
