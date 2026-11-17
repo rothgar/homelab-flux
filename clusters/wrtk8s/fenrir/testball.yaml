@@ -13,7 +13,17 @@ spec:
   id: 3
   isHDRSupported: false
   title: Test Ball
-  # Since volumeClaimTemplate is not defined, an ephemeral EmptyDir volume will be used.
+  # Upstream says "no volumeClaimTemplate → EmptyDir" but the operator
+  # actually provisions a PVC with StorageClass openebs-hostpath, which
+  # we don't have. Point it at the cluster's default local-path class so
+  # the session pod can actually schedule.
+  volumeClaimTemplate:
+    spec:
+      accessModes: [ReadWriteOnce]
+      storageClassName: local-path
+      resources:
+        requests:
+          storage: 1Gi
   wolfConfig:
     runtimeVariables:
       renderNode: /dev/dri/renderD128
