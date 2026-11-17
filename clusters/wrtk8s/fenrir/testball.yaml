@@ -24,6 +24,19 @@ spec:
       resources:
         requests:
           storage: 1Gi
+  template:
+    spec:
+      # Talos needs runtimeClassName: nvidia to trigger CDI injection of
+      # /dev/dri and /dev/nvidia*. Without it, nvidia.com/gpu is reserved
+      # but no device nodes appear in the container and wolf crashes
+      # with "/dev/dri/renderD128 doesn't exist" + "no compatible H.264
+      # encoder".
+      runtimeClassName: nvidia
+      # Pin to 3d — the only node with squat.ai/uinput advertised and the
+      # only node with the siderolabs uinput/uhid/joydev extensions. The
+      # scheduler could otherwise land the session on mini.
+      nodeSelector:
+        games-on-whales.io/gaming: "true"
   wolfConfig:
     runtimeVariables:
       renderNode: /dev/dri/renderD128
