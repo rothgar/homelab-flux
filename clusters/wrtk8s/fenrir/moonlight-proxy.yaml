@@ -11,6 +11,12 @@ metadata:
     "metallb.universe.tf/allow-shared-ip": "direwolf"
 spec:
   type: LoadBalancer
+  # Preserve client source IPs by announcing the VIP only from nodes that
+  # have a backend pod (mini, where the proxy runs). Otherwise MetalLB L2
+  # elects any node (today: iota at 10.1.1.9) and kube-proxy SNATs every
+  # external client to the speaker's IP, which makes logs look like
+  # every client is 10.1.1.9.
+  externalTrafficPolicy: Local
   selector:
     app: direwolf
     component: moonlight-proxy
