@@ -176,7 +176,11 @@ spec:
           securityContext:
             privileged: true
         - name: wolf
-          image: ghcr.io/games-on-whales/wolf:sha-d6d41de
+          # :sha-d6d41de (upstream Fenrir install default) panics in the
+          # gstreamer waylanddisplaysrc negotiate path even after all
+          # DRA-era env fixes (glvnd ICD, GBM_BACKENDS_PATH). Try :stable
+          # which is a known-good older release.
+          image: ghcr.io/games-on-whales/wolf:stable
           imagePullPolicy: IfNotPresent
           env:
             - { name: XDG_RUNTIME_DIR, value: /var/run/wolf-sockets }
