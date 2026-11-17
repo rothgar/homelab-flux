@@ -23,12 +23,8 @@ spec:
     hostPaths:
       driverInstallDir: /usr/local
     dcgmExporter:
-      serviceMonitor:
-        enabled: true
-        additionalLabels:
-          release: kube-prometheus-stack
-        relabelings:
-          - sourceLabels: [__meta_kubernetes_pod_node_name]
-            targetLabel: node
-          - sourceLabels: [__meta_kubernetes_pod_node_name]
-            targetLabel: instance
+      # Disabled 2026-11-17: on our consumer-GPU fleet (RTX 2060/3060, GB10)
+      # DCGM's DCP profiling module can't load, so default-counters.csv tops
+      # out at ~11–15 series per node while nvidia_gpu_exporter (nvml) gives
+      # 100+ at ~1/9th the memory.
+      enabled: false
