@@ -18,11 +18,9 @@ spec:
           video_settings:
             wayland_render_node: /dev/dri/renderD128
             runner_render_node:  /dev/dri/renderD128
-            # Drop the drm-format={NV12,YV12,...} filter. NVIDIA's wayland
-            # smithay backend exposes AR24/XR24/AB24/XB24 with NVIDIA-
-            # specific modifiers (not NV12/YV12), so the intersection was
-            # empty and waylanddisplaysrc's base_src.rs:452 negotiate
-            # failed with Internal data stream error. Letting caps float
-            # lets cudaupload+cudaconvertscale downstream handle the
-            # colorspace conversion to NV12 for the h264 encoder.
-            video_producer_buffer_caps: 'video/x-raw(memory:DMABuf)'
+            # NVIDIA: the lobby producer must emit CUDA memory. Wolf's nvcodec
+            # session pipeline listens for video/x-raw(memory:CUDAMemory);
+            # the upstream DMABuf default (written for AMD/VA) leaves the
+            # lobby interpipesink with no caps intersection, so the encoder
+            # never gets frames and clients see a black screen.
+            video_producer_buffer_caps: 'video/x-raw(memory:CUDAMemory)'
