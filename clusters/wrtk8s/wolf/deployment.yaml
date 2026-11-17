@@ -1,0 +1,95 @@
+# Wolf (games-on-whales/wolf) — a containerized Moonlight server. One
+# replica, pinned to the dedicated gaming node (3d). Runs with
+# hostNetwork because Moonlight uses a range of dynamic UDP ports per
+# session; Service LoadBalancer UDP forwarding is flaky at the ranges
+# Wolf wants, so binding to the host IP directly is the sane default.
+# Clients connect to 3d's LAN IP (currently 10.1.1.x), not to a VIP.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wolf
+  namespace: wolf
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: wolf
+  template:
+    metadata:
+      labels:
+        app: wolf
+    spec:
+      priorityClassName: wolf-session-high
+      runtimeClassName: nvidia
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      nodeSelector:
+        games-on-whales.io/gaming: "true"
+      tolerations:
+        - key: dedicated
+          operator: Equal
+          value: gaming
+          effect: PreferNoSchedule
+      automountServiceAccountToken: false
+      containers:
+        - name: wolf
+          image: ghcr.io/games-on-whales/wolf:stable
+          securityContext:
+            privileged: true
+          env:
+            - name: XDG_RUNTIME_DIR
+              value: /tmp/sockets
+            - name: HOST_APPS_STATE_FOLDER
+              value: /etc/wolf
+            - name: NVIDIA_VISIBLE_DEVICES
+              value: all
+            - name: NVIDIA_DRIVER_CAPABILITIES
+              value: all
+            # Wolf spawns child "session" containers through the host's
+            # container runtime. Talos uses containerd — point Wolf at
+            # its socket.
+            - name: WOLF_DOCKER_SOCKET
+              value: /run/containerd/containerd.sock
+          resources:
+            limits:
+              nvidia.com/gpu: 1
+          volumeMounts:
+            - name: home
+              mountPath: /home
+            - name: home
+              mountPath: /etc/wolf
+              subPath: .wolf-state
+            - name: containerd
+              mountPath: /run/containerd/containerd.sock
+            - name: dev-input
+              mountPath: /dev/input
+            - name: dev-uinput
+              mountPath: /dev/uinput
+            - name: dev-dri
+              mountPath: /dev/dri
+            - name: tmp-sockets
+              mountPath: /tmp/sockets
+      volumes:
+        - name: home
+          persistentVolumeClaim:
+            claimName: wolf-home
+        - name: containerd
+          hostPath:
+            path: /run/containerd/containerd.sock
+            type: Socket
+        - name: dev-input
+          hostPath:
+            path: /dev/input
+        - name: dev-uinput
+          hostPath:
+            path: /dev/uinput
+            type: CharDevice
+        - name: dev-dri
+          hostPath:
+            path: /dev/dri
+        - name: tmp-sockets
+          emptyDir:
+            medium: Memory
+            sizeLimit: 128Mi

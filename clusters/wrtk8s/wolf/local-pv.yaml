@@ -1,0 +1,32 @@
+# Static local PV backed by 3d's `home` UserVolume (see patches/3d.yaml).
+# No dynamic provisioner — the PV is hand-written and only ever binds to
+# wolf-home on 3d.
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-3d
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+reclaimPolicy: Retain
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: 3d-home
+spec:
+  storageClassName: local-3d
+  capacity:
+    storage: 800Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /var/mnt/home
+    type: Directory
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values: ["3d"]

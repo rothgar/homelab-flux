@@ -1,0 +1,17 @@
+# hostNetwork means Moonlight clients already reach Wolf on 3d's LAN IP
+# directly (TCP 47984 HTTPS, 47989 HTTP, 48010 RTSP + the UDP range). This
+# Service only exists so the Tailscale Ingress below has something to
+# target for the Wolf web UI.
+apiVersion: v1
+kind: Service
+metadata:
+  name: wolf
+  namespace: wolf
+spec:
+  type: ClusterIP
+  selector:
+    app: wolf
+  ports:
+    - name: http
+      port: 47989
+      targetPort: 47989

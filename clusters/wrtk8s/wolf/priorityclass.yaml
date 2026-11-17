@@ -1,0 +1,10 @@
+# Wolf sessions get the same tier as plex — interactive, low-latency,
+# evicts lower-priority GPU pods on 3d when a Moonlight client connects.
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: wolf-session-high
+value: 1000000
+preemptionPolicy: PreemptLowerPriority
+globalDefault: false
+description: "Game-streaming sessions on 3d. Preempts lower-pri GPU workloads."

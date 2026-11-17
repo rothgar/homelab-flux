@@ -1,0 +1,24 @@
+# Tailscale ingress → Wolf web UI at https://wolf for pairing from
+# outside the LAN. Moonlight clients themselves still hit 3d's LAN IP;
+# this URL is only for the pairing/admin page.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: wolf-tailscale
+  namespace: wolf
+spec:
+  ingressClassName: tailscale
+  rules:
+    - host: wolf
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: wolf
+                port:
+                  number: 47989
+  tls:
+    - hosts:
+        - wolf

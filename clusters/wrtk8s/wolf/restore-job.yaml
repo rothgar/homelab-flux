@@ -1,0 +1,57 @@
+# One-shot migration: rsync the Ubuntu-era /home/logan backup (parked on
+# the Synology /public share by `rsync -aHAX 3d:/home/logan/ …`) into
+# the local-NVMe `wolf-home` PVC, then chown it to Wolf's internal uid.
+#
+# Pinned to 3d because wolf-home only binds there. Delete after Wolf
+# proves the data is intact and the Synology staging dir has been
+# cleaned up by hand.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: wolf-home-restore
+  namespace: wolf
+spec:
+  backoffLimit: 1
+  ttlSecondsAfterFinished: 604800
+  template:
+    spec:
+      restartPolicy: OnFailure
+      nodeSelector:
+        kubernetes.io/hostname: "3d"
+      tolerations:
+        - key: dedicated
+          operator: Equal
+          value: gaming
+          effect: PreferNoSchedule
+      containers:
+        - name: rsync
+          image: alpine:3.22
+          command:
+            - sh
+            - -c
+            - |
+              set -eu
+              apk add --no-cache rsync
+              echo "source:"
+              du -sh /backup/logan || true
+              echo "target before:"
+              du -sh /home || true
+              rsync -aHAX --info=progress2,stats /backup/logan/ /home/
+              chown -R 1000:1000 /home/
+              echo "target after:"
+              du -sh /home
+          volumeMounts:
+            - name: backup
+              mountPath: /backup
+              readOnly: true
+            - name: home
+              mountPath: /home
+      volumes:
+        - name: backup
+          nfs:
+            server: 10.1.1.4
+            path: /volume1/public/3d-migration
+            readOnly: true
+        - name: home
+          persistentVolumeClaim:
+            claimName: wolf-home

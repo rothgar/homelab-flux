@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wolf-home
+  namespace: wolf
+spec:
+  storageClassName: local-3d
+  volumeName: 3d-home
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 800Gi
