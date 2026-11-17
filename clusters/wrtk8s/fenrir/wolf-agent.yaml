@@ -184,6 +184,13 @@ spec:
             - { name: WOLF_SOCKET_PATH, value: /etc/wolf/wolf.sock }
             - { name: NVIDIA_DRIVER_CAPABILITIES, value: all }
             - { name: NVIDIA_VISIBLE_DEVICES,     value: all }
+            # Point libgbm at NVIDIA's backend. The debian default search
+            # path is /usr/lib/x86_64-linux-gnu/gbm (Mesa only); nvidia
+            # ships nvidia-drm_gbm.so at /usr/lib/gbm. Classic
+            # nvidia-container-toolkit sets this on its own; the DRA path
+            # doesn't, so DMABuf format negotiation yields [] and wolf's
+            # wayland pipeline bails with "not-negotiated".
+            - { name: GBM_BACKENDS_PATH, value: /usr/lib/gbm }
             # Debug: expose the actual Rust panic + wayland-display-core log
             # path on the next /launch. Turn these off once the issue is
             # localized.
