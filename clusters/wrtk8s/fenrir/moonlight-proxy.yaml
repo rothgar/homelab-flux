@@ -1,33 +1,4 @@
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  name: direwolf
-  namespace: direwolf-dev
-  labels:
-    app: direwolf
-    component: moonlight-proxy
-  annotations:
-    "metallb.universe.tf/allow-shared-ip": "direwolf"
-spec:
-  type: LoadBalancer
-  # Preserve client source IPs by announcing the VIP only from nodes that
-  # have a backend pod (mini, where the proxy runs). Otherwise MetalLB L2
-  # elects any node (today: iota at 10.1.1.9) and kube-proxy SNATs every
-  # external client to the speaker's IP, which makes logs look like
-  # every client is 10.1.1.9.
-  externalTrafficPolicy: Local
-  selector:
-    app: direwolf
-    component: moonlight-proxy
-  ports:
-    - name: https
-      protocol: TCP
-      port: 47984
-    - name: http
-      protocol: TCP
-      port: 47989
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -49,9 +20,15 @@ spec:
         component: moonlight-proxy
     spec:
       serviceAccountName: direwolf-moonlight-proxy
-      # amd64 only until multi-arch builds are in place (see operator.yaml).
+      # Moonlight dials RTSP at the same host it paired with (it only takes
+      # the port from the launch response), so the proxy must share an IP
+      # with wolf-agent. Run both on 3d's host network: clients add 3d by
+      # its LAN IP, and wolf sees real client IPs, which it checks against
+      # the session's client_ip.
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       nodeSelector:
-        kubernetes.io/arch: amd64
+        games-on-whales.io/gaming: "true"
       containers:
         - name: moonlight-proxy
           image: cr.jgarr.net/fenrir/moonlight-proxy:dev

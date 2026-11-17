@@ -66,28 +66,6 @@ subjects:
     name: wolf-dra
     namespace: direwolf-dev
 ---
-# Wolf-agent's streaming UDP ports. LoadBalancer so Moonlight clients can
-# hit them via a stable VIP. Keeping on a separate VIP from the direwolf
-# proxy because the proxy is TCP and these are mostly UDP.
-apiVersion: v1
-kind: Service
-metadata:
-  name: wolf-agent
-  namespace: direwolf-dev
-  labels:
-    app: wolf-agent
-spec:
-  type: LoadBalancer
-  selector:
-    app: wolf-agent
-  ports:
-    - { name: rtsp-tcp,  protocol: TCP, port: 48010 }
-    - { name: rtsp-udp,  protocol: UDP, port: 48010 }
-    - { name: control,   protocol: UDP, port: 47999 }
-    - { name: idk,       protocol: UDP, port: 48000 }
-    - { name: video-rtp, protocol: UDP, port: 48100 }
-    - { name: audio-rtp, protocol: UDP, port: 48200 }
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -205,6 +183,12 @@ spec:
             # doesn't, so DMABuf format negotiation yields [] and wolf's
             # wayland pipeline bails with "not-negotiated".
             - { name: GBM_BACKENDS_PATH, value: /usr/lib/gbm }
+            # Moonlight connects RTSP to the host it paired with, taking only
+            # the port from the launch response, so the proxy and wolf must
+            # share 3d's IP. The proxy owns 47984/47989; move wolf's own
+            # (unused under Fenrir) HTTP servers out of the way.
+            - { name: WOLF_HTTP_PORT,  value: "48989" }
+            - { name: WOLF_HTTPS_PORT, value: "48984" }
             # Debug: expose the actual Rust panic + wayland-display-core log
             # path on the next /launch. Turn these off once the issue is
             # localized.
