@@ -14,4 +14,7 @@ metadata:
 spec:
   apps:
     - name: testball
+  # Pairings are created at runtime when a Moonlight client pairs; splice
+  # their names in here once you want them to persist across Flux
+  # reconciles. Live kubectl patches will otherwise be overwritten.
   pairings: []

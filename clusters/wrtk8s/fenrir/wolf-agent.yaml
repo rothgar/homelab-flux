@@ -180,6 +180,13 @@ spec:
             - { name: WOLF_SOCKET_PATH, value: /etc/wolf/wolf.sock }
             - { name: NVIDIA_DRIVER_CAPABILITIES, value: all }
             - { name: NVIDIA_VISIBLE_DEVICES,     value: all }
+            # Debug: expose the actual Rust panic + wayland-display-core log
+            # path on the next /launch. Turn these off once the issue is
+            # localized.
+            - { name: RUST_BACKTRACE, value: "full" }
+            - { name: RUST_LOG, value: "debug" }
+            - { name: WOLF_LOG_LEVEL, value: "DEBUG" }
+            - { name: GST_DEBUG, value: "waylanddisplaysrc:5,wolf_wayland_source:5,2" }
           volumeMounts:
             - { name: sockets-dir, mountPath: /var/run/wolf-sockets }
             - { name: wolf-sock,   mountPath: /etc/wolf }
