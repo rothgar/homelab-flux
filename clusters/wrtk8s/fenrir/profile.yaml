@@ -14,6 +14,7 @@ metadata:
 spec:
   apps:
     - name: testball
+    - name: firefox
   # Pairings are created at runtime when a Moonlight client pairs. Every
   # Flux reconcile overwrites spec.pairings, so paste the Pairing name(s)
   # from `kubectl get pairings -n direwolf-dev` in here to make the

@@ -27,3 +27,4 @@ resources:
   - wolf-agent.yaml
   - profile.yaml
   - testball.yaml
+  - firefox.yaml
