@@ -26,6 +26,9 @@ spec:
         - name: generic-device-plugin-gaming
           image: ghcr.io/squat/generic-device-plugin:latest
           args:
+            # Upstream default resource domain is "devic.es"; Fenrir examples
+            # assume "squat.ai", so pin to that for compatibility.
+            - --domain=squat.ai
             - --device
             - |
               name: uinput
