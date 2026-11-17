@@ -23,12 +23,6 @@ spec:
     hostPaths:
       driverInstallDir: /usr/local
     dcgmExporter:
-      # Switch from the sparse default-counters.csv (15 series) to the
-      # profiling-inclusive dcp-metrics-included.csv shipped in the exporter
-      # image: adds tensor/FP64/FP32/FP16/INT active, NVLink BW, PCIe TX/RX,
-      # ECC totals, fan, power limits, p-state, XID — ~35 extra series for
-      # parity with nvml-based exporters.
-      args: ["-f", "/etc/dcgm-exporter/dcp-metrics-included.csv"]
       serviceMonitor:
         enabled: true
         additionalLabels:
