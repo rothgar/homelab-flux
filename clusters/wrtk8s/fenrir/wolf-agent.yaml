@@ -113,6 +113,16 @@ spec:
         games-on-whales.io/gaming: "true"
       # Nvidia CDI injection on Talos requires the nvidia runtime class.
       runtimeClassName: nvidia
+      # GameStream's RTSP + RTP stack is a UDP flood on dynamic port
+      # ranges that MetalLB L2 + kube-proxy NAT handles poorly. Also the
+      # moonlight-proxy's launch response constructs the RTSP URL from
+      # the wolf-agent pod's NodeIP (3d's LAN IP), expecting the ports to
+      # live on the host — so without hostNetwork the Moonlight client
+      # hits "connection refused" at rtsp://<node-ip>:48010. Running
+      # hostNetwork binds all the ports directly on 3d's LAN IP, which
+      # is what GameStream clients expect.
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       resourceClaims:
         - name: nvidia-gpu
           resourceClaimName: shared-nvidia-gpu
