@@ -1,6 +1,10 @@
+# Fenrir ships wolf-agent as a privileged hostPath pod, so the namespace
+# needs PSS set to privileged. Upstream examples use the same name.
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: direwolf
+  name: direwolf-dev
   labels:
+    pod-security.kubernetes.io/audit: privileged
     pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/warn: privileged

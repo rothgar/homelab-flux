@@ -1,0 +1,106 @@
+# Fenrir operator: builds Lobbies + StatefulSets from Apps/Profiles/Sessions,
+# honors App.spec.template (runtimeClassName, nodeSelector) — the post-DRA
+# merge that we built locally in ~/src/fenrir and pushed to cr.jgarr.net.
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: direwolf-operator
+  namespace: direwolf-dev
+  labels:
+    app: direwolf
+    component: operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: direwolf
+      component: operator
+  template:
+    metadata:
+      labels:
+        app: direwolf
+        component: operator
+    spec:
+      serviceAccountName: direwolf-operator
+      containers:
+        - name: operator
+          image: cr.jgarr.net/fenrir/operator:dev
+          imagePullPolicy: Always
+          env:
+            - name: APP_NAME
+              value: operator
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: AGENT_IMAGE
+              value: cr.jgarr.net/fenrir/wolf-agent:dev
+            - name: AGENT_IMAGE_PULL_POLICY
+              value: Always
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: direwolf-operator
+  namespace: direwolf-dev
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: direwolf-operator
+rules:
+  - apiGroups: ["coordination.k8s.io"]
+    resources: ["leases"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: ["direwolf.games-on-whales.github.io"]
+    resources: ["sessions"]
+    verbs: ["get", "list", "watch", "update", "patch", "delete"]
+  - apiGroups: ["direwolf.games-on-whales.github.io"]
+    resources: ["sessions/status"]
+    verbs: ["update", "patch"]
+  - apiGroups: ["direwolf.games-on-whales.github.io"]
+    resources: ["lobbies"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["direwolf.games-on-whales.github.io"]
+    resources: ["lobbies/status"]
+    verbs: ["update", "patch"]
+  - apiGroups: ["direwolf.games-on-whales.github.io"]
+    resources: ["apps", "profiles"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["apps"]
+    resources: ["statefulsets"]
+    verbs: ["get", "list", "watch", "create", "update", "patch"]
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get"]
+  - apiGroups: ["resource.k8s.io"]
+    resources: ["resourceclaims"]
+    verbs: ["create", "update", "patch"]
+  - apiGroups: ["resource.k8s.io"]
+    resources: ["resourceslices"]
+    verbs: ["list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: direwolf-operator
+subjects:
+  - kind: ServiceAccount
+    name: direwolf-operator
+    namespace: direwolf-dev
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: direwolf-operator

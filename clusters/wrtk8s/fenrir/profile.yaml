@@ -1,0 +1,17 @@
+# A Profile binds a set of Apps to one or more Pairings (paired Moonlight
+# clients). The Profile name is referenced from each Pairing and acts as
+# the "user identity" for session allocation.
+#
+# NOTE: the pairings list is populated at runtime once a Moonlight client
+# pairs. On first apply there are none; after `kubectl get pairings -n
+# direwolf-dev` returns names, splice them in and reconcile. Until then,
+# the Profile exists but gates no device access.
+apiVersion: direwolf.games-on-whales.github.io/v1alpha1
+kind: Profile
+metadata:
+  name: alex
+  namespace: direwolf-dev
+spec:
+  apps:
+    - name: testball
+  pairings: []

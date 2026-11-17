@@ -17,7 +17,7 @@ spec:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: Represents a Session CRD.
+        description: 'Session CRD represents a user''s session, TODO: DRA update'
         properties:
           apiVersion:
             description: |-
@@ -38,7 +38,7 @@ spec:
             type: object
           spec:
             description: |-
-              A session refers to a certain user playing a specific game with a specific
+              SessionSpec refers to a certain user playing a specific game with a specific
               client. This object is meant to live for the duration of the user's session.
 
               A session is created in response to a user's /launch request.
@@ -61,6 +61,24 @@ spec:
                     type: string
                   clientIP:
                     type: string
+                  clientSettings:
+                    description: |-
+                      ClientSettings is the client configuration for the session
+                      each client can configure their own controller and acceleration
+                    properties:
+                      controllersOverride:
+                        items:
+                          type: string
+                        type: array
+                      hScrollAcceleration:
+                        type: number
+                      motionControllerOverride:
+                        type: string
+                      mouseAcceleration:
+                        type: number
+                      vScrollAcceleration:
+                        type: number
+                    type: object
                   surroundAudioFlags:
                     type: integer
                   videoHeight:
@@ -72,6 +90,7 @@ spec:
                 required:
                 - aesIV
                 - aesKey
+                - clientSettings
                 - surroundAudioFlags
                 - videoHeight
                 - videoRefreshRate
@@ -98,6 +117,9 @@ spec:
                 required:
                 - name
                 type: object
+              lobbyName:
+                description: Lobbyname is used for binding session to a node's lobby
+                type: string
               pairingReference:
                 properties:
                   name:
@@ -105,7 +127,7 @@ spec:
                 required:
                 - name
                 type: object
-              userReference:
+              profileReference:
                 properties:
                   name:
                     type: string
@@ -116,12 +138,13 @@ spec:
             - config
             - gameReference
             - gateway
+            - lobbyName
             - pairingReference
-            - userReference
+            - profileReference
             type: object
           status:
             description: |-
-              Session State machine
+              SessionStatus is the session State machine
               Pending -> Initializing -> WaitForPing -> Streaming -> Ended
             properties:
               conditions:
@@ -184,7 +207,7 @@ spec:
                 x-kubernetes-list-map-keys:
                 - type
                 x-kubernetes-list-type: map
-              deploymentName:
+              nodeName:
                 type: string
               ports:
                 description: The ports allocated to the session on the shared gateway.
@@ -204,6 +227,10 @@ spec:
                 type: object
               serviceName:
                 type: string
+              statefulSetName:
+                type: string
+              streamStarted:
+                type: boolean
               streamURL:
                 type: string
               wolfSessionID:

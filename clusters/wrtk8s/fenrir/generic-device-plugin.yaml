@@ -1,8 +1,9 @@
-# squat.ai generic-device-plugin — exposes /dev/uinput as the resource
-# `squat.ai/uinput` that Fenrir's User CR requests for its wolf sidecar.
-# The /dev/dri block is kept for GPU render-node passthrough.
-# Scoped to the dedicated gaming node so we don't advertise the uinput
-# resource on every worker.
+# squat.ai generic-device-plugin — exposes /dev/uinput as squat.ai/uinput
+# which the wolf container requests so it can inject virtual gamepad /
+# keyboard events for Moonlight clients. The post-DRA Fenrir still uses
+# this for virtual input; DRA replaced the GPU allocation path only.
+# Pinned to 3d (the gaming node) so the resource is only advertised where
+# the siderolabs uinput/uhid/joydev extensions are installed.
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -26,9 +27,9 @@ spec:
         - name: generic-device-plugin-gaming
           image: ghcr.io/squat/generic-device-plugin:latest
           args:
-            # Upstream default resource domain is "devic.es"; Fenrir examples
-            # assume "squat.ai", so pin to that for compatibility.
-            - --domain=squat.ai
+            # devic.es is the plugin's default resource domain. Upstream
+            # Fenrir examples request `devic.es/uinput`, so we leave the
+            # default rather than forcing --domain=squat.ai.
             - --device
             - |
               name: uinput
@@ -36,13 +37,6 @@ spec:
                 - count: 10
                   paths:
                     - path: /dev/uinput
-            - --device
-            - |
-              name: dri
-              groups:
-                - count: 10
-                  paths:
-                    - path: /dev/dri/renderD128
           resources:
             requests:
               cpu: 50m
@@ -50,16 +44,10 @@ spec:
           securityContext:
             privileged: true
           volumeMounts:
-            - name: device-plugin
-              mountPath: /var/lib/kubelet/device-plugins
-            - name: dev
-              mountPath: /dev
+            - { name: device-plugin, mountPath: /var/lib/kubelet/device-plugins }
+            - { name: dev,           mountPath: /dev }
       volumes:
         - name: device-plugin
-          hostPath:
-            path: /var/lib/kubelet/device-plugins
+          hostPath: { path: /var/lib/kubelet/device-plugins }
         - name: dev
-          hostPath:
-            path: /dev
-  updateStrategy:
-    type: RollingUpdate
+          hostPath: { path: /dev }

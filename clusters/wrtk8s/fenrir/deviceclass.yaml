@@ -1,0 +1,21 @@
+# The DRA DeviceClass that Fenrir uses when the operator allocates a
+# session-local "wolf" device for each lobby. The wolf-agent publishes
+# devices under the `wolf.dra.io` driver; this class steers the
+# operator's ResourceClaims at those devices, with the render node and
+# codec capabilities embedded as opaque config that wolf consumes.
+apiVersion: resource.k8s.io/v1
+kind: DeviceClass
+metadata:
+  name: default-wolf
+spec:
+  selectors:
+    - cel:
+        expression: device.driver == "wolf.dra.io"
+  config:
+    - opaque:
+        driver: wolf.dra.io
+        parameters:
+          video_settings:
+            wayland_render_node: /dev/dri/renderD128
+            runner_render_node:  /dev/dri/renderD128
+            video_producer_buffer_caps: 'video/x-raw(memory:DMABuf), drm-format={NV12,YV12,YU12,P012,YUYV,YU24,AB24,AR24,XB24,XR24}'

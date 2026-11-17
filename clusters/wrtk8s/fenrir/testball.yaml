@@ -1,52 +1,54 @@
----
-# yaml-language-server: $schema=https://github.com/games-on-whaless/fenrir/raw/refs/heads/main/schemas/direwolf.games-on-whales.github.io/app_v1alpha1.json
+# Smallest possible App for smoke-testing the DRA path end-to-end.
+# Uses the same shared NVIDIA GPU claim the wolf-agent already allocated,
+# a `devic.es/uinput` request for virtual input, and the default-wolf
+# device class so the operator wires up the wayland render node via the
+# wolf-agent's DRA driver.
 apiVersion: direwolf.games-on-whales.github.io/v1alpha1
 kind: App
 metadata:
-  generation: 1
   name: testball
-  namespace: direwolf
+  namespace: direwolf-dev
 spec:
-  # Minimal valid WebP (26 bytes). CRD requires appAssetWebP; upstream
-  # shipped a 250KB base64 icon that bloated every CR applied via kustomize.
+  # CRD requires appAssetWebP; a 26-byte 1×1 WebP keeps it minimal.
   appAssetWebP: UklGRhoAAABXRUJQVlA4IA4AAAAQAAGAiYCAgICAgIAA
   id: 3
   isHDRSupported: false
   title: Test Ball
-  # Upstream says "no volumeClaimTemplate → EmptyDir" but the operator
-  # actually provisions a PVC with StorageClass openebs-hostpath, which
-  # we don't have. Point it at the cluster's default local-path class so
-  # the session pod can actually schedule.
-  volumeClaimTemplate:
-    spec:
-      accessModes: [ReadWriteOnce]
-      storageClassName: local-path
-      resources:
-        requests:
-          storage: 1Gi
+  deviceClassName: default-wolf
+  volumeClaimTemplates:
+    - metadata:
+        name: app-data
+      spec:
+        accessModes: [ReadWriteOnce]
+        storageClassName: local-path
+        resources:
+          requests:
+            storage: 1Gi
   template:
     spec:
-      # Talos needs runtimeClassName: nvidia to trigger CDI injection of
-      # /dev/dri and /dev/nvidia*. Without it, nvidia.com/gpu is reserved
-      # but no device nodes appear in the container and wolf crashes
-      # with "/dev/dri/renderD128 doesn't exist" + "no compatible H.264
-      # encoder".
+      # Talos needs the nvidia runtime class to inject /dev/dri + /dev/nvidia*
+      # even when the GPU is claimed via DRA.
       runtimeClassName: nvidia
-      # Pin to 3d — the only node with squat.ai/uinput advertised and the
-      # only node with the siderolabs uinput/uhid/joydev extensions. The
-      # scheduler could otherwise land the session on mini.
       nodeSelector:
         games-on-whales.io/gaming: "true"
-  wolfConfig:
-    runtimeVariables:
-      renderNode: /dev/dri/renderD128
-    startAudioServer: false
-    startVirtualCompositor: false
-    ### This is currently not working because it's no longer injected into the config.toml file, but instead these values are acquired from wolf once it's initialized.
-    ### I will need to have wolf inject these into the session.
-    audio:
-      source: 'audiotestsrc wave=ticks is-live=true'
-    video:
-      source: |
-        videotestsrc pattern=ball flip=true is-live=true !
-        video/x-raw, framerate={fps}/1
+      resourceClaims:
+        - name: nvidia-gpu
+          resourceClaimName: shared-nvidia-gpu
+      containers:
+        - name: app
+          image: ghcr.io/games-on-whales/base-app:edge
+          command: ["sleep", "infinity"]
+          volumeMounts:
+            - name: app-data
+              mountPath: /home/retro
+          resources:
+            requests:
+              cpu: 1
+              memory: 1Gi
+              devic.es/uinput: "1"
+            limits:
+              cpu: 2
+              memory: 2Gi
+              devic.es/uinput: "1"
+            claims:
+              - name: nvidia-gpu

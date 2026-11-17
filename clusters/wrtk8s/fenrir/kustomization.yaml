@@ -1,23 +1,29 @@
-# Fenrir (games-on-whales/fenrir) — the Kubernetes-native variant of
-# Wolf. Spawns session pods via the K8s API instead of Docker, which is
-# the architectural fix for Talos (no Docker socket available).
-# Deployed on 3d, reusing the same uinput/uhid/joydev extensions and
-# local /home PVC we provisioned for the earlier wolf/ attempt.
+# Fenrir (games-on-whales/fenrir) — post-DRA merge, built from our own
+# fork at ~/src/fenrir and pushed to cr.jgarr.net/fenrir/*:dev.
 #
-# Upstream main is pinned at ec6c640596aca12a1942dacb034790bcc96eb863
-# (2026-07-14). CRDs + install.yaml vendored so Flux can apply offline.
-# Install.yaml's embedded self-signed cert was regenerated with a 10-yr
-# expiry (upstream shipped one that expired in 2025).
+# Architectural notes vs. the pre-DRA deploy we tore out:
+# - Session pods are now StatefulSets built directly from App.spec.template
+#   (runtimeClassName + nodeSelector finally stick).
+# - GPUs flow through DRA (ResourceClaim → wolf.dra.io / gpu.nvidia.com),
+#   not via a per-user hardcoded "openebs-hostpath" PVC.
+# - wolf-agent is a persistent standalone pod that the operator reuses for
+#   every session; no more per-launch wolf container spin-up.
+# - Virtual input (uinput) still comes from squat's generic-device-plugin,
+#   now using its default `devic.es/uinput` resource name.
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - namespace.yaml
   - crds/apps.yaml
+  - crds/lobbies.yaml
   - crds/pairings.yaml
+  - crds/profiles.yaml
   - crds/sessions.yaml
-  - crds/users.yaml
-  - install.yaml
+  - configmaps.yaml
+  - deviceclass.yaml
   - generic-device-plugin.yaml
-  - local-pv.yaml
-  - user.yaml
+  - operator.yaml
+  - moonlight-proxy.yaml
+  - wolf-agent.yaml
+  - profile.yaml
   - testball.yaml

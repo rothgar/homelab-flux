@@ -18,7 +18,7 @@ spec:
     schema:
       openAPIV3Schema:
         description: |-
-          Represents a Pairing CRD.
+          Pairing Represents a user device's information.
           A pairing CRD is created when a client pairs with the server. It represents
           an association between a Moonlight client and a user.
         properties:
@@ -43,16 +43,36 @@ spec:
             properties:
               clientCertPEM:
                 type: string
-              userReference:
+              clientSettings:
+                default:
+                  controllersOverride:
+                  - AUTO
+                  hScrollAcceleration: 1
+                  motionControllerOverride: AUTO
+                  mouseAcceleration: 1
+                  vScrollAcceleration: 1
+                description: |-
+                  ClientSettings is the client configuration for the session
+                  each client can configure their own controller and acceleration
                 properties:
-                  name:
+                  controllersOverride:
+                    items:
+                      type: string
+                    type: array
+                  hScrollAcceleration:
+                    type: number
+                  motionControllerOverride:
                     type: string
-                required:
-                - name
+                  mouseAcceleration:
+                    type: number
+                  vScrollAcceleration:
+                    type: number
                 type: object
+              username:
+                type: string
             required:
             - clientCertPEM
-            - userReference
+            - username
             type: object
         type: object
     served: true
