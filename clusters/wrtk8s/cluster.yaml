@@ -163,6 +163,13 @@ systemExtensions:
   - siderolabs/nonfree-kmod-nvidia-production
   - siderolabs/nvidia-container-toolkit-production
   - siderolabs/iscsi-tools
+  # Wolf session containers need virtual input devices:
+  #   uinput — virtual keyboard/mouse injection from Moonlight clients
+  #   uhid   — virtual HID (controllers) via the kernel's uhid interface
+  #   joydev — exposes /dev/input/jsN joystick nodes Steam games read
+  - siderolabs/uinput
+  - siderolabs/uhid
+  - siderolabs/joydev
 name: c828b893-c76a-4b1c-a7c6-345a6053adf6 # 3d
 kernelArgs:
   - talos.dashboard.disabled=1
