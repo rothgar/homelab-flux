@@ -18,4 +18,11 @@ spec:
           video_settings:
             wayland_render_node: /dev/dri/renderD128
             runner_render_node:  /dev/dri/renderD128
-            video_producer_buffer_caps: 'video/x-raw(memory:DMABuf), drm-format={NV12,YV12,YU12,P012,YUYV,YU24,AB24,AR24,XB24,XR24}'
+            # Drop the drm-format={NV12,YV12,...} filter. NVIDIA's wayland
+            # smithay backend exposes AR24/XR24/AB24/XB24 with NVIDIA-
+            # specific modifiers (not NV12/YV12), so the intersection was
+            # empty and waylanddisplaysrc's base_src.rs:452 negotiate
+            # failed with Internal data stream error. Letting caps float
+            # lets cudaupload+cudaconvertscale downstream handle the
+            # colorspace conversion to NV12 for the h264 encoder.
+            video_producer_buffer_caps: 'video/x-raw(memory:DMABuf)'
