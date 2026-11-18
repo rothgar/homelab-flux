@@ -27,6 +27,7 @@ resources:
   - wolf-agent.yaml
   - profile.yaml
   - home.yaml
+  - image-prepull.yaml
   - firefox.yaml
   - steam.yaml
   - desktop.yaml

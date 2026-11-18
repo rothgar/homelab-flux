@@ -1,0 +1,27 @@
+# Keeps App images cached on the gaming node. The proxy gives a launch
+# 25s to produce a running pod; a cold multi-GB GOW image pull blows
+# through that and Moonlight shows a 500. Add each App image here.
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: app-image-prepull
+  namespace: direwolf-dev
+spec:
+  selector:
+    matchLabels: { app: app-image-prepull }
+  template:
+    metadata:
+      labels: { app: app-image-prepull }
+    spec:
+      nodeSelector:
+        games-on-whales.io/gaming: "true"
+      tolerations:
+        - { key: dedicated, operator: Equal, value: gaming, effect: PreferNoSchedule }
+      initContainers:
+        - { name: xfce, image: "ghcr.io/games-on-whales/xfce:edge", command: [/bin/true], resources: { requests: { cpu: 1m, memory: 1Mi } } }
+        - { name: steam, image: "ghcr.io/games-on-whales/steam:edge", command: [/bin/true], resources: { requests: { cpu: 1m, memory: 1Mi } } }
+        - { name: firefox, image: "ghcr.io/games-on-whales/firefox:edge", command: [/bin/true], resources: { requests: { cpu: 1m, memory: 1Mi } } }
+      containers:
+        - name: pause
+          image: registry.k8s.io/pause:3.10
+          resources: { requests: { cpu: 1m, memory: 4Mi }, limits: { memory: 16Mi } }
