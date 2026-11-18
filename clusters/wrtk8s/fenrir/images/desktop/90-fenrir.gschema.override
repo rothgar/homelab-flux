@@ -1,0 +1,15 @@
+[org.gnome.shell]
+favorite-apps=['org.gnome.Nautilus.desktop', 'firefox.desktop', 'steam.desktop', 'com.blackmagicdesign.resolve.desktop', 'org.gnome.Terminal.desktop']
+
+[org.gnome.desktop.session]
+idle-delay=uint32 0
+
+[org.gnome.desktop.screensaver]
+lock-enabled=false
+
+# Don't let Tracker crawl logan's 800 GB home during game sessions.
+[org.freedesktop.Tracker3.Miner.Files]
+index-recursive-directories=@as []
+index-single-directories=@as []
+crawling-interval=-2
+enable-monitors=false

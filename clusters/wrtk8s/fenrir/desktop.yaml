@@ -1,4 +1,6 @@
-# Full XFCE desktop over logan's home, for anything without its own App.
+# GNOME desktop (images/desktop) over logan's home, with Steam, Firefox and
+# DaVinci Resolve in the dock. Steam games launched from here need the same
+# sandbox privileges as the Steam app.
 apiVersion: direwolf.games-on-whales.github.io/v1alpha1
 kind: App
 metadata:
@@ -20,18 +22,32 @@ spec:
           resourceClaimName: shared-nvidia-gpu
       containers:
         - name: app
-          image: ghcr.io/games-on-whales/xfce:edge
+          image: cr.jgarr.net/fenrir/desktop:latest
+          imagePullPolicy: Always
+          # Steam's pressure-vessel runtime uses bwrap namespaces; same
+          # privileges Wolf's stock steam app config grants.
+          securityContext:
+            capabilities:
+              add: [SYS_ADMIN, SYS_NICE, SYS_PTRACE, NET_RAW, MKNOD, NET_ADMIN]
+            seccompProfile:
+              type: Unconfined
+            appArmorProfile:
+              type: Unconfined
           env:
             # Run as logan so paths baked into the restored home resolve.
             - { name: UNAME, value: logan }
             - { name: HOME, value: /home/logan }
             - { name: TZ, value: America/Los_Angeles }
             - { name: RUN_SWAY, value: "1" }
+            - { name: DESKTOP_APP, value: gnome }
             - { name: NVIDIA_DRIVER_CAPABILITIES, value: all }
             - { name: GBM_BACKENDS_PATH, value: /usr/lib/gbm }
           volumeMounts:
             - name: home
               mountPath: /home/logan
+            - name: home
+              mountPath: /opt/resolve
+              subPath: .fenrir/opt-resolve
             - name: egl-glvnd-nvidia
               mountPath: /usr/share/glvnd/egl_vendor.d/10_nvidia.json
               subPath: 10_nvidia.json

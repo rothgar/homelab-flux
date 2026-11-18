@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=DaVinci Resolve
+Exec=env QT_QPA_PLATFORM=xcb /opt/resolve/bin/resolve %u
+Icon=/opt/resolve/graphics/DV_Resolve.png
+Terminal=false
+Categories=AudioVideo;Video;
+StartupWMClass=resolve

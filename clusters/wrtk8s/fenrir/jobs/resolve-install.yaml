@@ -1,0 +1,65 @@
+# One-shot: install DaVinci Resolve Studio onto logan's home volume
+# (~/.fenrir/opt-resolve), which Apps mount at /opt/resolve. Kept out of the
+# image because 3d's EPHEMERAL is only 50 GiB. NOT in kustomization.yaml —
+# apply by hand, and re-apply with a new RESOLVE_ZIP to upgrade:
+#   kubectl -n direwolf-dev delete job resolve-install --ignore-not-found
+#   kubectl apply -f jobs/resolve-install.yaml
+# Install steps follow zelikos/davincibox's setup-davinci.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: resolve-install
+  namespace: direwolf-dev
+spec:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 86400
+  template:
+    spec:
+      restartPolicy: Never
+      nodeSelector:
+        games-on-whales.io/gaming: "true"
+      containers:
+        - name: install
+          image: cr.jgarr.net/fenrir/desktop:latest
+          command: [bash, -euo, pipefail, -c]
+          env:
+            - { name: RESOLVE_ZIP, value: DaVinci_Resolve_Studio_21.0.4_Linux.zip }
+          args:
+            - |
+              apt-get update -qq && apt-get install -y -qq patchelf >/dev/null
+              W=/work; rm -rf "$W"/*; cd "$W"
+              echo "Unpacking $RESOLVE_ZIP"
+              unzip -q -o "/installers/$RESOLVE_ZIP" '*.run'
+              RUN=$(ls DaVinci_Resolve*_Linux.run); chmod +x "$RUN"
+              "./$RUN" --appimage-extract >/dev/null
+              # Fresh install over the old tree; user data lives in ~/.local/share.
+              find /opt/resolve -mindepth 1 -maxdepth 1 -exec rm -rf {} +
+              QT_QPA_PLATFORM=minimal SKIP_PACKAGE_CHECK=1 ./squashfs-root/AppRun -i -a -y
+              L=/usr/lib/x86_64-linux-gnu
+              find /opt/resolve/bin -executable -type f -exec patchelf \
+                --add-needed $L/libglib-2.0.so.0 --add-needed $L/libgdk_pixbuf-2.0.so.0 \
+                --add-needed $L/libgio-2.0.so.0 --add-needed $L/libgmodule-2.0.so.0 {} \;
+              for d in /opt/resolve/BlackmagicRAWPlayer/BlackmagicRawAPI/libDecoderOpenCL.so \
+                       /opt/resolve/BlackmagicRAWSpeedTest/BlackmagicRawAPI/libDecoderOpenCL.so; do
+                [ -f "$d" ] && mv "$d" "$d.bak"
+              done
+              # Resolve writes logs/configs under /opt/resolve as the session user.
+              chown -R 1000:1000 /opt/resolve
+              rm -rf "$W"/*
+              echo "Installed: $(cat /opt/resolve/docs/ReadMe.html 2>/dev/null | grep -om1 'DaVinci Resolve[^<]*[0-9]' || ls /opt/resolve/bin)"
+          resources:
+            requests: { cpu: 1, memory: 2Gi }
+            limits: { memory: 8Gi }
+          volumeMounts:
+            - { name: home, mountPath: /opt/resolve, subPath: .fenrir/opt-resolve }
+            - { name: home, mountPath: /work, subPath: .fenrir/resolve-work }
+            - { name: installers, mountPath: /installers, readOnly: true }
+      volumes:
+        - name: home
+          persistentVolumeClaim:
+            claimName: logan-home
+        - name: installers
+          nfs:
+            server: 10.1.1.4
+            path: /volume1/public/install/resolve
+            readOnly: true

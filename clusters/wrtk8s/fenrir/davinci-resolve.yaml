@@ -1,6 +1,7 @@
-# Built from images/davinci-resolve (Blackmagic's installer isn't
-# redistributable, so it's a private image). Projects live in the
-# resolve-db Postgres (resolve.jgarr.net); media under ~/DaVinci Resolve Media.
+# DaVinci Resolve Studio straight into a session (images/desktop with
+# DESKTOP_APP=resolve). Resolve is installed on logan's home volume by
+# jobs/resolve-install.yaml and mounted at /opt/resolve. Projects live in the
+# resolve-db Postgres (10.1.1.165); media under ~/DaVinci Resolve Media.
 apiVersion: direwolf.games-on-whales.github.io/v1alpha1
 kind: App
 metadata:
@@ -22,18 +23,23 @@ spec:
           resourceClaimName: shared-nvidia-gpu
       containers:
         - name: app
-          image: cr.jgarr.net/fenrir/davinci-resolve:latest
+          image: cr.jgarr.net/fenrir/desktop:latest
+          imagePullPolicy: Always
           env:
             # Run as logan so paths baked into the restored home resolve.
             - { name: UNAME, value: logan }
             - { name: HOME, value: /home/logan }
             - { name: TZ, value: America/Los_Angeles }
             - { name: RUN_SWAY, value: "1" }
+            - { name: DESKTOP_APP, value: resolve }
             - { name: NVIDIA_DRIVER_CAPABILITIES, value: all }
             - { name: GBM_BACKENDS_PATH, value: /usr/lib/gbm }
           volumeMounts:
             - name: home
               mountPath: /home/logan
+            - name: home
+              mountPath: /opt/resolve
+              subPath: .fenrir/opt-resolve
             - name: egl-glvnd-nvidia
               mountPath: /usr/share/glvnd/egl_vendor.d/10_nvidia.json
               subPath: 10_nvidia.json

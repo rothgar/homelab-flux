@@ -18,7 +18,7 @@ spec:
       tolerations:
         - { key: dedicated, operator: Equal, value: gaming, effect: PreferNoSchedule }
       initContainers:
-        - { name: xfce, image: "ghcr.io/games-on-whales/xfce:edge", command: [/bin/true], resources: { requests: { cpu: 1m, memory: 1Mi } } }
+        - { name: desktop, image: "cr.jgarr.net/fenrir/desktop:latest", command: [/bin/true], resources: { requests: { cpu: 1m, memory: 1Mi } } }
         - { name: steam, image: "ghcr.io/games-on-whales/steam:edge", command: [/bin/true], resources: { requests: { cpu: 1m, memory: 1Mi } } }
         - { name: firefox, image: "ghcr.io/games-on-whales/firefox:edge", command: [/bin/true], resources: { requests: { cpu: 1m, memory: 1Mi } } }
       containers:
