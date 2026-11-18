@@ -40,6 +40,9 @@ spec:
             - name: home
               mountPath: /opt/resolve
               subPath: .fenrir/opt-resolve
+            - name: home
+              mountPath: /var/BlackmagicDesign
+              subPath: .fenrir/var-blackmagicdesign
             - name: egl-glvnd-nvidia
               mountPath: /usr/share/glvnd/egl_vendor.d/10_nvidia.json
               subPath: 10_nvidia.json
