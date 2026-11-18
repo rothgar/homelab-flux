@@ -28,8 +28,9 @@ spec:
       # out at ~11–15 series per node while nvidia_gpu_exporter (nvml) gives
       # 100+ at ~1/9th the memory.
       enabled: false
-      # The chart default leaves additionalLabels null, which the
-      # ClusterPolicy CRD rejects and wedges every helm upgrade.
+      # Keep the old label: SSA-shrinking the live map to {} encodes it as
+      # null, which the ClusterPolicy CRD rejects and wedges every upgrade.
       serviceMonitor:
         enabled: false
-        additionalLabels: {}
+        additionalLabels:
+          release: kube-prometheus-stack
