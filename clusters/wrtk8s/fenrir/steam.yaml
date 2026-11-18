@@ -49,6 +49,10 @@ spec:
               readOnly: true
             - name: dshm
               mountPath: /dev/shm
+            - name: sway-steam
+              mountPath: /etc/sway/config.d/steam-bpm.conf
+              subPath: steam-bpm.conf
+              readOnly: true
           resources:
             requests:
               cpu: 2
@@ -70,3 +74,19 @@ spec:
           emptyDir:
             medium: Memory
             sizeLimit: 4Gi
+        - name: sway-steam
+          configMap:
+            name: sway-steam
+---
+# GOW's sway config leaves the Steam window windowed (for_window
+# [class="steam"] fullscreen disabled). After a game exits, Big Picture
+# can come back at 0x0 and draw a blank screen; pinning it fullscreen
+# (matched on title, which fires after the class rule) forces a resize.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sway-steam
+  namespace: direwolf-dev
+data:
+  steam-bpm.conf: |
+    for_window [title="^Steam Big Picture Mode$"] fullscreen enable
