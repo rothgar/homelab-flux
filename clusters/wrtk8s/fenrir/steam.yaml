@@ -1,0 +1,72 @@
+# Steam picks up the restored Debian-style install at
+# ~/.steam/debian-installation; /dev/shm must be large or steamwebhelper
+# crash-loops.
+apiVersion: direwolf.games-on-whales.github.io/v1alpha1
+kind: App
+metadata:
+  name: steam
+  namespace: direwolf-dev
+spec:
+  appAssetWebP: UklGRhoAAABXRUJQVlA4IA4AAAAQAAGAiYCAgICAgIAA
+  id: 2
+  isHDRSupported: false
+  title: Steam
+  deviceClassName: default-wolf
+  template:
+    spec:
+      runtimeClassName: nvidia
+      nodeSelector:
+        games-on-whales.io/gaming: "true"
+      resourceClaims:
+        - name: nvidia-gpu
+          resourceClaimName: shared-nvidia-gpu
+      containers:
+        - name: app
+          image: ghcr.io/games-on-whales/steam:edge
+          # Steam's pressure-vessel runtime uses bwrap namespaces; same
+          # privileges Wolf's stock steam app config grants.
+          securityContext:
+            capabilities:
+              add: [SYS_ADMIN, SYS_NICE, SYS_PTRACE, NET_RAW, MKNOD, NET_ADMIN]
+            seccompProfile:
+              type: Unconfined
+            appArmorProfile:
+              type: Unconfined
+          env:
+            # Run as logan so paths baked into the restored home resolve.
+            - { name: UNAME, value: logan }
+            - { name: HOME, value: /home/logan }
+            - { name: TZ, value: America/Los_Angeles }
+            - { name: RUN_SWAY, value: "1" }
+            - { name: NVIDIA_DRIVER_CAPABILITIES, value: all }
+            - { name: GBM_BACKENDS_PATH, value: /usr/lib/gbm }
+          volumeMounts:
+            - name: home
+              mountPath: /home/logan
+            - name: egl-glvnd-nvidia
+              mountPath: /usr/share/glvnd/egl_vendor.d/10_nvidia.json
+              subPath: 10_nvidia.json
+              readOnly: true
+            - name: dshm
+              mountPath: /dev/shm
+          resources:
+            requests:
+              cpu: 2
+              memory: 4Gi
+              devic.es/uinput: "1"
+            limits:
+              memory: 12Gi
+              devic.es/uinput: "1"
+            claims:
+              - name: nvidia-gpu
+      volumes:
+        - name: home
+          persistentVolumeClaim:
+            claimName: logan-home
+        - name: egl-glvnd-nvidia
+          configMap:
+            name: egl-glvnd-nvidia
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 4Gi

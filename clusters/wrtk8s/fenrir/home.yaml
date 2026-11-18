@@ -1,0 +1,46 @@
+# logan's restored Ubuntu /home/logan lives on 3d's `home` UserVolume
+# (patches/3d.yaml) at /var/mnt/home. Every App mounts this one PVC at
+# /home/logan with UNAME=logan so the absolute paths baked into the Steam
+# install (~/.steam/debian-installation, libraryfolders.vdf) stay valid.
+# Retain everywhere: deleting the PVC/PV must never touch the data.
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-3d
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+reclaimPolicy: Retain
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: 3d-home
+spec:
+  storageClassName: local-3d
+  capacity:
+    storage: 800Gi
+  accessModes: [ReadWriteOnce]
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /var/mnt/home
+    type: Directory
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values: ["3d"]
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: logan-home
+  namespace: direwolf-dev
+spec:
+  storageClassName: local-3d
+  volumeName: 3d-home
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 800Gi

@@ -1,6 +1,4 @@
 # Upstream examples/applications/01-firefox.yaml adapted for NVIDIA on 3d.
-# Unlike testball (sleep infinity), this actually draws to the wayland
-# display, so it's the visual end-to-end check.
 apiVersion: direwolf.games-on-whales.github.io/v1alpha1
 kind: App
 metadata:
@@ -12,15 +10,6 @@ spec:
   isHDRSupported: false
   title: Firefox
   deviceClassName: default-wolf
-  volumeClaimTemplates:
-    - metadata:
-        name: app-data
-      spec:
-        accessModes: [ReadWriteOnce]
-        storageClassName: synology-iscsi
-        resources:
-          requests:
-            storage: 1Gi
   template:
     spec:
       runtimeClassName: nvidia
@@ -33,12 +22,16 @@ spec:
         - name: app
           image: ghcr.io/games-on-whales/firefox:edge
           env:
+            # Run as logan so paths baked into the restored home resolve.
+            - { name: UNAME, value: logan }
+            - { name: HOME, value: /home/logan }
+            - { name: TZ, value: America/Los_Angeles }
             - { name: RUN_SWAY, value: "1" }
             - { name: NVIDIA_DRIVER_CAPABILITIES, value: all }
             - { name: GBM_BACKENDS_PATH, value: /usr/lib/gbm }
           volumeMounts:
-            - name: app-data
-              mountPath: /home/retro
+            - name: home
+              mountPath: /home/logan
             - name: egl-glvnd-nvidia
               mountPath: /usr/share/glvnd/egl_vendor.d/10_nvidia.json
               subPath: 10_nvidia.json
@@ -46,15 +39,17 @@ spec:
           resources:
             requests:
               cpu: 2
-              memory: 4Gi
+              memory: 2Gi
               devic.es/uinput: "1"
             limits:
-              cpu: 4
               memory: 4Gi
               devic.es/uinput: "1"
             claims:
               - name: nvidia-gpu
       volumes:
+        - name: home
+          persistentVolumeClaim:
+            claimName: logan-home
         - name: egl-glvnd-nvidia
           configMap:
             name: egl-glvnd-nvidia

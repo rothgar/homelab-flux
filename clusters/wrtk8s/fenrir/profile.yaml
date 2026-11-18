@@ -1,28 +1,24 @@
-# A Profile binds a set of Apps to one or more Pairings (paired Moonlight
-# clients). The Profile name is referenced from each Pairing and acts as
-# the "user identity" for session allocation.
+# A Profile is a user: the set of Apps a group of paired Moonlight clients
+# can launch. One active session per profile — quit on one device before
+# starting on another (a live resume from a second device crashes wolf,
+# see the per-profile session ID issue).
 #
-# NOTE: the pairings list is populated at runtime once a Moonlight client
-# pairs. On first apply there are none; after `kubectl get pairings -n
-# direwolf-dev` returns names, splice them in and reconcile. Until then,
-# the Profile exists but gates no device access.
+# Every Flux reconcile overwrites spec.pairings, so paste new Pairing names
+# from `kubectl get pairings -n direwolf-dev` in here. Pairings are keyed
+# by client-cert hash, so re-pairing a machine reuses its Pairing CR.
 apiVersion: direwolf.games-on-whales.github.io/v1alpha1
 kind: Profile
 metadata:
-  name: alex
+  name: logan
   namespace: direwolf-dev
 spec:
   apps:
-    - name: testball
+    - name: desktop
+    - name: steam
+    - name: davinci-resolve
     - name: firefox
-  # Pairings are created at runtime when a Moonlight client pairs. Every
-  # Flux reconcile overwrites spec.pairings, so paste the Pairing name(s)
-  # from `kubectl get pairings -n direwolf-dev` in here to make the
-  # assignment survive. Pairings are keyed by client-cert hash, so the
-  # same machine re-pairing reuses the same Pairing CR.
   pairings:
-    # This Claude Code workstation (client cert fingerprint 2d2d…). First
-    # paired 2026-11-17.
+    # s (workstation), paired 2026-11-17.
     - name: c6e28ec19461649c1ed5b50be3ce912fb85747ed9ebb17bd87783de5f24ee700
-    # Android phone, paired 2026-11-17 via proxy pin page.
+    # Android phone, paired 2026-11-17.
     - name: d3d837acb25d92dd099a96de9dc8b5c367e032e36997316bdf816c4ec3d047be

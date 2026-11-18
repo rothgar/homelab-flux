@@ -26,5 +26,8 @@ resources:
   - moonlight-proxy.yaml
   - wolf-agent.yaml
   - profile.yaml
-  - testball.yaml
+  - home.yaml
   - firefox.yaml
+  - steam.yaml
+  - desktop.yaml
+  - davinci-resolve.yaml
