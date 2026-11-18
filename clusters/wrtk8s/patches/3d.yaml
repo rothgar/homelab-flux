@@ -39,3 +39,10 @@ taints:
 apiVersion: v1alpha1
 kind: KernelModuleConfig
 name: uinput
+---
+# Talos ships user namespaces off; Steam's pressure-vessel/bwrap refuses
+# to start without them ("Steam now requires user namespaces").
+apiVersion: v1alpha1
+kind: SysctlConfig
+params:
+  user.max_user_namespaces: "11255"
