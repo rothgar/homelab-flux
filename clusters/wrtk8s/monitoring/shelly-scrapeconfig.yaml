@@ -23,6 +23,11 @@ spec:
       labels:
         device: shelly-spark
         model: S4PL-00116US
+    - targets:
+        - 10.1.3.74
+      labels:
+        device: shelly-qb2
+        model: S4PL-00116US
   relabelings:
     # Ship the raw target IP as the value of ?target= on the exporter probe URL
     # and rewrite the actual scrape address to the exporter service. This is
