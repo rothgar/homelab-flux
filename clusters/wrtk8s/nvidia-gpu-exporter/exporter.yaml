@@ -1,0 +1,109 @@
+# NVML-based GPU exporter; replaces gpu-operator's DCGM exporter (see
+# nvidia-system/release.yaml) — far more series on consumer GPUs and GB10.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: nvidia-gpu-exporter
+  namespace: nvidia-gpu-exporter
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: nvidia-gpu-exporter
+  namespace: nvidia-gpu-exporter
+  labels:
+    app.kubernetes.io/name: nvidia-gpu-exporter
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nvidia-gpu-exporter
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: nvidia-gpu-exporter
+    spec:
+      serviceAccountName: nvidia-gpu-exporter
+      runtimeClassName: nvidia
+      nodeSelector:
+        nvidia.com/gpu.present: "true"
+      tolerations:
+        - key: nvidia.com/gpu
+          operator: Exists
+          effect: NoSchedule
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+      containers:
+        - name: exporter
+          # 2.x defaults to the NVML backend (reads libnvidia-ml.so.1 directly).
+          image: utkuozdemir/nvidia_gpu_exporter:2.0.0
+          args:
+            - --web.listen-address=:9835
+            - --log.level=info
+          env:
+            - name: NVIDIA_VISIBLE_DEVICES
+              value: all
+            - name: NVIDIA_DRIVER_CAPABILITIES
+              value: compute,utility
+          ports:
+            - name: metrics
+              containerPort: 9835
+          livenessProbe:
+            httpGet:
+              path: /
+              port: metrics
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /
+              port: metrics
+            initialDelaySeconds: 5
+            periodSeconds: 30
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nvidia-gpu-exporter
+  namespace: nvidia-gpu-exporter
+  labels:
+    app.kubernetes.io/name: nvidia-gpu-exporter
+spec:
+  clusterIP: None
+  selector:
+    app.kubernetes.io/name: nvidia-gpu-exporter
+  ports:
+    - name: metrics
+      port: 9835
+      targetPort: metrics
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: nvidia-gpu-exporter
+  namespace: nvidia-gpu-exporter
+  labels:
+    app.kubernetes.io/name: nvidia-gpu-exporter
+    release: kube-prometheus-stack
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nvidia-gpu-exporter
+  endpoints:
+    - port: metrics
+      interval: 30s
+      relabelings:
+        - sourceLabels: [__meta_kubernetes_pod_node_name]
+          targetLabel: node
+        - sourceLabels: [__meta_kubernetes_pod_node_name]
+          targetLabel: instance
