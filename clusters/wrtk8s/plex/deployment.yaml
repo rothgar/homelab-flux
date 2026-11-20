@@ -18,13 +18,12 @@ spec:
         app: plex
     spec:
       priorityClassName: plex-high-priority
-      # AMD VAAPI transcoding on any node NFD flags as having an AMD
-      # display controller (see node-feature-discovery/amdgpu-rule.yaml).
-      # Currently only mini; add more AMD-accelerator nodes and NFD will
-      # label them within a scan cycle. NVIDIA GPU slot on mini stays
-      # free for whisper-webui.
-      nodeSelector:
-        feature.node.kubernetes.io/amdgpu-present: "true"
+      # AMD iGPU for VAAPI transcoding, allocated by the gpu.amd.com DRA driver
+      # (amd-gpu-system). The claim pins the pod to a node with an AMD GPU and
+      # injects /dev/dri/card*, /dev/dri/renderD* and /dev/kfd via CDI.
+      resourceClaims:
+        - name: amd-gpu
+          resourceClaimTemplateName: plex-amd-gpu
       securityContext:
         seccompProfile:
           type: RuntimeDefault
@@ -63,10 +62,6 @@ spec:
       containers:
         - name: plex
           image: lscr.io/linuxserver/plex:1.43.5.11079-b3b13e506-ls333
-          # hostPath /dev/dri doesn't grant device-cgroup access; without this
-          # VAAPI on the AMD iGPU fails with "No VA display found".
-          securityContext:
-            privileged: true
           ports:
             - containerPort: 32400
           env:
@@ -79,6 +74,8 @@ spec:
             - name: DEBUG
               value: "true"
           resources:
+            claims:
+              - name: amd-gpu
             requests:
               cpu: 500m
               memory: 1Gi
@@ -89,8 +86,6 @@ spec:
               mountPath: /config/Library/Application Support
             - name: transcode
               mountPath: /transcode
-            - name: dri
-              mountPath: /dev/dri
             - name: movies
               mountPath: /data/movies
             - name: music
@@ -116,9 +111,6 @@ spec:
             claimName: plex-config-backup
         - name: transcode
           emptyDir: {}
-        - name: dri
-          hostPath:
-            path: /dev/dri
         - name: movies
           persistentVolumeClaim:
             claimName: plex-movies

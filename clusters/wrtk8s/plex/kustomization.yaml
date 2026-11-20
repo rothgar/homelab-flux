@@ -5,4 +5,5 @@ resources:
   - priority-class.yaml
   - nfs-volumes.yaml
   - plex-config-pvc.yaml
+  - amd-gpu-claim.yaml
   - deployment.yaml

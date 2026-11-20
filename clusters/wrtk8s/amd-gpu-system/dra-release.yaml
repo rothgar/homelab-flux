@@ -1,0 +1,32 @@
+# AMD GPU DRA driver (gpu.amd.com). Creates the gpu.amd.com DeviceClass and
+# injects /dev/dri/card*, /dev/dri/renderD* and /dev/kfd via CDI on allocation.
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: amd-gpu-dra-driver
+  namespace: amd-gpu-system
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: k8s-gpu-dra-driver
+      version: v1.0.1
+      sourceRef:
+        kind: HelmRepository
+        name: rocm-dra-driver
+        namespace: amd-gpu-system
+  values:
+    # Built from upstream main (2d002694) and pushed to cr.jgarr.net: v1.0.1
+    # reads every DRM card's module version, so on mini it publishes NVIDIA's
+    # "595.91.07" as driverVersion and the API server rejects the ResourceSlice
+    # (non-semver). Fixed upstream in ad96ab70; drop this once a release ships it.
+    image:
+      repository: cr.jgarr.net/rocm/k8s-gpu-dra-driver
+      tag: v1.0.1-2d002694
+    kubeletPlugin:
+      nodeSelector:
+        feature.node.kubernetes.io/amdgpu-present: "true"
+      tolerations:
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
