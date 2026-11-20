@@ -1,0 +1,25 @@
+apiVersion: v1alpha1
+kind: HostnameConfig
+auto: "off"
+hostname: qb2
+---
+apiVersion: v1alpha1
+kind: VolumeConfig
+name: EPHEMERAL
+provisioning:
+  diskSelector:
+    match: disk.transport == "nvme"
+  maxSize: 200GiB
+---
+# Dedicated partition for LLM weight caches (HF_HOME, vLLM download-dir, tt-inference-server caches).
+# Same shape as spark/sparky's — mounted at /var/mnt/model by Talos. The 4 TB NVMe leaves ~2.6 TiB
+# unallocated for later.
+apiVersion: v1alpha1
+kind: UserVolumeConfig
+name: model
+volumeType: partition
+provisioning:
+  diskSelector:
+    match: disk.transport == "nvme"
+  maxSize: 1TiB
+  minSize: 800GiB

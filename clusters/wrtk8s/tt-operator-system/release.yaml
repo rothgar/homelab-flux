@@ -1,0 +1,66 @@
+# Tenstorrent operator: fabric manager + DRA driver (chips as ResourceSlices, claimed via the
+# tenstorrent.com DeviceClass) + telemetry. Everything runs only on nodes labeled
+# tenstorrent.com/has-tt=true (node-feature-discovery/tenstorrent-rule.yaml), today just qb2.
+#
+# Off: the chart's own NFD (gpu-operator already runs one), tt-k8s-driver-manager (Talos ships tt-kmd as the
+# siderolabs/tenstorrent extension, so there's nothing to build), jobset and kubepmix (multi-node training only).
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: tt-operator
+  namespace: tt-operator-system
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: tt-operator
+      version: 0.3.0
+      sourceRef:
+        kind: HelmRepository
+        name: tenstorrent
+        namespace: tt-operator-system
+  install:
+    remediation:
+      retries: 3
+  values:
+    node-feature-discovery: { enabled: false }
+    tt-k8s-driver-manager: { enabled: false }
+    jobset: { enabled: false }
+    kubepmix: { enabled: false }
+    tt-fabric-manager:
+      scaleoutConfigsHostPath: /var/lib/tt-fabric-manager/scaleout_configs   # /data is read-only on Talos
+      controller:
+        nodeSelector: { tenstorrent.com/has-tt: "true" }
+        affinity: null   # chart default prefers non-TT nodes; keep it on the TT node instead
+      agent:
+        nodeSelector: { tenstorrent.com/has-tt: "true" }
+    tt-dra-driver:
+      kubeletPlugin:
+        nodeSelector: { tenstorrent.com/has-tt: "true" }
+        # The plugin couldn't resolve the agent Service by name on qb2, so the agent Service gets a fixed
+        # ClusterIP from the static band (postRenderers below) and the plugin dials that.
+        fabricManagerAgentAddress: "10.96.0.53:50053"
+    tt-telemetry:
+      aggregator: { enabled: false }   # single TT node: the collector alone
+      daemonset:
+        affinity:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+                - matchExpressions:
+                    - key: tenstorrent.com/has-tt
+                      operator: In
+                      values: ["true"]
+                    - key: tenstorrent.com/deploy.tt-telemetry
+                      operator: NotIn
+                      values: ["false"]
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              kind: Service
+              name: tt-fabric-manager-agent
+            patch: |
+              - op: add
+                path: /spec/clusterIP
+                value: 10.96.0.53

@@ -35,6 +35,7 @@ machines:
   - d68614b6-bfde-11d3-8000-4cbb472dcf87 # spark (arm64, DGX Spark GB10)
   - 4c5615cc-1dd2-11b2-8000-4cbb47001716 # sparky (arm64, DGX Spark GB10)
   - c828b893-c76a-4b1c-a7c6-345a6053adf6 # 3d (amd64, RTX 3060, Wolf game-streaming)
+  - ab006b9c-b14d-0000-0000-000000000000 # qb2 (amd64, Tenstorrent QuietBox 2, 4x Blackhole)
 ---
 kind: Machine
 systemExtensions:
@@ -177,4 +178,21 @@ kernelArgs:
 patches:
   - file: patches/3d.yaml
   - file: patches/spark-nvidia-modules.yaml
+  - file: patches/kubelet.yaml
+---
+# qb2: Tenstorrent QuietBox 2 (Ryzen 7 9700X, 2x p300c = 4x Blackhole). The tenstorrent extension
+# provides tt-kmd; some tt-model bundles check for a 1 GiB hugetlbfs, hence the hugepages.
+kind: Machine
+systemExtensions:
+  - siderolabs/amd-ucode
+  - siderolabs/tenstorrent
+  - siderolabs/iscsi-tools
+name: ab006b9c-b14d-0000-0000-000000000000 # qb2
+kernelArgs:
+  - talos.dashboard.disabled=1
+  - nfs.nfs4_disable_idmapping=1
+  - hugepagesz=1G
+  - hugepages=8
+patches:
+  - file: patches/qb2.yaml
   - file: patches/kubelet.yaml

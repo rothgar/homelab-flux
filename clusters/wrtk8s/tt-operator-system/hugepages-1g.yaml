@@ -1,0 +1,20 @@
+# Mounts a 1 GiB-page hugetlbfs at /dev/hugepages-1G on each Tenstorrent node, as tenstorrent-tools'
+# hugepages service does on Ubuntu. tt-operator's DRA driver bind-mounts the host's /dev/hugepages-1G into
+# pods that claim chips, and some tt-model bundles refuse to start unless it is a hugetlbfs. The pages
+# themselves come from the kernel args (hugepagesz=1G hugepages=8, cluster.yaml, qb2 Machine kernelArgs).
+apiVersion: apps/v1
+kind: DaemonSet
+metadata: { name: hugepages-1g, namespace: tt-operator-system }
+spec:
+  selector: { matchLabels: { app: hugepages-1g } }
+  template:
+    metadata: { labels: { app: hugepages-1g } }
+    spec:
+      nodeSelector: { tenstorrent.com/has-tt: "true" }
+      containers:
+      - name: mount
+        image: busybox:1.37
+        securityContext: { privileged: true }
+        command: [sh, -c, "grep -q ' /host-dev/hugepages-1G hugetlbfs ' /proc/mounts || { mkdir -p /host-dev/hugepages-1G && mount -t hugetlbfs -o pagesize=1G,mode=1777 nodev /host-dev/hugepages-1G; }; grep hugepages-1G /proc/mounts; exec sleep infinity"]
+        volumeMounts: [{ name: dev, mountPath: /host-dev, mountPropagation: Bidirectional }]
+      volumes: [{ name: dev, hostPath: { path: /dev } }]

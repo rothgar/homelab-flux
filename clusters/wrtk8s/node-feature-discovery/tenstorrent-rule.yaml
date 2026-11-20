@@ -1,0 +1,19 @@
+# Tenstorrent cards (PCI vendor 1e52, class 1200 "processing accelerator"). gpu-operator's NFD labels by vendor only
+# (pci-1e52.present), but tt-operator's DaemonSets select on tenstorrent.com/has-tt=true or the class+vendor label
+# pci-1200_1e52.present. Emit both so tt-operator-system works without the chart's own NFD.
+apiVersion: nfd.k8s-sigs.io/v1alpha1
+kind: NodeFeatureRule
+metadata:
+  name: tenstorrent-present
+spec:
+  rules:
+    - name: "tenstorrent"
+      labels:
+        "tenstorrent.com/has-tt": "true"
+        "pci-1200_1e52.present": "true"
+      matchFeatures:
+        - feature: pci.device
+          matchExpressions:
+            vendor:
+              op: In
+              value: ["1e52"]
