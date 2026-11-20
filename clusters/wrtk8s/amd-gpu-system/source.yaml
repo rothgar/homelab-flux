@@ -1,0 +1,8 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: rocm-dra-driver
+  namespace: amd-gpu-system
+spec:
+  interval: 1h
+  url: https://rocm.github.io/k8s-gpu-dra-driver

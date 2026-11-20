@@ -36,6 +36,7 @@ resources:
   - monitoring
   - mqtt
 
+  - amd-gpu-system
   - nvidia-system
   - node-feature-discovery
 
