@@ -13,7 +13,7 @@ spec:
       nodeSelector: { tenstorrent.com/has-tt: "true" }
       containers:
       - name: mount
-        image: busybox:1.37
+        image: busybox:1.38
         securityContext: { privileged: true }
         command: [sh, -c, "grep -q ' /host-dev/hugepages-1G hugetlbfs ' /proc/mounts || { mkdir -p /host-dev/hugepages-1G && mount -t hugetlbfs -o pagesize=1G,mode=1777 nodev /host-dev/hugepages-1G; }; grep hugepages-1G /proc/mounts; exec sleep infinity"]
         volumeMounts: [{ name: dev, mountPath: /host-dev, mountPropagation: Bidirectional }]
