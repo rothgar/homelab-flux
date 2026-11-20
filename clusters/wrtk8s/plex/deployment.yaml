@@ -63,6 +63,10 @@ spec:
       containers:
         - name: plex
           image: lscr.io/linuxserver/plex:1.43.5.11079-b3b13e506-ls333
+          # hostPath /dev/dri doesn't grant device-cgroup access; without this
+          # VAAPI on the AMD iGPU fails with "No VA display found".
+          securityContext:
+            privileged: true
           ports:
             - containerPort: 32400
           env:
