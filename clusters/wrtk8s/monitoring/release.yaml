@@ -93,10 +93,6 @@ spec:
             gnetId: 1860
             revision: 37
             datasource: Prometheus
-          nvidia-dcgm:
-            gnetId: 12239
-            revision: 2
-            datasource: Prometheus
 
     # AlertManager - disable if not needed
     alertmanager:

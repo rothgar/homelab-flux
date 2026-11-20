@@ -3,3 +3,15 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - exporter.yaml
+configMapGenerator:
+  - name: nvidia-gpu-exporter-dashboard
+    namespace: monitoring
+    # Upstream dashboards from charts/nvidia-gpu-exporter/dashboards at the
+    # exporter's release tag; copy verbatim when bumping the image.
+    files:
+      - dashboards/nvidia-gpu-metrics.json
+      - dashboards/nvidia-gpu-overview.json
+    options:
+      disableNameSuffixHash: true
+      labels:
+        grafana_dashboard: "1"
