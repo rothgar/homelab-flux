@@ -37,6 +37,7 @@ resources:
   - mqtt
 
   - amd-gpu-system
+  - nvidia-gpu-exporter
   - nvidia-system
   - node-feature-discovery
 
