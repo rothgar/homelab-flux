@@ -34,7 +34,7 @@ spec:
         supplementalGroups: [44, 109]
       initContainers:
         - name: restore-backup
-          image: restic/restic:0.19.1
+          image: restic/restic:0.20.0
           command:
             - sh
             - -c
