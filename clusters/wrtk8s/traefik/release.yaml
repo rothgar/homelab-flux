@@ -20,6 +20,13 @@ spec:
       # (22) on one A record.
       annotations:
         metallb.universe.tf/allow-shared-ip: gitea-web-ssh
+    ports:
+      websecure:
+        transport:
+          respondingTimeouts:
+            # Traefik v3 defaults readTimeout to 60s, which cuts off large
+            # image-layer PUTs to cr.jgarr.net mid-upload.
+            readTimeout: 30m
     ingressClass:
       enabled: true
       isDefaultClass: true
