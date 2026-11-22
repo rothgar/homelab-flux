@@ -14,8 +14,13 @@ spec:
         namespace: csi-system
   values:
     controller:
+      # Only the control-plane taint: tolerating every NoSchedule taint let the
+      # scheduler place the controller on a cordoned, powered-off node (qb2)
+      # after an eviction, leaving NFS provisioning down. The node plugin below
+      # is a DaemonSet and does need to run everywhere.
       tolerations:
-        - operator: Exists
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
           effect: NoSchedule
     node:
       tolerations:
