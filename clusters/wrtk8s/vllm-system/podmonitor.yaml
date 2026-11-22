@@ -6,11 +6,12 @@ metadata:
   labels:
     release: kube-prometheus-stack
 spec:
+  # Every model pod carries vllm-model: "true" (also used for the one-model-
+  # per-node anti-affinity), so new models are scraped without editing this.
+  # The old app-name list missed qwen38-27b-nvfp4 (app label has the -nvfp4).
   selector:
-    matchExpressions:
-      - key: app
-        operator: In
-        values: [qwen36-27b, qwen36-35b-a3b, qwen38-27b]
+    matchLabels:
+      vllm-model: "true"
   podMetricsEndpoints:
     - port: http
       interval: 30s
