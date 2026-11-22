@@ -48,6 +48,12 @@ spec:
               value: cr.jgarr.net/fenrir/wolf-agent:dev
             - name: AGENT_IMAGE_PULL_POLICY
               value: Always
+            # Tear down a desktop/game lobby 30m after the Moonlight client
+            # disconnects without quitting. Frees 3d's GPU and lets the power
+            # autoscaler shut 3d down. Needs an operator + wolf-agent built
+            # with the Streaming-condition change; ignored by older images.
+            - name: LOBBY_IDLE_TIMEOUT
+              value: 30m
           resources:
             requests:
               cpu: 100m
@@ -78,7 +84,9 @@ rules:
     verbs: ["update", "patch"]
   - apiGroups: ["direwolf.games-on-whales.github.io"]
     resources: ["lobbies"]
-    verbs: ["get", "list", "watch"]
+    # delete: the lobby idle reaper (--lobby-idle-timeout) removes lobbies
+    # nobody has streamed from, like Moonlight's Quit.
+    verbs: ["get", "list", "watch", "delete"]
   - apiGroups: ["direwolf.games-on-whales.github.io"]
     resources: ["lobbies/status"]
     verbs: ["update", "patch"]
