@@ -13,10 +13,13 @@ spec:
   # Add another `- targets:` block per additional Shelly plug and Prometheus
   # will pick it up on the next config reload.
   staticConfigs:
+    # Plug at 10.1.2.2 powers sparky (formerly labelled shelly-benchy; its
+    # readings track sparky's GB10 power, r=0.83). Device label = node name
+    # so per-node queries like shelly-{{ .NodeName }} work.
     - targets:
         - 10.1.2.2
       labels:
-        device: shelly-benchy
+        device: shelly-sparky
         model: S4PL-00116US
     - targets:
         - 10.1.2.44
