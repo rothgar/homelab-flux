@@ -139,7 +139,15 @@ spec:
             capabilities:
               add:
                 - IPC_LOCK
+          # Memory request = what the model really occupies, so the scheduler (and the
+          # power autoscaler) never packs other memory-hungry pods next to it. On GB10's
+          # unified memory vLLM's CUDA allocations aren't charged to the container like
+          # ordinary RSS (kubectl top shows ~6-7 GiB), so no memory limit is set.
+          # weights 21.8 + KV 10.0 (262144 ctx × 4 seqs, fp8, 10 KiB/token) + runtime ≈ 44 GiB,
+          # but --gpu-memory-utilization 0.65 pre-allocates 78.7 GiB (+6 GiB process) → 85Gi
           resources:
+            requests:
+              memory: 85Gi
             limits:
               nvidia.com/gpu: 1
           volumeMounts:

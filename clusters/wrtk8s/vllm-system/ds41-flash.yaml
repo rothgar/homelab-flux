@@ -161,7 +161,15 @@ spec:
           ports:
             - containerPort: 8000
               name: http
+          # Memory request = what the model really occupies, so the scheduler (and the
+          # power autoscaler) never packs other memory-hungry pods next to it. On GB10's
+          # unified memory vLLM's CUDA allocations aren't charged to the container like
+          # ordinary RSS (kubectl top shows ~6-7 GiB), so no memory limit is set.
+          # ds4 keeps ~152 GiB of the Q2 GGUF resident (more than the node) and streams the rest
+          # from NVMe, so it effectively owns the whole GB10 → 112Gi of 121.1 GiB allocatable
           resources:
+            requests:
+              memory: 112Gi
             limits:
               nvidia.com/gpu: 1
           volumeMounts:

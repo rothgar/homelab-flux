@@ -130,7 +130,15 @@ spec:
               capabilities:
                 add:
                   - IPC_LOCK
+            # Memory request = what the model really occupies, so the scheduler (and the
+            # power autoscaler) never packs other memory-hungry pods next to it. On GB10's
+            # unified memory vLLM's CUDA allocations aren't charged to the container like
+            # ordinary RSS (kubectl top shows ~6-7 GiB), so no memory limit is set.
+            # per rank (tp=2): weights 130.3/2 = 65.2 + KV 23.2 (196608 ctx, bf16, 124 KiB/token/rank) + runtime ≈ 99 GiB;
+            # --gpu-memory-utilization 0.80 pre-allocates 96.9 GiB (+6 GiB process) → 103Gi
             resources:
+              requests:
+                memory: 103Gi
               claims:
                 - name: gpu-rdma
             volumeMounts: &mounts
@@ -197,7 +205,15 @@ spec:
               capabilities:
                 add:
                   - IPC_LOCK
+            # Memory request = what the model really occupies, so the scheduler (and the
+            # power autoscaler) never packs other memory-hungry pods next to it. On GB10's
+            # unified memory vLLM's CUDA allocations aren't charged to the container like
+            # ordinary RSS (kubectl top shows ~6-7 GiB), so no memory limit is set.
+            # per rank (tp=2): weights 130.3/2 = 65.2 + KV 23.2 (196608 ctx, bf16, 124 KiB/token/rank) + runtime ≈ 99 GiB;
+            # --gpu-memory-utilization 0.80 pre-allocates 96.9 GiB (+6 GiB process) → 103Gi
             resources:
+              requests:
+                memory: 103Gi
               claims:
                 - name: gpu-rdma
             volumeMounts: *mounts
