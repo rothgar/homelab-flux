@@ -23,3 +23,28 @@ spec:
         kind: HelmRepository
         name: kedacore
         namespace: keda
+  values:
+    interceptor:
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          nodeTaintsPolicy: Honor
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/component: interceptor
+              app.kubernetes.io/instance: keda-add-ons-http
+          matchLabelKeys:
+            - pod-template-hash
+    scaler:
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          nodeTaintsPolicy: Honor
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/component: scaler
+              app.kubernetes.io/instance: keda-add-ons-http
+          matchLabelKeys:
+            - pod-template-hash

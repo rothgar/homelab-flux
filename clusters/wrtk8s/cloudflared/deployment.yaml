@@ -26,12 +26,14 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       # Spread replicas across nodes so a single node loss doesn't take
-      # the tunnel down. Soft (preferred) so a single-node cluster still
-      # schedules.
+      # the tunnel down. Hard: ScheduleAnyway let both land on one node.
       topologySpreadConstraints:
         - maxSkew: 1
           topologyKey: kubernetes.io/hostname
-          whenUnsatisfiable: ScheduleAnyway
+          whenUnsatisfiable: DoNotSchedule
+          nodeTaintsPolicy: Honor
+          matchLabelKeys:
+            - pod-template-hash
           labelSelector:
             matchLabels:
               app: cloudflared
@@ -71,3 +73,14 @@ spec:
               memory: 64Mi
             limits:
               memory: 256Mi
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: cloudflared
+  namespace: cloudflared
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: cloudflared
