@@ -43,5 +43,9 @@ COPY cont-init-gnome.sh /etc/cont-init.d/40-gnome.sh
 COPY sway-gnome.conf /etc/sway/config.d/gnome.conf
 COPY resolve.desktop /usr/share/applications/com.blackmagicdesign.resolve.desktop
 COPY 90-fenrir.gschema.override /usr/share/glib-2.0/schemas/
+# NVIDIA 595 EGL only initializes on Wayland through egl-wayland2; the base
+# image's 10_nvidia_wayland.json (egl-wayland 1.x) fails, so glvnd fell back
+# to Mesa zink. The library itself is injected by the NVIDIA container toolkit.
+COPY 09_nvidia_wayland2.json /usr/share/egl/egl_external_platform.d/
 RUN chmod +x /opt/gow/startup-app.sh /opt/gow/gnome-session.sh /etc/cont-init.d/40-gnome.sh && \
     glib-compile-schemas /usr/share/glib-2.0/schemas
