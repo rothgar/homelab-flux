@@ -185,6 +185,7 @@ patches:
 kind: Machine
 systemExtensions:
   - siderolabs/amd-ucode
+  - siderolabs/amdgpu
   - siderolabs/tenstorrent
   - siderolabs/iscsi-tools
 name: ab006b9c-b14d-0000-0000-000000000000 # qb2
