@@ -15,3 +15,10 @@ metadata:
 spec:
   ipAddressPools:
     - default
+  # Announce only from nodes that stay on. nodenap powers these off and on,
+  # and each change moves announcements and resets open connections.
+  nodeSelectors:
+    - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: NotIn
+          values: [3d, qb2, spark, sparky]

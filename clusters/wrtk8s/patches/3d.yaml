@@ -46,3 +46,12 @@ apiVersion: v1alpha1
 kind: SysctlConfig
 params:
   user.max_user_namespaces: "11255"
+---
+# Keep Wake-on-LAN armed on the 2.5GbE port (MAC 34:5a:60:53:ad:f6) so
+# nodenap can wake 3d from fully off. Also needs BIOS: Settings > Advanced >
+# Wake Up Event Setup > Resume By PCI-E Device = Enabled, ErP Ready = Disabled.
+apiVersion: v1alpha1
+kind: EthernetConfig
+name: enp37s0
+wakeOnLan:
+  - magic
