@@ -1,0 +1,18 @@
+# The PowerPolicy and Machines in ./config need nodenap's CRDs, which the
+# HelmRelease installs after the root sync; applied separately so the root
+# sync never dry-runs an unknown kind. Retries until the CRDs exist.
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: nodenap-config
+  namespace: flux-system
+spec:
+  interval: 10m
+  retryInterval: 1m
+  path: ./clusters/wrtk8s/nodenap/config
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  dependsOn:
+    - name: flux-system

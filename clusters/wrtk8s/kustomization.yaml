@@ -35,6 +35,7 @@ resources:
   - n8n
   - monitoring
   - mqtt
+  - nodenap
 
   - amd-gpu-system
   - nvidia-gpu-exporter

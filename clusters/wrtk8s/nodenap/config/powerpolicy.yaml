@@ -1,0 +1,59 @@
+# Docs: https://github.com/rothgar/nodenap/tree/main/docs
+apiVersion: power.nodenap.rothgar.github.io/v1alpha1
+kind: PowerPolicy
+metadata:
+  name: default
+spec:
+  # Report only: status.lastActions / status.suggestions show what it would do.
+  # Set to false to let it power machines off and on.
+  dryRun: true
+  minNodesOn: 2
+  ignorePods:
+    # Hardware manager for the Tenstorrent box; not a reason to keep it on.
+    - namespace: tt-operator-system
+      selector: {matchLabels: {app.kubernetes.io/name: tt-fabric-manager}}
+    # Wolf streaming infra is pinned to 3d. Moonlight wakes 3d itself with
+    # Wake-on-LAN; a running desktop (Lobby) still keeps 3d on.
+    - namespace: direwolf-dev
+      selector: {matchLabels: {app: wolf-agent}}
+    - namespace: direwolf-dev
+      selector: {matchLabels: {component: moonlight-proxy}}
+  scaleDown:
+    utilizationThresholdPercent: 40
+    minSavingsPerHour: "0.005"
+  integrations:
+    prometheusURL: http://kube-prometheus-stack-prometheus.monitoring:9090
+    homeAssistantURL: http://home-assistant.home-assistant:8080
+    homeAssistantTokenSecretRef: {name: home-assistant, key: token}
+  energy:
+    timeZone: America/Los_Angeles
+    currency: USD
+    # SCE TOU-D-5-8PM. All-in $/kWh: delivery + generation + CTC/NDC/PPPC +
+    # wildfire fund + fixed recovery + state tax. Holidays aren't modelled.
+    tariff:
+      defaultPrice: "0.3883"   # winter off peak, 8pm–8am
+      windows:
+        # Summer, Jun–Sep
+        - {months: [6,7,8,9], days: [Mon,Tue,Wed,Thu,Fri], start: "17:00", end: "20:00", price: "0.7503"}  # on peak
+        - {months: [6,7,8,9], start: "17:00", end: "20:00", price: "0.5501"}                                # mid peak (weekends)
+        - {months: [6,7,8,9], start: "00:00", end: "00:00", price: "0.3518"}                                # off peak
+        # Winter, Oct–May
+        - {months: [10,11,12,1,2,3,4,5], start: "17:00", end: "20:00", price: "0.5713"}  # mid peak
+        - {months: [10,11,12,1,2,3,4,5], start: "08:00", end: "17:00", price: "0.3345"}  # super off peak
+    # NEM 2.0: exports credited at the TOU rate minus non-bypassable charges.
+    netMetering:
+      nonBypassableChargesPerKWh: "0.01164"
+    # Enphase Envoy via Home Assistant
+    gridPower:   # + exporting
+      homeAssistant: {entity: sensor.envoy_current_net_power_consumption}
+      scale: "-1000"   # kW import(+) -> W export(+)
+    battery:
+      soc:
+        homeAssistant: {entity: sensor.envoy_battery}
+      reserveSoCPercent: 40
+      power:   # + discharging / − charging
+        homeAssistant:
+          entities: [sensor.encharge_1_power, sensor.encharge_2_power,
+                     sensor.encharge_3_power, sensor.encharge_4_power]
+      # Battery energy is energy bought back at 5–8pm (winter mid peak).
+      costPerKWh: "0.5713"
