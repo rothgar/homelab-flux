@@ -20,3 +20,11 @@ spec:
       - 10.1.0.0/16
     providerRegex: ".*"
     bypassDnsResolution: true
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          - topologyKey: kubernetes.io/hostname
+            labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: kubelet-csr-approver
+                app.kubernetes.io/instance: kubelet-csr-approver

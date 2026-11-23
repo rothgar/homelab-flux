@@ -19,3 +19,48 @@ spec:
         kind: HelmRepository
         name: kedacore
         namespace: keda
+  values:
+    operator:
+      replicaCount: 2
+    metricsServer:
+      replicaCount: 2
+    webhooks:
+      replicaCount: 2
+    podDisruptionBudget:
+      operator:
+        maxUnavailable: 1
+      metricServer:
+        maxUnavailable: 1
+      webhooks:
+        maxUnavailable: 1
+    topologySpreadConstraints:
+      operator:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          nodeTaintsPolicy: Honor
+          labelSelector:
+            matchLabels:
+              app: keda-operator
+          matchLabelKeys:
+            - pod-template-hash
+      metricsServer:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          nodeTaintsPolicy: Honor
+          labelSelector:
+            matchLabels:
+              app: keda-operator-metrics-apiserver
+          matchLabelKeys:
+            - pod-template-hash
+      webhooks:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          nodeTaintsPolicy: Honor
+          labelSelector:
+            matchLabels:
+              app: keda-admission-webhooks
+          matchLabelKeys:
+            - pod-template-hash

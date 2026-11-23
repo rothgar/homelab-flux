@@ -15,3 +15,18 @@ spec:
   values:
     args:
       - --kubelet-insecure-tls
+    replicas: 2
+    podDisruptionBudget:
+      enabled: true
+      maxUnavailable: 1
+    topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
+        nodeTaintsPolicy: Honor
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: metrics-server
+            app.kubernetes.io/instance: metrics-server
+        matchLabelKeys:
+          - pod-template-hash

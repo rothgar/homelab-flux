@@ -12,3 +12,20 @@ spec:
         kind: HelmRepository
         name: external-secrets
         namespace: external-secrets
+  values:
+    webhook:
+      replicaCount: 2
+      podDisruptionBudget:
+        enabled: true
+        minAvailable: 1
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          nodeTaintsPolicy: Honor
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: external-secrets-webhook
+              app.kubernetes.io/instance: external-secrets
+          matchLabelKeys:
+            - pod-template-hash

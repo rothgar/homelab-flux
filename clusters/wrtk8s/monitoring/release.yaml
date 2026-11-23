@@ -97,3 +97,7 @@ spec:
     # AlertManager - disable if not needed
     alertmanager:
       enabled: true
+      alertmanagerSpec:
+        # Two gossiping replicas (chart default anti-affinity spreads them) so
+        # alerts still fire when the node hosting one goes down.
+        replicas: 2
