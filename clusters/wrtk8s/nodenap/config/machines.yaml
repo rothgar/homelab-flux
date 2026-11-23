@@ -1,0 +1,87 @@
+# One Machine per node nodenap may switch. Nodes without a Machine are never
+# touched (dry run still lists them under status.suggestions).
+# Shutdown goes through Omni (Secret "omni"); Shelly Gen2 plugs cut power,
+# bring machines back (BIOS: restore on AC power) and measure them.
+apiVersion: power.nodenap.rothgar.github.io/v1alpha1
+kind: Machine
+metadata:
+  name: 3d
+spec:
+  # Game streaming (Wolf). No plug: never cut its power.
+  powerOn:
+    - wakeOnLAN: {mac: "34:5a:60:53:ad:f6"}
+  shutdown:
+    omni: {credentialsSecretRef: {name: omni}}
+  sensor:   # CPU (Kepler) + GPU + ~30 W for the rest
+    prometheus:
+      query: >-
+        sum(kepler_node_cpu_watts{node_name="{{ .NodeName }}",zone="package"})
+        + max(nvidia_smi_power_draw_watts{instance="{{ .NodeName }}"})
+        + 30
+  profile: {idleWatts: "53", offWatts: "2"}
+---
+apiVersion: power.nodenap.rothgar.github.io/v1alpha1
+kind: Machine
+metadata:
+  name: iota
+spec:
+  # Frigate video processing hardware: measured, never powered off.
+  alwaysOn: true
+  sensor:
+    prometheus:
+      query: 'sum(kepler_node_cpu_watts{node_name="{{ .NodeName }}",zone="package"}) + 8'
+  profile: {idleWatts: "12"}
+---
+apiVersion: power.nodenap.rothgar.github.io/v1alpha1
+kind: Machine
+metadata:
+  name: qb2
+spec:
+  # Tenstorrent box, ~570 W when on.
+  powerOn:
+    - http: {method: GET, url: "http://10.1.3.74/rpc/Switch.Set?id=0&on=true"}
+  shutdown:
+    omni: {credentialsSecretRef: {name: omni}}
+  powerCut:
+    http: {method: GET, url: "http://10.1.3.74/rpc/Switch.Set?id=0&on=false"}
+  powerCutDelay: 30s
+  sensor:
+    http: {url: "http://10.1.3.74/rpc/Switch.GetStatus?id=0", field: apower}
+  bootTimeout: 10m
+  profile: {idleWatts: "120", maxWatts: "1300", offWatts: "0"}
+---
+apiVersion: power.nodenap.rothgar.github.io/v1alpha1
+kind: Machine
+metadata:
+  name: spark
+spec:
+  # GB10. Suspend saves ~8 W and WoL can't wake it, so plug on/off.
+  powerOn:
+    - http: {method: GET, url: "http://10.1.2.44/rpc/Switch.Set?id=0&on=true"}
+  shutdown:
+    omni: {credentialsSecretRef: {name: omni}}
+  powerCut:
+    http: {method: GET, url: "http://10.1.2.44/rpc/Switch.Set?id=0&on=false"}
+  powerCutDelay: 30s
+  sensor:
+    http: {url: "http://10.1.2.44/rpc/Switch.GetStatus?id=0", field: apower}
+  bootTimeout: 6m
+  profile: {idleWatts: "56", maxWatts: "240", offWatts: "0", bootTime: 4m15s}
+---
+apiVersion: power.nodenap.rothgar.github.io/v1alpha1
+kind: Machine
+metadata:
+  name: sparky
+spec:
+  # GB10. Plug power-on (AC restore) to Ready measured at ~4m.
+  powerOn:
+    - http: {method: GET, url: "http://10.1.2.2/rpc/Switch.Set?id=0&on=true"}
+  shutdown:
+    omni: {credentialsSecretRef: {name: omni}}
+  powerCut:
+    http: {method: GET, url: "http://10.1.2.2/rpc/Switch.Set?id=0&on=false"}
+  powerCutDelay: 30s
+  sensor:
+    http: {url: "http://10.1.2.2/rpc/Switch.GetStatus?id=0", field: apower}
+  bootTimeout: 6m
+  profile: {idleWatts: "56", maxWatts: "240", offWatts: "0", bootTime: 4m15s}
