@@ -30,5 +30,6 @@ resources:
   - image-prepull.yaml
   - firefox.yaml
   - steam.yaml
+  - steam-gamescope.yaml
   - desktop.yaml
   - davinci-resolve.yaml
