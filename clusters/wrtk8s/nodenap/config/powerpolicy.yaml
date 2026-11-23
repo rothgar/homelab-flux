@@ -4,9 +4,9 @@ kind: PowerPolicy
 metadata:
   name: default
 spec:
-  # Report only: status.lastActions / status.suggestions show what it would do.
-  # Set to false to let it power machines off and on.
-  dryRun: true
+  # Live: nodenap powers machines off and on. Set to true to only report
+  # (kubectl get powerpolicy / machines show PLANNED and WOULD).
+  dryRun: false
   minNodesOn: 2
   ignorePods:
     # Hardware manager for the Tenstorrent box; not a reason to keep it on.
