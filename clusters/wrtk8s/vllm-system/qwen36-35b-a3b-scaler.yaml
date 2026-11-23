@@ -1,0 +1,72 @@
+# Scale qwen36-35b-a3b to zero after 60 minutes with no requests, and wake it
+# on the next request. With the model gone, sparky sits empty and nodenap
+# powers it off; a held request makes the pod Pending and nodenap powers
+# sparky back on.
+#
+# Traffic path:
+#   client → 10.1.1.154:8000 or qwen36-35b-a3b.<tailnet>.ts.net:8000
+#          → Service keda/qwen36-35b-a3b (selects the interceptor pods)
+#          → interceptor matches the Host header below, holds the request,
+#            scales the Deployment 0→1 and waits for it to be Ready
+#          → qwen36-35b-a3b-backend:8000
+#
+# A cold start is sparky booting (~4 min) plus vLLM loading (~3 min), so the
+# first request after an idle hour takes ~7-8 min. Clients need a timeout
+# longer than that.
+apiVersion: v1
+kind: Service
+metadata:
+  # Lives in keda so it can select the interceptor pods directly (an
+  # EndpointSlice pointing across namespaces needs a reconciler).
+  name: qwen36-35b-a3b
+  namespace: keda
+  annotations:
+    # Same LAN IP and tailnet name the model had before.
+    metallb.io/loadBalancerIPs: "10.1.1.154"
+    tailscale.com/expose: "true"
+    tailscale.com/hostname: "qwen36-35b-a3b"
+spec:
+  type: LoadBalancer
+  selector:
+    app.kubernetes.io/component: interceptor
+    app.kubernetes.io/instance: keda-add-ons-http
+    app.kubernetes.io/name: http-add-on
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8080
+---
+apiVersion: http.keda.sh/v1alpha1
+kind: HTTPScaledObject
+metadata:
+  name: qwen36-35b-a3b
+  namespace: vllm-system
+spec:
+  # Host headers clients send, with and without the port.
+  hosts:
+    - 10.1.1.154
+    - 10.1.1.154:8000
+    - qwen36-35b-a3b
+    - qwen36-35b-a3b:8000
+    - qwen36-35b-a3b.gerbil-dragon.ts.net
+    - qwen36-35b-a3b.gerbil-dragon.ts.net:8000
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: qwen36-35b-a3b
+    service: qwen36-35b-a3b-backend
+    port: 8000
+  replicas:
+    min: 0
+    max: 1
+  # In-flight requests keep it active, so a long generation is never cut off.
+  scalingMetric:
+    concurrency:
+      targetValue: 1
+  # 60 minutes with no requests in flight → scale to 0.
+  scaledownPeriod: 3600
+  timeouts:
+    # Hold the first request through a sparky boot plus model load.
+    conditionWait: 15m
+    # Non-streaming completions can take minutes before the first byte.
+    responseHeader: 10m

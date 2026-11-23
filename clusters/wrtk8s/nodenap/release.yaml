@@ -28,6 +28,15 @@ spec:
   values:
     policy:
       create: false
+    # Always run on the control plane (mini), which is never powered off.
+    # Preferred-only lets upgrades land on a worker: with hostNetwork the
+    # terminating pod still holds its host ports on mini.
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - {key: node-role.kubernetes.io/control-plane, operator: Exists}
     # Prometheus here only selects ServiceMonitors with this label.
     serviceMonitor:
       enabled: true

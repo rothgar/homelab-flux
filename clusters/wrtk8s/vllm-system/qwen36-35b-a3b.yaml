@@ -14,7 +14,7 @@ metadata:
   name: qwen36-35b-a3b
   namespace: vllm-system
 spec:
-  replicas: 1
+  # No replicas: KEDA owns the count (0 or 1). See qwen36-35b-a3b-scaler.yaml.
   strategy:
     type: Recreate
   selector:
@@ -184,20 +184,18 @@ spec:
             medium: Memory
             sizeLimit: 16Gi
 ---
+# In-cluster backend for the KEDA HTTP interceptor. Clients don't use this:
+# the LAN IP and tailnet name live on the interceptor-facing Service in
+# qwen36-35b-a3b-scaler.yaml so requests can wake the model from zero.
 apiVersion: v1
 kind: Service
 metadata:
-  name: qwen36-35b-a3b
+  name: qwen36-35b-a3b-backend
   namespace: vllm-system
-  annotations:
-    tailscale.com/expose: "true"
-    # Dot-free Tailscale hostname; unique so Aperture can register it as
-    # its own upstream (http://qwen36-35b-a3b.<tailnet>.ts.net:8000).
-    tailscale.com/hostname: "qwen36-35b-a3b"
 spec:
   selector:
     app: qwen36-35b-a3b
   ports:
-    - port: 8000
+    - name: http
+      port: 8000
       targetPort: http
-  type: LoadBalancer
