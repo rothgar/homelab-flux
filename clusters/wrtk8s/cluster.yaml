@@ -136,6 +136,7 @@ patches:
   - file: patches/spark-nvidia-modules.yaml
   - file: patches/gb10-nvidia.yaml
   - file: patches/kubelet.yaml
+  - file: patches/gr8.yaml
 ---
 kind: Machine
 systemExtensions:
@@ -154,6 +155,7 @@ patches:
   - file: patches/spark-nvidia-modules.yaml
   - file: patches/gb10-nvidia.yaml
   - file: patches/kubelet.yaml
+  - file: patches/gr8.yaml
 ---
 # 3d: RTX 3060 (Ampere, sm_86) — production driver variant, same as mini/spark.
 # Dedicated gaming node for Wolf (containerized Moonlight server). The `home`

@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - deepseek-v4-flash.yaml
   - minimax-m27-nvfp4.yaml
+  - qwen38-flash-next.yaml

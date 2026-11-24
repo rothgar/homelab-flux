@@ -1,0 +1,351 @@
+# Qwen3.8-Flash-Next (EXLR8 bit300 / K3) at TP=2 across spark and sparky, served by kindlingai/gr8
+# (recipe: github.com/kindlingai/qwen3.8-flash-next-exlr8-2x-spark). One rank per box over the ConnectX-7 link,
+# 8 concurrent chats of the full native 262,144-token context, MTP=3.
+#
+# Differences from gr8's own chart (deploy/k8s), which runs on the host network with mentatd on every box:
+# - Pods stay on the pod network. dranet moves both CX-7 rails into each pod and gives them static RoCE addresses
+#   (IPS/IPS2), so no Talos network config touches the CX-7 ports (a host-level CX-7 change bricked spark before).
+# - Peers mode: TP=2 and POOL lists both pods by DNS name (the chart's `tp` pool), so no mentatd.
+# - Rank 0 is pinned to spark and rank 1 to sparky: the rail addresses are per claim template, and each box keeps
+#   its part of the model in /var/mnt/model/gr8 (~141 GB).
+# Node prerequisites (patches/gr8.yaml): vm.compaction_proactiveness=0 and an unlimited memlock hard limit.
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaimTemplate
+metadata:
+  name: qwen38-flash-next-rank0
+  namespace: vllm-system
+spec:
+  spec:
+    devices:
+      requests:
+        - name: gpu
+          exactly:
+            deviceClassName: gpu.nvidia.com
+        - name: rail1
+          exactly:
+            deviceClassName: rdma.dra.net
+            selectors:
+              - cel:
+                  expression: device.attributes["dra.net"].ifName == "enp1s0f0np0"
+        - name: rail2
+          exactly:
+            deviceClassName: rdma.dra.net
+            selectors:
+              - cel:
+                  expression: device.attributes["dra.net"].ifName == "enP2p1s0f0np0"
+      config:
+        - requests: [rail1]
+          opaque:
+            driver: dra.net
+            parameters:
+              interface:
+                addresses: ["192.168.100.1/24"]
+                mtu: 9000
+        - requests: [rail2]
+          opaque:
+            driver: dra.net
+            parameters:
+              interface:
+                addresses: ["192.168.101.1/24"]
+                mtu: 9000
+---
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaimTemplate
+metadata:
+  name: qwen38-flash-next-rank1
+  namespace: vllm-system
+spec:
+  spec:
+    devices:
+      requests:
+        - name: gpu
+          exactly:
+            deviceClassName: gpu.nvidia.com
+        - name: rail1
+          exactly:
+            deviceClassName: rdma.dra.net
+            selectors:
+              - cel:
+                  expression: device.attributes["dra.net"].ifName == "enp1s0f0np0"
+        - name: rail2
+          exactly:
+            deviceClassName: rdma.dra.net
+            selectors:
+              - cel:
+                  expression: device.attributes["dra.net"].ifName == "enP2p1s0f0np0"
+      config:
+        - requests: [rail1]
+          opaque:
+            driver: dra.net
+            parameters:
+              interface:
+                addresses: ["192.168.100.2/24"]
+                mtu: 9000
+        - requests: [rail2]
+          opaque:
+            driver: dra.net
+            parameters:
+              interface:
+                addresses: ["192.168.101.2/24"]
+                mtu: 9000
+---
+# The launcher's options, the recipe's .env.example (K3 numbers' settings). Same on both ranks.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: qwen38-flash-next
+  namespace: vllm-system
+data:
+  GR8_MODEL: qw38
+  MODEL: https://huggingface.co/kindlingai/Qwen3.8-Flash-Next-exlr8@4943478fdd54d8a59f2f9824b2389799e79f564b
+  VARIANT: bit300
+  # Rank order: rank 0 (spark) first. Must match the claim templates above.
+  IPS: 192.168.100.1,192.168.100.2
+  IPS2: 192.168.101.1,192.168.101.2
+  READY_TMO: "1800"
+  CAP: "262208"
+  MAX_MODEL_LEN: "262144"
+  SESS: "8"
+  MTP: "3"
+  EXTRA_ENV: GR8_QW38_PLE_CACHE_MIB=4096
+---
+apiVersion: leaderworkerset.x-k8s.io/v1
+kind: LeaderWorkerSet
+metadata:
+  name: qwen38-flash-next
+  namespace: vllm-system
+spec:
+  replicas: 1
+  leaderWorkerTemplate:
+    size: 2
+    # A failed rank stops both boxes; recreate the pair, which boots again from the local caches.
+    restartPolicy: RecreateGroupOnPodRestart
+    leaderTemplate:
+      metadata:
+        labels:
+          app.kubernetes.io/name: qwen38-flash-next
+          app.kubernetes.io/component: leader
+      spec:
+        runtimeClassName: nvidia
+        nodeSelector:
+          kubernetes.io/hostname: spark
+        # Pod DNS inherits the node's jgarr.net search suffix; ndots:1 keeps huggingface.co from resolving to the
+        # *.jgarr.net wildcard.
+        dnsConfig:
+          options:
+            - name: ndots
+              value: "1"
+        securityContext:
+          seccompProfile:
+            type: RuntimeDefault
+        resourceClaims:
+          - name: fabric
+            resourceClaimTemplateName: qwen38-flash-next-rank0
+        containers:
+          - name: gr8
+            image: ghcr.io/kindlingai/gr8:v1.2.0
+            envFrom:
+              - configMapRef:
+                  name: qwen38-flash-next
+            env:
+              # Peers mode: both ranks by DNS name, rank 0 first.
+              - name: TP
+                value: "2"
+              - name: POOL
+                value: qwen38-flash-next-0.qwen38-flash-next.vllm-system.svc.cluster.local,qwen38-flash-next-0-1.qwen38-flash-next.vllm-system.svc.cluster.local
+              - name: GR8_WORK_DIR
+                value: /var/lib/gr8/home
+              - name: MODEL_CACHE
+                value: /var/lib/gr8/cache
+              - name: PY
+                value: /usr/bin/python3
+              - name: FRONT_BIN
+                value: /opt/gr8/bin/g6front-rs
+            ports:
+              - name: api
+                containerPort: 8100
+              - name: control
+                containerPort: 7340
+              - name: s2
+                containerPort: 7341
+            # Ready once the cluster serves (on rank 0, once the API answers too). A cold boot downloads ~141 GB.
+            startupProbe:
+              exec:
+                command: [/bin/sh, -c, 'exec /opt/gr8/gr8 "$GR8_MODEL" health']
+              periodSeconds: 30
+              timeoutSeconds: 5
+              failureThreshold: 480
+            readinessProbe:
+              exec:
+                command: [/bin/sh, -c, 'exec /opt/gr8/gr8 "$GR8_MODEL" health']
+              periodSeconds: 30
+              timeoutSeconds: 5
+            # The image's uid 1000, IPC_LOCK for pinned memory, read-only image with a private /tmp (as gr8's chart).
+            securityContext:
+              runAsUser: 1000
+              runAsGroup: 1000
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop: [ALL]
+                add: [IPC_LOCK]
+            resources:
+              requests:
+                memory: 100Gi
+              claims:
+                - name: fabric
+            volumeMounts:
+              - name: cache
+                mountPath: /var/lib/gr8/cache
+              - name: home
+                mountPath: /var/lib/gr8/home
+              - name: shm
+                mountPath: /dev/shm
+              - name: tmp
+                mountPath: /tmp
+              - name: dispram
+                mountPath: /run/dispram
+        volumes:
+          # Must exist, owned by uid 1000 (fsGroup does not reach a hostPath).
+          - name: cache
+            hostPath:
+              path: /var/mnt/model/gr8/cache
+              type: Directory
+          - name: home
+            hostPath:
+              path: /var/mnt/model/gr8/home
+              type: Directory
+          - name: dispram
+            hostPath:
+              path: /run/dispram
+              type: DirectoryOrCreate
+          - name: shm
+            emptyDir:
+              medium: Memory
+          - name: tmp
+            emptyDir:
+              sizeLimit: 1Gi
+    workerTemplate:
+      metadata:
+        labels:
+          app.kubernetes.io/name: qwen38-flash-next
+          app.kubernetes.io/component: worker
+      spec:
+        runtimeClassName: nvidia
+        # Pod DNS inherits the node's jgarr.net search suffix; ndots:1 keeps huggingface.co from resolving to the
+        # *.jgarr.net wildcard.
+        dnsConfig:
+          options:
+            - name: ndots
+              value: "1"
+        securityContext:
+          seccompProfile:
+            type: RuntimeDefault
+        containers:
+          - name: gr8
+            image: ghcr.io/kindlingai/gr8:v1.2.0
+            envFrom:
+              - configMapRef:
+                  name: qwen38-flash-next
+            env:
+              # Peers mode: both ranks by DNS name, rank 0 first.
+              - name: TP
+                value: "2"
+              - name: POOL
+                value: qwen38-flash-next-0.qwen38-flash-next.vllm-system.svc.cluster.local,qwen38-flash-next-0-1.qwen38-flash-next.vllm-system.svc.cluster.local
+              - name: GR8_WORK_DIR
+                value: /var/lib/gr8/home
+              - name: MODEL_CACHE
+                value: /var/lib/gr8/cache
+              - name: PY
+                value: /usr/bin/python3
+              - name: FRONT_BIN
+                value: /opt/gr8/bin/g6front-rs
+            ports:
+              - name: api
+                containerPort: 8100
+              - name: control
+                containerPort: 7340
+              - name: s2
+                containerPort: 7341
+            # Ready once the cluster serves (on rank 0, once the API answers too). A cold boot downloads ~141 GB.
+            startupProbe:
+              exec:
+                command: [/bin/sh, -c, 'exec /opt/gr8/gr8 "$GR8_MODEL" health']
+              periodSeconds: 30
+              timeoutSeconds: 5
+              failureThreshold: 480
+            readinessProbe:
+              exec:
+                command: [/bin/sh, -c, 'exec /opt/gr8/gr8 "$GR8_MODEL" health']
+              periodSeconds: 30
+              timeoutSeconds: 5
+            # The image's uid 1000, IPC_LOCK for pinned memory, read-only image with a private /tmp (as gr8's chart).
+            securityContext:
+              runAsUser: 1000
+              runAsGroup: 1000
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop: [ALL]
+                add: [IPC_LOCK]
+            resources:
+              requests:
+                memory: 100Gi
+              claims:
+                - name: fabric
+            volumeMounts:
+              - name: cache
+                mountPath: /var/lib/gr8/cache
+              - name: home
+                mountPath: /var/lib/gr8/home
+              - name: shm
+                mountPath: /dev/shm
+              - name: tmp
+                mountPath: /tmp
+              - name: dispram
+                mountPath: /run/dispram
+        volumes:
+          # Must exist, owned by uid 1000 (fsGroup does not reach a hostPath).
+          - name: cache
+            hostPath:
+              path: /var/mnt/model/gr8/cache
+              type: Directory
+          - name: home
+            hostPath:
+              path: /var/mnt/model/gr8/home
+              type: Directory
+          - name: dispram
+            hostPath:
+              path: /run/dispram
+              type: DirectoryOrCreate
+          - name: shm
+            emptyDir:
+              medium: Memory
+          - name: tmp
+            emptyDir:
+              sizeLimit: 1Gi
+        nodeSelector:
+          kubernetes.io/hostname: sparky
+        resourceClaims:
+          - name: fabric
+            resourceClaimTemplateName: qwen38-flash-next-rank1
+---
+# The OpenAI API on rank 0, on the tailnet as qwen38-flash-next (port 8000 like the other models). The LeaderWorkerSet
+# makes its own headless Service named qwen38-flash-next for the ranks, so this one takes a different name.
+apiVersion: v1
+kind: Service
+metadata:
+  name: qwen38-flash-next-api
+  namespace: vllm-system
+  annotations:
+    tailscale.com/expose: "true"
+    tailscale.com/hostname: "qwen38-flash-next"
+spec:
+  selector:
+    app.kubernetes.io/name: qwen38-flash-next
+    app.kubernetes.io/component: leader
+  ports:
+    - name: http
+      port: 8000
+      targetPort: api
