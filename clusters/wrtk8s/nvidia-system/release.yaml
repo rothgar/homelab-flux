@@ -34,3 +34,5 @@ spec:
         enabled: false
         additionalLabels:
           release: kube-prometheus-stack
+  upgrade:
+    disableWait: true
