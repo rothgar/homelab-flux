@@ -100,6 +100,14 @@
       "description": "Auto-merge Traefik chart minor/patch bumps in the 02:00-06:00 PT window: it fronts every *.jgarr.net host, so a bad rollout should land while nobody is using it. Majors still need review (42.4 changed the service schema and stalled the HelmRelease)."
     },
     {
+      "matchManagers": ["flux"],
+      "matchDepNames": ["nodenap", "ghcr.io/rothgar/charts/nodenap"],
+      "matchUpdateTypes": ["major", "minor", "patch", "digest"],
+      "automerge": true,
+      "platformAutomerge": true,
+      "description": "Auto-merge every nodenap chart release (our own project, oci://ghcr.io/rothgar/charts) as soon as the kustomize render check passes."
+    },
+    {
       "matchDepNames": ["nvcr.io/nvidia/vllm"],
       "allowedVersions": "/^(2[0-5]\\.\\d+|26\\.0[0-4])-py\\d+$/",
       "description": "Pin nvcr.io/nvidia/vllm — 26.06 segfaults in cuStreamCreateWithPriority on GB10 with driver 595. Docker versioning can't parse the -py3 suffix, so allowedVersions is a regex allowing 20.xx-py* through 26.04-py*."
