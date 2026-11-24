@@ -1,3 +1,6 @@
+# Reference copy only, NOT deployed. The live file is
+# /romm/config/config.yml on the romm-config PVC and RomM's UI edits it.
+# Sync by hand: kubectl -n romm exec deploy/romm -- cat /romm/config/config.yml
 # RomM library layout. The Synology share is an old ES-DE/EmuDeck tree:
 # most platforms are {platform}/roms/{game} with BIOS in {platform}/bios,
 # but newer dumps sit directly in the platform folder.

@@ -8,8 +8,3 @@ resources:
   - deployment.yaml
   - ingress.yaml
   - tailscale-ingress.yaml
-configMapGenerator:
-  - name: romm-config-yml
-    namespace: romm
-    files:
-      - config.yml
