@@ -51,6 +51,13 @@ spec:
             - name: home
               mountPath: /var/BlackmagicDesign
               subPath: .fenrir/var-blackmagicdesign
+            # Resolve Studio's RLM activation is bound to the native hostid, which glibc
+            # derives from the pod IP when /etc/hostid is absent, so every new pod lost
+            # the license. Pin it (value from the pod Studio was re-activated in).
+            - name: home
+              mountPath: /etc/hostid
+              subPath: .fenrir/hostid
+              readOnly: true
             - name: egl-glvnd-nvidia
               mountPath: /usr/share/glvnd/egl_vendor.d/10_nvidia.json
               subPath: 10_nvidia.json
