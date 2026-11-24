@@ -15,12 +15,3 @@ if [ -d /opt/resolve/bin ]; then
   mkdir -p "/var/BlackmagicDesign/DaVinci Resolve"
   chown -R "${PUID:-1000}:${PGID:-1000}" /var/BlackmagicDesign
 fi
-# Resolve Studio's RLM activation checks the native hostid (pinned via
-# /etc/hostid) and the ethernet MAC; a pod's eth0 gets a random MAC every time,
-# which invalidated the activation. Pin it (needs NET_ADMIN; veth allows a
-# live change without dropping connectivity).
-if [ -n "${FIXED_MAC:-}" ] && [ "$(cat /sys/class/net/eth0/address)" != "$FIXED_MAC" ]; then
-  ip link set dev eth0 address "$FIXED_MAC" \
-    && gow_log "eth0 MAC pinned to $FIXED_MAC" \
-    || gow_log "could not pin eth0 MAC to $FIXED_MAC"
-fi
