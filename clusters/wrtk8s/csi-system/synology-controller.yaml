@@ -84,11 +84,13 @@ spec:
     spec:
       serviceAccountName: csi-controller-sa
       hostNetwork: true
+      # Only the control-plane taint: tolerating every taint lets the
+      # StatefulSet recreate this pod on a cordoned node, so nodenap's drain
+      # never finishes and the machine can't be powered off.
       tolerations:
-        - operator: Exists
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
           effect: NoSchedule
-        - operator: Exists
-          effect: NoExecute
       containers:
         - name: csi-provisioner
           securityContext:
