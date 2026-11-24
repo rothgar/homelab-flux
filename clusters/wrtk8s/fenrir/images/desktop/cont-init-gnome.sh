@@ -15,3 +15,13 @@ if [ -d /opt/resolve/bin ]; then
   mkdir -p "/var/BlackmagicDesign/DaVinci Resolve"
   chown -R "${PUID:-1000}:${PGID:-1000}" /var/BlackmagicDesign
 fi
+# GNOME runs thumbnailers and glycin image decoders (Nautilus previews, Loupe)
+# in bwrap --unshare-all, which mounts a fresh /proc. The NVIDIA container
+# toolkit/CDI overmounts /proc/driver/nvidia/params, and the kernel refuses a
+# new proc mount while one is layered over the old one. Needs the privileged
+# container (see desktop.yaml).
+if mountpoint -q /proc/driver/nvidia/params 2>/dev/null; then
+  umount /proc/driver/nvidia/params \
+    && gow_log "unmounted /proc/driver/nvidia/params for bwrap" \
+    || gow_log "could not unmount /proc/driver/nvidia/params; previews and image viewers will fail"
+fi
