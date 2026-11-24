@@ -12,3 +12,23 @@ metadata:
 spec:
   externalName: unused  # tailscale operator rewrites this
   type: ExternalName
+---
+# The operator's egress Service is headless (resolves to the proxy pod IP,
+# which changes on restart). This pins a stable ClusterIP in front of the
+# proxy pod so the romm Deployment's hostAlias can point at it.
+apiVersion: v1
+kind: Service
+metadata:
+  name: romm-tsidp-egress
+  namespace: tailscale
+spec:
+  clusterIP: 10.96.200.43
+  selector:
+    tailscale.com/managed: "true"
+    tailscale.com/parent-resource: tsidp
+    tailscale.com/parent-resource-ns: romm
+    tailscale.com/parent-resource-type: svc
+  ports:
+    - name: https
+      port: 443
+      targetPort: 443

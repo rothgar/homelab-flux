@@ -69,6 +69,11 @@ spec:
       # Service "romm" would inject ROMM_PORT=tcp://..., which RomM reads as
       # its nginx listen port.
       enableServiceLinks: false
+      # Pods can't resolve *.ts.net; route tsidp through the tailscale egress
+      # proxy (romm-tsidp-egress in tsidp-egress.yaml).
+      hostAliases:
+        - ip: 10.96.200.43
+          hostnames: [tsidp.gerbil-dragon.ts.net]
       securityContext:
         seccompProfile:
           type: RuntimeDefault
@@ -80,6 +85,18 @@ spec:
           envFrom:
             - secretRef:
                 name: romm-credentials
+          env:
+            - name: OIDC_ENABLED
+              value: "true"
+            - name: OIDC_PROVIDER
+              value: Tailscale
+            - name: OIDC_SERVER_APPLICATION_URL
+              value: https://tsidp.gerbil-dragon.ts.net
+            - name: OIDC_REDIRECT_URI
+              value: https://rom.jgarr.net/api/oauth/openid
+            # tsidp emits `username`, not `preferred_username`.
+            - name: OIDC_USERNAME_ATTRIBUTE
+              value: username
           volumeMounts:
             - name: resources
               mountPath: /romm/resources
