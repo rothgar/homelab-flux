@@ -36,6 +36,9 @@ spec:
           pod:
             nodeSelector:
               kubernetes.io/arch: amd64
+            hostAliases:
+              - ip: 10.96.200.43  # tsidp egress (romm/tsidp-egress.yaml)
+                hostnames: [tsidp.gerbil-dragon.ts.net]
           containers:
             main:
               image:
@@ -61,8 +64,8 @@ spec:
               readOnly: true
         mail-config:
           enabled: true
-          type: configMap
-          name: immich-mail-config
+          type: secret
+          name: immich-config
           globalMounts:
             - path: /etc/immich
               readOnly: true

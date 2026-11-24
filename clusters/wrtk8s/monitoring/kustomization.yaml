@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - source.yaml
+  - grafana-external-secrets.yaml
   - release.yaml
   - httproute.yaml
   - alerting-rules.yaml

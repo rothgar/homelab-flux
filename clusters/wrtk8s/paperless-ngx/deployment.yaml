@@ -28,6 +28,9 @@ spec:
         runAsGroup: 65534
         fsGroup: 65534
       automountServiceAccountToken: false
+      hostAliases:
+        - ip: 10.96.200.43  # tsidp egress (romm/tsidp-egress.yaml)
+          hostnames: [tsidp.gerbil-dragon.ts.net]
       containers:
         - name: paperless-ngx
           image: ghcr.io/paperless-ngx/paperless-ngx:3.5.1
@@ -61,6 +64,15 @@ spec:
               value: America/Los_Angeles
             - name: PAPERLESS_OCR_LANGUAGE
               value: eng
+            # Tailscale login via tsidp (provider JSON with client creds comes
+            # from the paperless-oidc Secret).
+            - name: PAPERLESS_APPS
+              value: allauth.socialaccount.providers.openid_connect
+            - name: PAPERLESS_SOCIALACCOUNT_PROVIDERS
+              valueFrom:
+                secretKeyRef:
+                  name: paperless-oidc
+                  key: providers
             - name: PAPERLESS_ADMIN_USER
               valueFrom:
                 secretKeyRef:

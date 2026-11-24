@@ -1,9 +1,8 @@
-# Mailwip SMTP credentials + JSON config file for Immich.
+# Mailwip SMTP credentials + Immich's config file.
 #
-# Immich reads notification settings from its Postgres DB, but a config
-# file at IMMICH_CONFIG_FILE overrides them on every startup. Env-var
-# substitution (${VAR}) inside the JSON pulls the password from this
-# Secret without baking it into the ConfigMap.
+# A config file at IMMICH_CONFIG_FILE overrides the DB settings on every
+# startup. Immich does NOT expand ${VAR} in it, so the whole file is
+# rendered by ESO into the immich-config Secret with real values.
 ---
 apiVersion: external-secrets.io/v1
 kind: ExternalSecret
@@ -22,26 +21,62 @@ spec:
       remoteRef:
         key: mailwip-smtp/password
 ---
-apiVersion: v1
-kind: ConfigMap
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
 metadata:
-  name: immich-mail-config
+  name: immich-config
   namespace: immich
-data:
-  config.json: |
-    {
-      "notifications": {
-        "smtp": {
-          "enabled": true,
-          "from": "Immich <noreply@jgarr.net>",
-          "replyTo": "noreply@jgarr.net",
-          "transport": {
-            "ignoreCert": false,
-            "host": "smtp.hanami.run",
-            "port": 587,
-            "username": "noreply@jgarr.net",
-            "password": "${SMTP_PASSWORD}"
+spec:
+  refreshInterval: 12h
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: onepassword
+  target:
+    name: immich-config
+    template:
+      engineVersion: v2
+      data:
+        config.json: |
+          {
+            "notifications": {
+              "smtp": {
+                "enabled": true,
+                "from": "Immich <noreply@jgarr.net>",
+                "replyTo": "noreply@jgarr.net",
+                "transport": {
+                  "ignoreCert": false,
+                  "host": "smtp.hanami.run",
+                  "port": 587,
+                  "username": "noreply@jgarr.net",
+                  "password": {{ .smtpPassword | toJson }}
+                }
+              }
+            },
+            "oauth": {
+              "enabled": true,
+              "issuerUrl": "https://tsidp.gerbil-dragon.ts.net",
+              "clientId": {{ .oauthClientId | toJson }},
+              "clientSecret": {{ .oauthClientSecret | toJson }},
+              "scope": "openid email profile",
+              "tokenEndpointAuthMethod": "client_secret_post",
+              "buttonText": "Login with Tailscale",
+              "autoRegister": true,
+              "autoLaunch": false,
+              "storageLabelClaim": "username",
+              "mobileOverrideEnabled": true,
+              "mobileRedirectUri": "https://immich.jgarr.net/api/oauth/mobile-redirect"
+            },
+            "passwordLogin": {
+              "enabled": true
+            }
           }
-        }
-      }
-    }
+  data:
+    - secretKey: smtpPassword
+      remoteRef:
+        key: mailwip-smtp/password
+    - secretKey: oauthClientId
+      remoteRef:
+        key: immich_immich-oidc/client-id
+    - secretKey: oauthClientSecret
+      remoteRef:
+        key: immich_immich-oidc/client-secret

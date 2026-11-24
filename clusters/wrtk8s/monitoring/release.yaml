@@ -55,7 +55,19 @@ spec:
     # Grafana configuration
     grafana:
       enabled: true
-      adminPassword: admin
+      # Local admin is break-glass only; normal login is Tailscale via tsidp.
+      admin:
+        existingSecret: grafana-admin
+        userKey: admin-user
+        passwordKey: admin-password
+      # Client creds + role mapping (keeps the admin email out of git).
+      envFromSecrets:
+        - name: grafana-oauth
+      # Pods can't resolve *.ts.net; route tsidp via the pinned egress IP
+      # (romm/tsidp-egress.yaml).
+      hostAliases:
+        - ip: 10.96.200.43
+          hostnames: [tsidp.gerbil-dragon.ts.net]
       persistence:
         enabled: true
         size: 1Gi
@@ -72,6 +84,22 @@ spec:
         auth.anonymous:
           enabled: true
           org_role: Viewer
+        server:
+          root_url: https://grafana.jgarr.net
+        auth.generic_oauth:
+          enabled: true
+          name: Tailscale
+          allow_sign_up: true
+          auto_login: false
+          scopes: openid profile email
+          auth_url: https://tsidp.gerbil-dragon.ts.net/authorize
+          token_url: https://tsidp.gerbil-dragon.ts.net/token
+          api_url: https://tsidp.gerbil-dragon.ts.net/userinfo
+          use_pkce: true
+          email_attribute_path: email
+          login_attribute_path: username
+          name_attribute_path: username
+          allow_assign_grafana_admin: true
       dashboardProviders:
         dashboardproviders.yaml:
           apiVersion: 1

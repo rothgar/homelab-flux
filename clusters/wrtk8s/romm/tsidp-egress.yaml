@@ -1,7 +1,8 @@
 ---
-# Tailscale operator egress to tsidp. Pods can't resolve *.ts.net, so the
-# romm Deployment pins tsidp.gerbil-dragon.ts.net to this proxy's ClusterIP
-# via hostAliases (TLS still verifies against the real tsidp cert).
+# Tailscale operator egress to tsidp, shared by every tsidp OIDC client
+# (romm, grafana, paperless-ngx, mealie, immich). Pods can't resolve
+# *.ts.net, so those pods pin tsidp.gerbil-dragon.ts.net to the stable
+# ClusterIP below via hostAliases (TLS still verifies against tsidp's cert).
 apiVersion: v1
 kind: Service
 metadata:

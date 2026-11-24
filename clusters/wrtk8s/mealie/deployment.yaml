@@ -30,6 +30,9 @@ spec:
             - name: data
               mountPath: /app/data
       automountServiceAccountToken: false
+      hostAliases:
+        - ip: 10.96.200.43  # tsidp egress (romm/tsidp-egress.yaml)
+          hostnames: [tsidp.gerbil-dragon.ts.net]
       securityContext:
         seccompProfile:
           type: RuntimeDefault
@@ -49,6 +52,22 @@ spec:
               value: "false"
             - name: DB_ENGINE
               value: sqlite
+            # Tailscale login via tsidp. tsidp has no `name` claim.
+            - name: OIDC_AUTH_ENABLED
+              value: "true"
+            - name: OIDC_PROVIDER_NAME
+              value: Tailscale
+            - name: OIDC_CONFIGURATION_URL
+              value: https://tsidp.gerbil-dragon.ts.net/.well-known/openid-configuration
+            - name: OIDC_SIGNUP_ENABLED
+              value: "true"
+            - name: OIDC_USER_CLAIM
+              value: email
+            - name: OIDC_NAME_CLAIM
+              value: username
+          envFrom:
+            - secretRef:
+                name: mealie-oidc
           ports:
             - containerPort: 9000
               name: http
