@@ -102,6 +102,19 @@ spec:
             # ingress is tailnet-only.
             - name: KIOSK_MODE
               value: "true"
+            # Keyless metadata sources (IGDB creds come from romm-credentials).
+            - name: HASHEOUS_API_ENABLED
+              value: "true"
+            - name: LAUNCHBOX_API_ENABLED
+              value: "true"
+            - name: PLAYMATCH_API_ENABLED
+              value: "true"
+            - name: TGDB_API_ENABLED
+              value: "true"
+            - name: HLTB_API_ENABLED
+              value: "true"
+            - name: FLASHPOINT_API_ENABLED
+              value: "true"
           volumeMounts:
             - name: resources
               mountPath: /romm/resources
