@@ -1,0 +1,14 @@
+---
+# Tailscale operator egress to tsidp. Pods can't resolve *.ts.net, so the
+# romm Deployment pins tsidp.gerbil-dragon.ts.net to this proxy's ClusterIP
+# via hostAliases (TLS still verifies against the real tsidp cert).
+apiVersion: v1
+kind: Service
+metadata:
+  name: tsidp
+  namespace: romm
+  annotations:
+    tailscale.com/tailnet-fqdn: tsidp.gerbil-dragon.ts.net
+spec:
+  externalName: unused  # tailscale operator rewrites this
+  type: ExternalName

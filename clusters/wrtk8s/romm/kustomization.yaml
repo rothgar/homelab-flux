@@ -8,3 +8,4 @@ resources:
   - deployment.yaml
   - ingress.yaml
   - tailscale-ingress.yaml
+  - tsidp-egress.yaml
