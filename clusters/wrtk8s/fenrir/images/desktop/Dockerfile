@@ -24,6 +24,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       adwaita-icon-theme yaru-theme-gtk yaru-theme-icon yaru-theme-gnome-shell \
       yaru-theme-sound ubuntu-wallpapers fonts-ubuntu \
       firefox unzip \
+      loupe ffmpegthumbnailer gnome-sushi totem ffmpeg \
+      gstreamer1.0-libav gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly \
       # DaVinci Resolve runtime deps
       libapr1t64 libaprutil1t64 libasound2t64 libglib2.0-0t64 \
       libxcb-composite0 libxcb-cursor0 libxcb-damage0 libxcb-xinerama0 \

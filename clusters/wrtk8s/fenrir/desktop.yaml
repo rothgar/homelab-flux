@@ -40,6 +40,8 @@ spec:
             - { name: TZ, value: America/Los_Angeles }
             - { name: RUN_SWAY, value: "1" }
             - { name: DESKTOP_APP, value: gnome }
+            # Fixed eth0 MAC for Resolve Studio activation (see images/desktop/cont-init-gnome.sh).
+            - { name: FIXED_MAC, value: "02:42:4c:6f:67:61" }
             - { name: NVIDIA_DRIVER_CAPABILITIES, value: all }
             - { name: GBM_BACKENDS_PATH, value: /usr/lib/gbm }
           volumeMounts:
