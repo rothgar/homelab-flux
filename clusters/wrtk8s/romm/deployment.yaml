@@ -66,6 +66,9 @@ spec:
         app: romm
     spec:
       automountServiceAccountToken: false
+      # Service "romm" would inject ROMM_PORT=tcp://..., which RomM reads as
+      # its nginx listen port.
+      enableServiceLinks: false
       securityContext:
         seccompProfile:
           type: RuntimeDefault
