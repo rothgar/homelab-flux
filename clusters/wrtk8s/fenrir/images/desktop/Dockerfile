@@ -43,5 +43,12 @@ COPY cont-init-gnome.sh /etc/cont-init.d/40-gnome.sh
 COPY sway-gnome.conf /etc/sway/config.d/gnome.conf
 COPY resolve.desktop /usr/share/applications/com.blackmagicdesign.resolve.desktop
 COPY 90-fenrir.gschema.override /usr/share/glib-2.0/schemas/
+# NVIDIA 595 EGL needs its external platform libraries registered: Wayland
+# via egl-wayland2 (the base image's egl-wayland 1.x json fails) and X11 via
+# egl-xlib/xcb (no json at all). Without them glvnd falls back to Mesa zink,
+# which can't import NVIDIA dmabufs, so GNOME (nested on sway's Xwayland)
+# drew no GPU-rendered app windows. The libraries come from the NVIDIA
+# container toolkit.
+COPY 09_nvidia_wayland2.json 20_nvidia_xlib.json 20_nvidia_xcb.json /usr/share/egl/egl_external_platform.d/
 RUN chmod +x /opt/gow/startup-app.sh /opt/gow/gnome-session.sh /etc/cont-init.d/40-gnome.sh && \
     glib-compile-schemas /usr/share/glib-2.0/schemas
