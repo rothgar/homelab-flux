@@ -3,7 +3,8 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - qwen36-35b-a3b.yaml
-  - qwen36-35b-a3b-scaler.yaml
+  # Disabled: sparky runs rank 1 of qwen38-flash-next. Re-add (and drop replicas: 0 in qwen36-35b-a3b.yaml) to bring back.
+  # - qwen36-35b-a3b-scaler.yaml
   - ds41-flash.yaml
   - qwen36-35b-nvfp4.yaml
   - qwen38-27b-nvfp4.yaml

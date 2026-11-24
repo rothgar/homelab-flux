@@ -9,6 +9,9 @@
 # - Rank 0 is pinned to spark and rank 1 to sparky: the rail addresses are per claim template, and each box keeps
 #   its part of the model in /var/mnt/model/gr8 (~141 GB).
 # Node prerequisites (patches/gr8.yaml): vm.compaction_proactiveness=0 and an unlimited memlock hard limit.
+# No runtimeClassName: the GPU comes through the gpu.nvidia.com DRA claim (CDI) under the default runtime. The
+# `nvidia` runtime class does not get Talos's CRIBaseRuntimeSpecConfig, so its pods keep the 8 MiB memlock limit and
+# gr8's entrypoint exits 2.
 apiVersion: resource.k8s.io/v1
 kind: ResourceClaimTemplate
 metadata:
@@ -126,7 +129,6 @@ spec:
           app.kubernetes.io/name: qwen38-flash-next
           app.kubernetes.io/component: leader
       spec:
-        runtimeClassName: nvidia
         nodeSelector:
           kubernetes.io/hostname: spark
         # Pod DNS inherits the node's jgarr.net search suffix; ndots:1 keeps huggingface.co from resolving to the
@@ -231,7 +233,6 @@ spec:
           app.kubernetes.io/name: qwen38-flash-next
           app.kubernetes.io/component: worker
       spec:
-        runtimeClassName: nvidia
         # Pod DNS inherits the node's jgarr.net search suffix; ndots:1 keeps huggingface.co from resolving to the
         # *.jgarr.net wildcard.
         dnsConfig:
