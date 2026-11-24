@@ -37,6 +37,7 @@ spec:
           # Steam's pressure-vessel runtime uses bwrap namespaces; same
           # privileges Wolf's stock steam app config grants.
           securityContext:
+            privileged: true
             capabilities:
               add: [SYS_ADMIN, SYS_NICE, SYS_PTRACE, NET_RAW, MKNOD, NET_ADMIN]
             seccompProfile:
