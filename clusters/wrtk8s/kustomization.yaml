@@ -12,6 +12,7 @@ resources:
   - external-secrets
   - flannel
   - flux-system
+  - gateway-api
   - frigate
   - headlamp
   - hermes-agent

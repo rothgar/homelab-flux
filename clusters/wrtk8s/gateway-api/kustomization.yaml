@@ -1,0 +1,7 @@
+# Gateway API CRDs (standard channel), vendored from
+# https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.7.0/standard-install.yaml
+# Traefik's chart stopped shipping these; chart 43 (Proxy v3.8) needs v1.7.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - standard-install-v1.7.0.yaml
