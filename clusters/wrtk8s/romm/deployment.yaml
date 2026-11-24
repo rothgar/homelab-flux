@@ -88,6 +88,11 @@ spec:
               mountPath: /romm/assets
             - name: config
               mountPath: /romm/config
+            # Layout is managed in git; RomM UI edits to config.yml won't persist.
+            - name: config-yml
+              mountPath: /romm/config/config.yml
+              subPath: config.yml
+              readOnly: true
       volumes:
         - name: resources
           persistentVolumeClaim:
@@ -104,6 +109,9 @@ spec:
         - name: config
           persistentVolumeClaim:
             claimName: romm-config
+        - name: config-yml
+          configMap:
+            name: romm-config-yml
 ---
 apiVersion: v1
 kind: Service

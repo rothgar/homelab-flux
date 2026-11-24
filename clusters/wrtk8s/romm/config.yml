@@ -1,0 +1,26 @@
+# RomM library layout. The Synology share is an old ES-DE/EmuDeck tree:
+# most platforms are {platform}/roms/{game} with BIOS in {platform}/bios,
+# but newer dumps sit directly in the platform folder.
+filesystem:
+  structure:
+    default: "{platform}/roms/{game}"
+    firmware: "{platform}/bios"
+    dreamcast: "{platform}/{game}"
+    gamecube: "{platform}/{game}"
+    mame: "{platform}/{game}"
+    ps2: "{platform}/{game}"
+    ps3: "{platform}/{game}"
+    switch: "{platform}/{game}"
+    vita: "{platform}/{game}"
+    xbox: "{platform}/{game}"
+system:
+  platforms:
+    segaGG: gamegear
+    segaSG: sg1000
+    vb: virtualboy
+    ws: wonderswan
+exclude:
+  platforms: ["bios", "config", "hashes", "main", "scripts", "tools"]
+  roms:
+    single_file:
+      names: ["systeminfo.txt"]
