@@ -8,6 +8,8 @@ filesystem:
   structure:
     default: "{platform}/roms/{game}"
     firmware: "{platform}/bios"
+    PS1: "{platform}/{game}"
+    PSP: "{platform}/{game}"
     dreamcast: "{platform}/{game}"
     gamecube: "{platform}/{game}"
     mame: "{platform}/{game}"
@@ -18,12 +20,13 @@ filesystem:
     xbox: "{platform}/{game}"
 system:
   platforms:
+    PS1: psx
     segaGG: gamegear
     segaSG: sg1000
     vb: virtualboy
     ws: wonderswan
 exclude:
-  platforms: ["bios", "config", "hashes", "main", "scripts", "tools"]
+  platforms: [".ipfs", "bios", "config", "hashes", "main", "scripts", "tools"]
   roms:
     single_file:
       names: ["systeminfo.txt"]
