@@ -97,6 +97,11 @@ spec:
             # tsidp emits `username`, not `preferred_username`.
             - name: OIDC_USERNAME_ATTRIBUTE
               value: username
+            # Anonymous read-only browsing (includes ROM/BIOS downloads). Safe only
+            # because rom.jgarr.net is LAN-only (10.1.1.152) and the ts.net
+            # ingress is tailnet-only.
+            - name: KIOSK_MODE
+              value: "true"
           volumeMounts:
             - name: resources
               mountPath: /romm/resources
