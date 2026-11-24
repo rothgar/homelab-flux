@@ -8,6 +8,11 @@ spec:
   # (kubectl get powerpolicy / machines show PLANNED and WOULD).
   dryRun: false
   minNodesOn: 2
+  # One anonymous report a day (energy saved, machine-hours off, wakes; no
+  # names, addresses or prices) to the public total. The payload is logged.
+  telemetry:
+    enabled: true
+    endpoint: https://nodenap-collector.123dev.workers.dev/report
   ignorePods:
     # Hardware manager for the Tenstorrent box; not a reason to keep it on.
     - namespace: tt-operator-system
