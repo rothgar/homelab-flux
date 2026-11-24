@@ -8,11 +8,15 @@ spec:
   chart:
     spec:
       chart: traefik
-      version: "42.4.3"
+      version: "43.0.0"
       sourceRef:
         kind: HelmRepository
         name: traefik
         namespace: traefik
+  # Apply the chart's own CRDs on upgrade (Flux default is Skip). Gateway API
+  # CRDs are not in the chart; they're vendored in ../gateway-api.
+  upgrade:
+    crds: CreateReplace
   values:
     service:
       # Chart 42.4 moved the type under service.spec (strict schema).
