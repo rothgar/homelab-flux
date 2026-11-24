@@ -15,9 +15,6 @@ spec:
   apps:
     - name: desktop
     - name: steam
-    - name: steam-gamescope
-    - name: davinci-resolve
-    - name: firefox
   pairings:
     # s (workstation), paired 2026-11-17.
     - name: c6e28ec19461649c1ed5b50be3ce912fb85747ed9ebb17bd87783de5f24ee700

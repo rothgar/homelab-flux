@@ -1,6 +1,7 @@
-# Steam picks up the restored Debian-style install at
-# ~/.steam/debian-installation; /dev/shm must be large or steamwebhelper
-# crash-loops.
+# Steam in a Steam Deck-style Gamescope session (RUN_GAMESCOPE=1): one compositor
+# between the game and Wolf, plus MangoApp, VRS and Steam's Gamescope scaling.
+# Steam picks up the restored Debian-style install at ~/.steam/debian-installation;
+# /dev/shm must be large or steamwebhelper crash-loops.
 apiVersion: direwolf.games-on-whales.github.io/v1alpha1
 kind: App
 metadata:
@@ -34,12 +35,12 @@ spec:
               type: Unconfined
           env:
             # Run as logan so paths baked into the restored home resolve.
-            - { name: UNAME, value: logan }
-            - { name: HOME, value: /home/logan }
-            - { name: TZ, value: America/Los_Angeles }
-            - { name: RUN_SWAY, value: "1" }
-            - { name: NVIDIA_DRIVER_CAPABILITIES, value: all }
-            - { name: GBM_BACKENDS_PATH, value: /usr/lib/gbm }
+            - {name: UNAME, value: logan}
+            - {name: HOME, value: /home/logan}
+            - {name: TZ, value: America/Los_Angeles}
+            - {name: RUN_GAMESCOPE, value: "1"}
+            - {name: NVIDIA_DRIVER_CAPABILITIES, value: all}
+            - {name: GBM_BACKENDS_PATH, value: /usr/lib/gbm}
           volumeMounts:
             - name: home
               mountPath: /home/logan
@@ -49,10 +50,6 @@ spec:
               readOnly: true
             - name: dshm
               mountPath: /dev/shm
-            - name: sway-steam
-              mountPath: /etc/sway/config.d/steam-bpm.conf
-              subPath: steam-bpm.conf
-              readOnly: true
           resources:
             requests:
               cpu: 2
@@ -74,19 +71,3 @@ spec:
           emptyDir:
             medium: Memory
             sizeLimit: 4Gi
-        - name: sway-steam
-          configMap:
-            name: sway-steam
----
-# GOW's sway config leaves the Steam window windowed (for_window
-# [class="steam"] fullscreen disabled). After a game exits, Big Picture
-# can come back at 0x0 and draw a blank screen; pinning it fullscreen
-# (matched on title, which fires after the class rule) forces a resize.
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: sway-steam
-  namespace: direwolf-dev
-data:
-  steam-bpm.conf: |
-    for_window [title="^Steam Big Picture Mode$"] fullscreen enable
