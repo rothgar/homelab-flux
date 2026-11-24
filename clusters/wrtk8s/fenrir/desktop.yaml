@@ -25,7 +25,7 @@ spec:
       # Kubernetes has no MAC field, so set it in the pod's netns before the app starts.
       initContainers:
         - name: pin-mac
-          image: busybox:1.36
+          image: busybox:1.38
           command: [ip, link, set, dev, eth0, address, "02:42:4c:6f:67:61"]
           securityContext:
             capabilities:
