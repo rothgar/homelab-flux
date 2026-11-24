@@ -86,8 +86,10 @@ spec:
                   nvidia.com/gpu: 1
           pod:
             runtimeClassName: nvidia
+            # GFD emits gpu.present; the bare nvidia.com/gpu=true label never
+            # existed. amd64 + GPU = mini (RTX 2060, time-sliced).
             nodeSelector:
-              nvidia.com/gpu: "true"
+              nvidia.com/gpu.present: "true"
               kubernetes.io/arch: amd64
       persistence:
         cache:
