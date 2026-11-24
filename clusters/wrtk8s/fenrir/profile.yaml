@@ -23,3 +23,5 @@ spec:
     - name: c6e28ec19461649c1ed5b50be3ce912fb85747ed9ebb17bd87783de5f24ee700
     # Android phone, paired 2026-11-17.
     - name: d3d837acb25d92dd099a96de9dc8b5c367e032e36997316bdf816c4ec3d047be
+    # Client at 10.1.3.154, paired 2026-11-24.
+    - name: b8d8456242ff12e44e53a3ca0a99c64bbbce182ce6d368e76f17fc076161c562
