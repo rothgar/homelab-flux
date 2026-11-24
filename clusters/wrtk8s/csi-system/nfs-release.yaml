@@ -26,3 +26,5 @@ spec:
       tolerations:
         - operator: Exists
           effect: NoSchedule
+  upgrade:
+    disableWait: true

@@ -47,3 +47,5 @@ spec:
       # any other namespace on otherwise-idle nodes.
       monitor:
         interval: 30s
+  upgrade:
+    disableWait: true

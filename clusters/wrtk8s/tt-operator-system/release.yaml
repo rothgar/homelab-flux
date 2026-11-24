@@ -64,3 +64,5 @@ spec:
               - op: add
                 path: /spec/clusterIP
                 value: 10.96.0.53
+  upgrade:
+    disableWait: true

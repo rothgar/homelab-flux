@@ -10,6 +10,7 @@ spec:
     remediation:
       retries: 3
   upgrade:
+    disableWait: true
     crds: CreateReplace
   chart:
     spec:
