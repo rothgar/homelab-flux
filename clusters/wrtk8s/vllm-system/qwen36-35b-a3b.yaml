@@ -14,7 +14,8 @@ metadata:
   name: qwen36-35b-a3b
   namespace: vllm-system
 spec:
-  # No replicas: KEDA owns the count (0 or 1). See qwen36-35b-a3b-scaler.yaml.
+  # Stopped while sparky runs rank 1 of qwen38-flash-next; its KEDA scaler is out of kustomization.yaml.
+  replicas: 0
   strategy:
     type: Recreate
   selector:
