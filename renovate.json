@@ -82,6 +82,24 @@
       "description": "Auto-merge nvidia_gpu_exporter minor/patch bumps; it's a stateless metrics DaemonSet. Major bumps (e.g. 2.0.0 switched the default backend and renamed the collection-status metric) still need review."
     },
     {
+      "matchDatasources": ["docker"],
+      "matchDepNames": ["busybox", "docker.io/library/busybox"],
+      "matchUpdateTypes": ["minor", "patch", "digest"],
+      "automerge": true,
+      "platformAutomerge": true,
+      "description": "Auto-merge busybox bumps any time; it only runs in small init/helper containers (pin-mac, chown and cache-warm jobs)."
+    },
+    {
+      "matchDatasources": ["helm"],
+      "matchDepNames": ["traefik"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true,
+      "platformAutomerge": true,
+      "automergeSchedule": ["after 2:00am and before 6:00am"],
+      "timezone": "America/Los_Angeles",
+      "description": "Auto-merge Traefik chart minor/patch bumps in the 02:00-06:00 PT window: it fronts every *.jgarr.net host, so a bad rollout should land while nobody is using it. Majors still need review (42.4 changed the service schema and stalled the HelmRelease)."
+    },
+    {
       "matchDepNames": ["nvcr.io/nvidia/vllm"],
       "allowedVersions": "/^(2[0-5]\\.\\d+|26\\.0[0-4])-py\\d+$/",
       "description": "Pin nvcr.io/nvidia/vllm — 26.06 segfaults in cuStreamCreateWithPriority on GB10 with driver 595. Docker versioning can't parse the -py3 suffix, so allowedVersions is a regex allowing 20.xx-py* through 26.04-py*."
