@@ -46,6 +46,7 @@ resources:
   - omni-cd
   - paperless-ngx
   - reaparr
+  - romm
   - registry
   - resolve-db
   - reloader
