@@ -15,7 +15,8 @@ metadata:
   name: qwen38-27b-nvfp4
   namespace: vllm-system
 spec:
-  replicas: 1
+  # Stopped: spark runs rank 0 of qwen38-flash-next (lws/qwen38-flash-next.yaml).
+  replicas: 0
   strategy:
     type: Recreate
   selector:

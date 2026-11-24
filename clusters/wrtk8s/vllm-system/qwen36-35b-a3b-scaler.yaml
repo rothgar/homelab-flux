@@ -58,7 +58,8 @@ spec:
     port: 8000
   replicas:
     min: 0
-    max: 1
+    # Held at 0: sparky runs rank 1 of qwen38-flash-next (lws/qwen38-flash-next.yaml). Back to 1 to re-enable.
+    max: 0
   # In-flight requests keep it active, so a long generation is never cut off.
   scalingMetric:
     concurrency:

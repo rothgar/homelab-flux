@@ -1,0 +1,19 @@
+# gr8 (Qwen3.8-Flash-Next, TP=2 across both GB10s): its launcher needs proactive
+# memory compaction off and an unlimited memlock hard limit for RDMA-pinned buffers
+# (the entrypoint exits 2 otherwise; Kubernetes has no ulimit field).
+apiVersion: v1alpha1
+kind: SysctlConfig
+params:
+  vm.compaction_proactiveness: "0"
+---
+apiVersion: v1alpha1
+kind: CRIBaseRuntimeSpecConfig
+overrides:
+  process:
+    rlimits:
+      - type: RLIMIT_MEMLOCK
+        hard: 18446744073709551615
+        soft: 18446744073709551615
+      - type: RLIMIT_NOFILE
+        hard: 1048576
+        soft: 1048576
