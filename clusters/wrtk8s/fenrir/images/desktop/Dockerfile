@@ -52,5 +52,10 @@ COPY 90-fenrir.gschema.override /usr/share/glib-2.0/schemas/
 # drew no GPU-rendered app windows. The libraries come from the NVIDIA
 # container toolkit.
 COPY 09_nvidia_wayland2.json 20_nvidia_xlib.json 20_nvidia_xcb.json /usr/share/egl/egl_external_platform.d/
+# Audio is Wolf's PulseAudio (PULSE_SERVER); no PipeWire runs here. The base
+# image points ALSA's default PCM at PipeWire, so ALSA-only apps (DaVinci
+# Resolve) played into nothing. Route ALSA default through PulseAudio.
+RUN rm -f /etc/alsa/conf.d/99-pipewire-default.conf && \
+    cp /etc/alsa/conf.d/99-pulseaudio-default.conf.example /etc/alsa/conf.d/99-pulseaudio-default.conf
 RUN chmod +x /opt/gow/startup-app.sh /opt/gow/gnome-session.sh /etc/cont-init.d/40-gnome.sh && \
     glib-compile-schemas /usr/share/glib-2.0/schemas
