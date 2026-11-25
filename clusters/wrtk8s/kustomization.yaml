@@ -48,6 +48,7 @@ resources:
   - paperless-ngx
   - reaparr
   - romm
+  - tautulli
   - registry
   - resolve-db
   - reloader

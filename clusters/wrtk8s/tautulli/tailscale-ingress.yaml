@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tautulli-tailscale
+  namespace: tautulli
+spec:
+  ingressClassName: tailscale
+  rules:
+    - host: tautulli
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: tautulli
+                port:
+                  number: 8181
+  tls:
+    - hosts:
+        - tautulli
