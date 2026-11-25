@@ -23,6 +23,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       xdg-desktop-portal-gnome xdg-user-dirs-gtk dbus-x11 \
       adwaita-icon-theme yaru-theme-gtk yaru-theme-icon yaru-theme-gnome-shell \
       yaru-theme-sound ubuntu-wallpapers fonts-ubuntu \
+      # Themes logan's dconf settings reference (ePapirus-Dark, Arc-Dark).
+      papirus-icon-theme arc-theme \
       firefox unzip \
       loupe ffmpegthumbnailer gnome-sushi totem ffmpeg \
       gstreamer1.0-libav gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly \
