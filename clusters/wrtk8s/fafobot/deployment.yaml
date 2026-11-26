@@ -89,7 +89,7 @@ spec:
             - name: tmp
               mountPath: /tmp
         - name: bot
-          image: cr.jgarr.net/fafobot:0.1.2
+          image: cr.jgarr.net/fafobot:0.1.3
           envFrom:
             - secretRef:
                 name: fafobot-secrets
