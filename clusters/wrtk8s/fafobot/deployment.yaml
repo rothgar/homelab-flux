@@ -95,11 +95,11 @@ spec:
                 name: fafobot-secrets
                 optional: true
           env:
-            # Signal account UUIDs allowed to run commands. Leave empty for the first
-            # start, message the bot, and copy your UUID from the
-            # "Ignoring message from <uuid>" log line.
+            # Signal account UUIDs allowed to run commands (comma-separated). Find one
+            # in the bot's "Ignoring message from <uuid>" log line. Alerts go to the
+            # first admin unless FAFOBOT_ALERT_RECIPIENT / _GROUP_ID is set.
             - name: FAFOBOT_ADMINS
-              value: ""
+              value: "e7e69d8f-c35b-44e7-92c3-ddb5c7b2d0a9"
             - name: FAFOBOT_APPROVALS_REQUIRED
               value: "2"
             - name: FAFOBOT_APPROVAL_EMOJI
