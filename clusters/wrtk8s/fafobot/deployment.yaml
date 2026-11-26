@@ -34,9 +34,6 @@ spec:
     spec:
       automountServiceAccountToken: false
       enableServiceLinks: false
-      # signal-cli's native build is x86-64 only (and the images are built for amd64).
-      nodeSelector:
-        kubernetes.io/arch: amd64
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
@@ -46,21 +43,25 @@ spec:
           type: RuntimeDefault
       initContainers:
         # First start only: links signal-cli to the Signal account as a secondary
-        # device. Prints a QR code here and waits for it to be scanned from Signal >
-        # Settings > Linked devices:  kubectl -n fafobot logs deploy/fafobot -c link -f
-        # Exits immediately once an account exists on the volume.
+        # device. Shows a QR code (refreshed every 2 minutes) at https://fafobot-link
+        # on the tailnet and in `kubectl -n fafobot logs deploy/fafobot -c link -f`;
+        # scan it from Signal > Settings > Linked devices. Exits immediately once an
+        # account exists on the volume.
         - name: link
-          image: cr.jgarr.net/fafobot-signal-cli:0.14.10-1
+          image: cr.jgarr.net/fafobot-signal-cli:0.14.10-2
           args: [link]
           env:
             - name: SIGNAL_DEVICE_NAME
               value: fafobot
+          ports:
+            - name: link
+              containerPort: 8081
           resources:
             requests:
               cpu: 10m
-              memory: 64Mi
+              memory: 256Mi
             limits:
-              memory: 512Mi
+              memory: 768Mi
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
@@ -73,14 +74,14 @@ spec:
               mountPath: /tmp
       containers:
         - name: signal-cli
-          image: cr.jgarr.net/fafobot-signal-cli:0.14.10-1
+          image: cr.jgarr.net/fafobot-signal-cli:0.14.10-2
           args: [daemon]
           resources:
             requests:
               cpu: 50m
-              memory: 128Mi
+              memory: 384Mi
             limits:
-              memory: 512Mi
+              memory: 1Gi
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
@@ -92,7 +93,7 @@ spec:
             - name: tmp
               mountPath: /tmp
         - name: bot
-          image: cr.jgarr.net/fafobot:0.1.1
+          image: cr.jgarr.net/fafobot:0.1.2
           envFrom:
             - secretRef:
                 name: fafobot-secrets
@@ -154,7 +155,8 @@ spec:
         - name: tmp
           emptyDir: {}
 ---
-# Serves /healthz, and /media/<token>/... for Instagram once an ingress is added.
+# 8080: /healthz, and /media/<token>/... for Instagram once a public ingress is added.
+# 8081: the link QR page during first-time setup.
 apiVersion: v1
 kind: Service
 metadata:
@@ -167,3 +169,7 @@ spec:
     - name: http
       port: 8080
       targetPort: http
+    # Only answers while the link init container is waiting for a scan.
+    - name: link
+      port: 8081
+      targetPort: 8081

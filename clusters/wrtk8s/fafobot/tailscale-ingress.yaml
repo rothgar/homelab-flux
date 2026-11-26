@@ -1,0 +1,23 @@
+# Tailnet-only page showing the Signal link QR code during first-time setup
+# (https://fafobot-link). Nothing answers once the device is linked.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fafobot-link-tailscale
+  namespace: fafobot
+spec:
+  ingressClassName: tailscale
+  rules:
+    - host: fafobot-link
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: fafobot
+                port:
+                  number: 8081
+  tls:
+    - hosts:
+        - fafobot-link
