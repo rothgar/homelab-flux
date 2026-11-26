@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: miru-tailscale
+  namespace: miru
+spec:
+  ingressClassName: tailscale
+  rules:
+    - host: miru
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: miru
+                port:
+                  number: 8080
+  tls:
+    - hosts:
+        - miru

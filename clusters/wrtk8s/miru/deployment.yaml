@@ -1,0 +1,109 @@
+---
+# SQLite on iSCSI (SQLite on Synology NFS is unusable).
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: miru-data
+  namespace: miru
+spec:
+  storageClassName: synology-iscsi
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: miru
+  namespace: miru
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: miru
+  template:
+    metadata:
+      labels:
+        app: miru
+    spec:
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: miru
+          image: ghcr.io/hononeko/miru:1.0.0
+          env:
+            - name: DB_ENGINE
+              value: sqlite
+            - name: SQLITE_PATH
+              value: /data/miru.db
+            # Local logins: Miru's OIDC requires a groups claim tsidp doesn't send.
+            - name: AUTH_MODE
+              value: local
+            # Behind Traefik / the tailscale proxy.
+            - name: MIRU_TRUST_PROXY_HEADERS
+              value: "true"
+            - name: LOG_LEVEL
+              value: INFO
+          envFrom:
+            - secretRef:
+                name: miru-secrets
+          ports:
+            - name: http
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          resources:
+            requests:
+              cpu: 50m
+              memory: 192Mi
+            limits:
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: miru-data
+        - name: tmp
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: miru
+  namespace: miru
+spec:
+  selector:
+    app: miru
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
