@@ -1,0 +1,166 @@
+---
+# Signal account keys (signal-cli), received attachments and the bot's SQLite state.
+# SQLite on iSCSI (SQLite on Synology NFS is unusable). Losing this volume means
+# linking the device again (the link init container prints a new QR code).
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: fafobot-data
+  namespace: fafobot
+spec:
+  storageClassName: synology-iscsi
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fafobot
+  namespace: fafobot
+spec:
+  replicas: 1 # never more: two signal-cli instances on one account conflict
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: fafobot
+  template:
+    metadata:
+      labels:
+        app: fafobot
+    spec:
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+        # First start only: links signal-cli to the Signal account as a secondary
+        # device. Prints a QR code here and waits for it to be scanned from Signal >
+        # Settings > Linked devices:  kubectl -n fafobot logs deploy/fafobot -c link -f
+        # Exits immediately once an account exists on the volume.
+        - name: link
+          image: cr.jgarr.net/fafobot-signal-cli:0.14.10-1
+          args: [link]
+          env:
+            - name: SIGNAL_DEVICE_NAME
+              value: fafobot
+          resources:
+            requests:
+              cpu: 10m
+              memory: 64Mi
+            limits:
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: tmp
+              mountPath: /tmp
+      containers:
+        - name: signal-cli
+          image: cr.jgarr.net/fafobot-signal-cli:0.14.10-1
+          args: [daemon]
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: tmp
+              mountPath: /tmp
+        - name: bot
+          image: cr.jgarr.net/fafobot:0.1.1
+          envFrom:
+            - secretRef:
+                name: fafobot-secrets
+                optional: true
+          env:
+            # Signal account UUIDs allowed to run commands. Leave empty for the first
+            # start, message the bot, and copy your UUID from the
+            # "Ignoring message from <uuid>" log line.
+            - name: FAFOBOT_ADMINS
+              value: ""
+            - name: FAFOBOT_APPROVALS_REQUIRED
+              value: "2"
+            - name: FAFOBOT_APPROVAL_EMOJI
+              value: "👍"
+            - name: SIGNAL_RPC_HOST
+              value: 127.0.0.1
+            - name: SIGNAL_RPC_PORT
+              value: "7583"
+            - name: SIGNAL_DATA_DIR
+              value: /data/signal-cli
+            - name: FAFOBOT_DATA_DIR
+              value: /data/bot
+            - name: LOG_LEVEL
+              value: INFO
+          ports:
+            - name: http
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              memory: 1Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: fafobot-data
+        - name: tmp
+          emptyDir: {}
+---
+# Serves /healthz, and /media/<token>/... for Instagram once an ingress is added.
+apiVersion: v1
+kind: Service
+metadata:
+  name: fafobot
+  namespace: fafobot
+spec:
+  selector:
+    app: fafobot
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http

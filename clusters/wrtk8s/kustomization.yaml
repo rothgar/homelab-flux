@@ -10,6 +10,7 @@ resources:
   - dranet
   - external-dns
   - external-secrets
+  - fafobot
   - flannel
   - flux-system
   - gateway-api
