@@ -15,7 +15,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: fafobot
+                name: fafobot-link
                 port:
                   number: 8081
   tls:

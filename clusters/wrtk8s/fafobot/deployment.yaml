@@ -155,8 +155,7 @@ spec:
         - name: tmp
           emptyDir: {}
 ---
-# 8080: /healthz, and /media/<token>/... for Instagram once a public ingress is added.
-# 8081: the link QR page during first-time setup.
+# /healthz, and /media/<token>/... for Instagram once a public ingress is added.
 apiVersion: v1
 kind: Service
 metadata:
@@ -169,7 +168,19 @@ spec:
     - name: http
       port: 8080
       targetPort: http
-    # Only answers while the link init container is waiting for a scan.
+---
+# The link QR page, served by the init container during first-time setup. The pod
+# isn't Ready then, so this Service must publish not-ready addresses.
+apiVersion: v1
+kind: Service
+metadata:
+  name: fafobot-link
+  namespace: fafobot
+spec:
+  selector:
+    app: fafobot
+  publishNotReadyAddresses: true
+  ports:
     - name: link
       port: 8081
       targetPort: 8081
