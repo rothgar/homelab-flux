@@ -4,4 +4,3 @@ resources:
   - namespace.yaml
   - secrets.yaml
   - deployment.yaml
-  - tailscale-ingress.yaml

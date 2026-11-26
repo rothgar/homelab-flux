@@ -43,19 +43,15 @@ spec:
           type: RuntimeDefault
       initContainers:
         # First start only: links signal-cli to the Signal account as a secondary
-        # device. Shows a QR code (refreshed every 2 minutes) at https://fafobot-link
-        # on the tailnet and in `kubectl -n fafobot logs deploy/fafobot -c link -f`;
-        # scan it from Signal > Settings > Linked devices. Exits immediately once an
-        # account exists on the volume.
+        # device. Prints a QR code (a new one every 2 minutes) to
+        # `kubectl -n fafobot logs deploy/fafobot -c link -f`; scan it from Signal >
+        # Settings > Linked devices. Exits immediately once an account exists.
         - name: link
           image: cr.jgarr.net/fafobot-signal-cli:0.14.10-2
           args: [link]
           env:
             - name: SIGNAL_DEVICE_NAME
               value: fafobot
-          ports:
-            - name: link
-              containerPort: 8081
           resources:
             requests:
               cpu: 10m
@@ -168,19 +164,3 @@ spec:
     - name: http
       port: 8080
       targetPort: http
----
-# The link QR page, served by the init container during first-time setup. The pod
-# isn't Ready then, so this Service must publish not-ready addresses.
-apiVersion: v1
-kind: Service
-metadata:
-  name: fafobot-link
-  namespace: fafobot
-spec:
-  selector:
-    app: fafobot
-  publishNotReadyAddresses: true
-  ports:
-    - name: link
-      port: 8081
-      targetPort: 8081
