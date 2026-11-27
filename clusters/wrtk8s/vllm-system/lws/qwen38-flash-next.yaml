@@ -145,7 +145,7 @@ spec:
             resourceClaimTemplateName: qwen38-flash-next-rank0
         containers:
           - name: gr8
-            image: ghcr.io/kindlingai/gr8:v1.2.0
+            image: ghcr.io/kindlingai/gr8:v1.5.0
             envFrom:
               - configMapRef:
                   name: qwen38-flash-next
@@ -244,7 +244,7 @@ spec:
             type: RuntimeDefault
         containers:
           - name: gr8
-            image: ghcr.io/kindlingai/gr8:v1.2.0
+            image: ghcr.io/kindlingai/gr8:v1.5.0
             envFrom:
               - configMapRef:
                   name: qwen38-flash-next
