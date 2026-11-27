@@ -41,7 +41,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: miru
-          image: ghcr.io/hononeko/miru:1.0.0
+          image: ghcr.io/hononeko/miru:1.3.0
           env:
             - name: DB_ENGINE
               value: sqlite
